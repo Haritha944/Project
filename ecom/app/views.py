@@ -1,27 +1,37 @@
 from django.shortcuts import render,redirect
-from django.urls import reverse
+from math import ceil
 from .forms import SignupForm,LoginForm
 from django.core.mail import send_mail
 from django.contrib import messages
 from django.contrib.auth.models import User
 import re
-from django.utils.crypto import get_random_string
 from app.models import Profile
-from django.contrib.auth import login,authenticate,logout
+from django.contrib.auth import login,authenticate
 from django.views.decorators.cache import cache_control
 from django.contrib.auth.decorators import login_required
-from .utils import send_otp, otp_generated,send_forget_password_mail
+from .utils import send_otp,send_forget_password_mail
 from datetime import datetime
 import pyotp
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
-
+from products.models import Product
+from category.models import Category,Sub_Category
 
 
 
 # Create your views here.
 def index(request):
-    return render(request,'user/index.html')
+    #cat = Category.objects.filter(is_visible=True)
+    #sub_cat = Sub_Category.objects.filter(is_visible=True)
+    products =Product.objects.filter(is_visible=True)
+    context = {
+        #'category': cat,
+        #'sub_category': sub_cat,
+        'products': products,
+        
+          }
+  
+    return render(request,'user/index.html',context)
 def about(request):
     return render(request,'user/about.html')
 def contact(request):
@@ -171,15 +181,17 @@ def signup_otp(request):
 def handlelogin(request):
     if request.method =='POST':
         uname=request.POST.get('username')
-        pass1=request.POST.get('pass1')
-        user=authenticate(username=uname,password=pass1)
+        pass1=request.POST.get('password')
+        user=authenticate(request,username=uname,password=pass1)
         if user is not None:
-            login(request,user)
-            messages.success(request,'Login sucessfully')
-            return redirect('user/index.html')
+            if user.is_active is True and user.is_superuser is False:
+                if user.is_authenticated == True:
+                   login(request,user)
+                   messages.success(request,'Login sucessfully')
+                   return redirect('/index/')
         else:
             messages.error(request,'Invalid Credientials')
-            return redirect('user/login.html')
+            return redirect('/login/')
     return render(request,'user/login.html')
 
 
@@ -256,3 +268,9 @@ def confirm_password(request, token):
     return render(request, 'user/confirm_password.html', context)
 
    
+def search(request):
+    product_objects=Product.objects.all()
+    keyword= request.GET.get('item_name')
+    if keyword !='' and keyword is not None:
+         product_objects = product_objects.filter(title__icontains=keyword)
+    return render(request,'user/index.html',{'product_objects':product_objects})

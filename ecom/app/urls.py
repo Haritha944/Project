@@ -1,4 +1,4 @@
-from django.urls import path,include
+from django.urls import path
 from . import views
 from .forms import LoginForm
 from django.contrib.auth import views as auth_views
@@ -16,6 +16,7 @@ urlpatterns = [
     path('confirm_password/<str:token>/', views.confirm_password, name='confirm_password'),
     path('login/',auth_views.LoginView.as_view(template_name='user/login.html',authentication_form=LoginForm),name='handlelogin'),
     path('logout/',views.logout,name='logout'),
+    path('',views.search,name='search'),
 
 
 
