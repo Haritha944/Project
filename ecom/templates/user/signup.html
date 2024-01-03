@@ -1,0 +1,67 @@
+{% extends 'user/base.html' %}
+{% block title %}
+signup
+{% endblock %}
+{% block content %}
+{% load static %}
+    <div class="container-fluid">
+    <div class='row'>
+        <div class='col-md-6'>
+            <div class="content">
+                <img src="{% static '/images/young.jpg' %}" class="slide d-block w-100" alt="...">
+                
+            </div>
+        </div>
+        <div class='col-md-5 bg-light'>
+            <h3 class=' mt-1 text-secondary'>SIGN UP</h3>
+            {% for message in messages %}
+            <div class="alert alert-{{message.tags}} alert-dismissible fade show" role="alert">
+                 {{message}}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+            {% endfor %}
+    <form method='post' action='.'>
+        {% csrf_token %}
+        <div class='mt-4'>
+            <input type="text" class="form-control" name="name" id="name"
+                                   placeholder="Username" value="{{pre_name}}" required>
+        </div>
+        <div class='mt-3'>
+            <input type="email" class="form-control" id="email" name="email"
+                                   placeholder="Email" value="{{pre_email}}" required>
+        </div>
+        <div class='mt-3'>
+            <input type="tel" class="form-control" name="mobile"
+            placeholder="PhoneNumber" value="{{pre_mobile}}" required>
+        </div>
+        <div class='mt-3'>
+            <input type="password" class="form-control" name="password1"
+            placeholder="Password" required>
+        </div>
+        <div class='mt-3'>
+            <input type="password" class="form-control" name="password2" id="password"
+                                   placeholder="Confirm Password" required>
+        </div>
+        
+        {% if form.errors or form.non_field_errors %}
+            <div class='mb-3 p-6 bg-danger-100 rounded-xl'>
+                {% for field in form %}
+                    {{ field.errors }}
+                {% endfor %}
+                {{ form.non_field_errors }}
+
+            </div>
+        {% endif %}
+        <button class="px-5 py-2 bg-success mt-3 rounded">Submit</button>
+        <p class='mt-3'>Already have an account? <a class="text-decoration-none fw-bold" href='{% url 'user:handlelogin' %}'>Login</a></p>
+    </form>
+   
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block 'j-script' %}
+
+{% endblock %}

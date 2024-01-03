@@ -14,9 +14,10 @@ urlpatterns = [
     path('resend_otp_signup', views.ResentOtpSignup, name='resend_otp_signup'),
     path('forgot_password/', views.forgot_password, name='forgot_password'),
     path('confirm_password/<str:token>/', views.confirm_password, name='confirm_password'),
-    path('login/',auth_views.LoginView.as_view(template_name='user/login.html',authentication_form=LoginForm),name='handlelogin'),
+    #path('login/',auth_views.LoginView.as_view(template_name='user/login.html',authentication_form=LoginForm),name='handlelogin'),
+    path('login/',views.handlelogin,name='handlelogin'),
     path('logout/',views.logout,name='logout'),
-    path('',views.search,name='search'),
+    path('search/',views.search,name='search'),
 
 
 

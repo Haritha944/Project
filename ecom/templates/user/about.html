@@ -1,0 +1,26 @@
+{% extends 'user/base.html' %}
+{% block title %}
+About
+{% endblock %}
+{% block content %}
+{% load static %}
+<div class='container mb-1'>
+    <div class='row justify-content-center mt-1'>
+        <div class='col-md-4 col-sm-4 p-4 text-justify '>
+            <div class="content">
+                <img src="{% static '/images/women.jpg' %}" class="slide d-block w-100" alt="...">
+                
+            </div>
+        </div>
+        <div class="col-md-8">
+            <div class="row mt-3">
+                <h2 class='text-center'>About Us</h2>
+                <p class='mt-3'> Over the past seven decades, the company and the brand have become synonymous with unmatched quality, skilled craftsmanship and high-fashion products in the footwear industry.We pride ourselves on providing our customers with exclusive, high-quality shoes that are crafted with precision and attention to detail.
+                Our vision is to become a leading fashion brand globally, blending culture, craftsmanship, and innovation. By infusing our designs with diverse influences,aims 
+                to create a community where every woman feels confident and empowered. Join us on the journey to redefine fashion and embrace a brand that celebrates individuality and quality. 
+               </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

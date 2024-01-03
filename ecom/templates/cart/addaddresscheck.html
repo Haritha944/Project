@@ -1,0 +1,107 @@
+{% extends 'user/base.html' %}
+{% load static %}
+{% block title %}
+Checkout
+{% endblock %}
+{% block content %}
+ <!--Add address-->
+ <div class="container-fluid">
+    <div class="row">
+    <div class="col-lg-12 col-md-12 ">
+     <form method="post" action="{% url 'cart:addaddresscheck' %}" id="form1">
+        {% csrf_token %}     
+            <div class="row">
+                <div class="col-md-6">
+                 <div class="mb-3 mx-1">
+                        <label for="RecipientName" class="form-label">Recipient Name:</label>
+                            <input type="text" class="form-control" id="RecipientName" name="RecipientName"
+                                   value="" required placeholder="Enter Username">
+                           </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3 ml-2 mr-1">
+                              <label for="house_no" class="form-label">House No:</label>
+                              <input type="text" class="form-control" id="house_no" name="house_no"
+                                     value="" required placeholder="Enter House No" >
+                             </div>
+                          </div>
+                
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                          <div class="mb-3 ml-2 mr-1">
+                            <label for="street_name" class="form-label">Street Name:</label>
+                            <input type="text" class="form-control" id="street_name" name="street_name"
+                                   value="" required placeholder="Enter Street Name" >
+                           </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3 ml-2 mr-1">
+                              <label for="village_name" class="form-label">Village/City: </label>
+                              <input type="text" class="form-control" id="village_name" name="village_name"
+                                     value="" required placeholder="Enter Village name" >
+                             </div>
+                          </div>
+                
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                          <div class="mb-3 ml-2 mr-1">
+                            <label for="postal_code" class="form-label">Postal code:</label>
+                            <input type="text" class="form-control" id="postal_code" name="postal_code"
+                                   value="" required placeholder="Enter Postal Code">
+                           </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3 ml-2 mr-1">
+                              <label for="district" class="form-label">District: </label>
+                              <input type="text" class="form-control" id="district" name="district"
+                                     value="" required placeholder="Enter District">
+                             </div>
+                          </div>
+                
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                          <div class="mb-3 ml-2 mr-1">
+                            <label for="email" class="form-label">Email:</label>
+                            <input type="text" class="form-control" id="email" name="email"
+                                   value="" required placeholder="Enter Email">
+                           </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3 ml-2 mr-1">
+                              <label for="mobile" class="form-label">Phone Number: </label>
+                              <input type="tel" class="form-control" id="mobile" name="mobile"
+                                     value="" required placeholder="Enter Phone number">
+                             </div>
+                          </div>
+                
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                          <div class="mb-3 ml-2 mr-1">
+                            <label for="state" class="form-label">State:</label>
+                            <input type="text" class="form-control" id="state" name="state"
+                                   value="" required placeholder="Enter State">
+                           </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3 ml-2 mr-1">
+                              <label for="country" class="form-label">Country: </label>
+                              <input type="text" class="form-control" id="country" name="country"
+                                     value="" required placeholder="Enter Country">
+                             </div>
+                          </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Add</button>
+                        </div>
+                             </form>
+                            </div>
+                            </div>   
+                        </div>
+                      
+                
+{% endblock %}

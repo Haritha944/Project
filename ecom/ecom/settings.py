@@ -45,6 +45,10 @@ INSTALLED_APPS = [
     'app',
     'products',
     'category',
+    'dashboard',
+    'user',
+    'cart',
+    
 ]
 
 MIDDLEWARE = [
@@ -149,3 +153,9 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'trendyfoot.official@gmail.com'
 EMAIL_HOST_PASSWORD = 'ogmexiihifysxkni'
+
+AUTH_USER_MODEL = 'user.User'
+
+PASSWORD_HASHERS = [
+    'django.contrib.auth.hashers.PBKDF2PasswordHasher',
+]

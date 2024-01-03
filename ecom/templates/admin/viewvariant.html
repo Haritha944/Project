@@ -1,0 +1,244 @@
+{% extends 'admin/adminmain.html' %}
+{% load static %}
+{% block styles %}
+<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+<link rel="stylesheet" href="{% static 'css/admin/image_upload.css' %}" type="text/css">
+{% endblock %}
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="row b-5">
+            <div class="col-md-12">
+                <button type="button" class="btn text-white mb-3" style="background-color:rgba(127, 173, 57, 1)"
+                        data-bs-toggle="modal" data-bs-target="#exampleModal">
+                    Add Variant
+                </button>
+            </div>
+    </div>
+</div>
+<div>
+    {% if messages %}
+    <div class="container" style="background-color:transparent;">
+        <ul class="messages mx-auto text-center">
+            {% for message in messages %}
+            <div id="message">
+                <div style="background-color:transparent;" class="error-alert {% if message.tags %}alert-{{ message.tags }}{% endif %}" role="alert">
+                    <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span></button>
+                    {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %} {% endif %}
+                    {{ message }}
+                </div>
+            </div>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+</div>
+<div class="container-fluid">
+    <div class="row">
+        <div class="bg-light text-center rounded p-4">
+            <div class="d-flex align-items-center justify-content-between ">
+                <h6 class="mb-0">Product Variants</h6>
+            </div>
+            <div class="table-responsive">
+                <table class="table text-start align-middle table-bordered table-hover mb-0 table-striped">
+                    <thead>
+                    <tr class="text-dark">
+                        <th scope="col"></th>
+                        <!--                    <th scope="col">PRODUCTS ID</th>-->
+                        <th scope="col">PRODUCTS NAME</th>
+                        <th scope="col">WEIGHT</th>
+                        <th scope="col">ORIGINAL PRICE</th>
+                        <th scope="col">DISCOUNT PRICE</th>
+                        <th scope="col">STOCK</th>
+                        <th scope="col">IS AVAILABLE</th>
+                        <th>Edit</th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for item in variants %}
+                    <tr>
+                        <td>{{forloop.counter}}</td>
+                        <!--                    <td>{{item.product.id }}</td>-->
+                        <td>{{item.product.product_name }}</td>
+                        <td>{{item.weight}}</td>
+                        <td>Rs. {{item.original_price}}</td>
+                        <td>Rs. {{item.discount_price}}</td>
+                        <td>{{item.stock}}</td>
+                        <td>{{item.is_available}}</td>
+                        <td>
+                            <button type="button" class="btn  mb-3"
+                                    data-bs-toggle="modal" data-bs-target="#editCategoryModal-{{forloop.counter}}">
+                                <i class="material-icons" data-toggle="tooltip" title="Edit">&#xE254;</i>
+                            </button>
+                        </td>
+                        <td>
+                            <div class="dropdown">
+                                <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
+                                    <i class="bx bx-dots-vertical-rounded"></i>
+                                </button>
+                                <div class="dropdown-menu">
+                                        <a class="dropdown-item" href="{% url 'products:softdeletevariant' variant_id=item.id %}"><i class="bx bx-trash me-1"></i>Soft Delete</a>
+                                        <a class="dropdown-item" href="{% url 'products:undosoftdeletevariant' variant_id=item.id %}"><i class="bx bx-undo me-1"></i> Undo</a>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+    
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Add Variant-->
+<div class="container-fluid">
+    <div class="row">
+       
+        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-scrollable">
+                <div class="modal-content">
+                    <form method="post" action="{% url 'products:addvariant' %}" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="modal-header">
+                            <h5 class="modal-title">Add Variant</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body" style="max-height: 400px; overflow-y: auto;">
+                            <!-- Variant Name -->
+                            <div class="d-flex justify-content-between">
+                                <div class="form-group col-md-6 mx-1">
+                                    <label for="variants">Variant Name:</label>
+                                    <input type="text" class="form-control" name="variant_name" required>
+                                </div>
+                            
+                            <div class="form-group">
+                                <label for="variants">Original Price:</label>
+                                <input type="text" class="form-control" id="variant_original_price"   name="variant_original_price">
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <div class="form-group">
+                                <label for="variants">Discount Price:</label>
+                                <input type="text" class="form-control" id="variant_discount_price"   name="variant_discount_price">
+                            </div>
+                            <div class="form-group col-md-6 mx-1">
+                                  <label for="variants">Variant Size:</label>
+                                  <input type="text" class="form-control" id="variant_size" name="variant_size">
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                                <div class="form-group col-md-6 mx-1">
+                                    <label for="product">Product:</label>
+                                    <input type="text" class="form-control" id="product_name" name="product_name"
+                                           required>
+                                </div>
+                             <div class="form-group">
+                                <label for="variants">Variant Color:</label>
+                                <input type="text" class="form-control" id="variant_color" name="variant_color">
+                            </div>
+
+                            </div>
+                            <div class="form-group col-md-6 mx-1">
+                                <label for="variants">Variant Material:</label>
+                                <input type="text" class="form-control" id="variant_material" name="variant_material">
+                          </div>
+                          <div class="form-group col-md-6 mx-1">
+                                <label for="variants">Variant Stock:</label>
+                                <input type="text" class="form-control" id="variant_stock" name="variant_stock">
+                          </div>
+        
+                            <!--Product Images-->
+                            <div class="d-flex justify-content-between">
+                                <div class="form-group col-md-6 mx-1">
+                                    <label for="images">Product Images 1:</label>
+                                    <input class="form-control" type="file" name="img1">
+                                </div>
+                            </div>
+        
+                            <!-- Variants -->
+                           
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Add</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<!--Edit Variant-->
+<div class="container">
+    <div class="row">
+        {% for item in variants %}
+        <div class="modal fade" id="editCategoryModal-{{forloop.counter}}" tabindex="-1" aria-labelledby="exampleModalLabel"
+        data-bs-backdrop="static"
+        aria-hidden="true">
+       <div class="modal-dialog ">
+           <div class="modal-content">
+               <form method="post" action="{% url 'products:editvariant' variant_id=item.id %}" enctype="multipart/form-data">
+                   {% csrf_token %}
+                   <div class="modal-header">
+                    <h5 class="modal-title">Edit Product</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="form-group d-flex col-12 mx-1">
+                        <div class="col-12">
+                          <label for="">Product Name: </label>
+                          <input class="text" class="form-control" value="{{ item.product.product_name }}" name="product_name"  step="0.01" readonly>
+                        </div>
+                    </div>
+                    <div class="form-group d-flex col-12 mx-1">
+                        <div class="col-6">
+                          <label for=""> Size: </label>
+                          <input type="text" class="form-control" name="variant_size" value="{{item.size}}" step="0.01" required>
+                        </div>
+                        <div class="col-6">
+                           <label for=""> Colour: </label>
+                           <input type="text" class="form-control" name="variant_color" value="{{item.color}}" step="0.01" required>
+                         </div>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <div class="form-group col-6">
+                            <label for="">Original Price: </label>
+                            <input type="number" class="form-control" name="variant_original_price" value="{{item.original_price}}" step="0.01" required>
+                        </div>
+                        <div class="form-group col-6">
+                            <label for="">Discount Price: </label>
+                            <input type="number" class="form-control" name="variant_discount_price" value="{{item.discount_price}}" step="0.01" required>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <div class="form-group col-6">
+                            <label for="">Material: </label>
+                            <input type="text" class="form-control" name="variant_material" value="{{item.material}}" step="0.01" required>
+                        </div>
+                        <div class="form-group col-6">
+                            <label for="">Stock: </label>
+                            <input type="number" class="form-control" name="variant_stock" value="{{item.stock}}" step="0.01" required>
+                        </div>
+                    </div>
+                </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Add</button>
+                     </div>
+            
+                </form>
+               </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor%}
+{% endblock %}
+{% block scripts %}
+<script src="{% static 'js/admin/uploadstyle.js'%}"></script>
+<script src="{% static 'js/admin/prod/varstyle.js'%}"></script>
+
+{% endblock %}
