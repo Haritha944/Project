@@ -200,11 +200,9 @@ def signup_otp(request):
        
        
     return render(request,'user/otp_signup.html')  
-<<<<<<< HEAD
-@never_cache
-=======
+
  
->>>>>>> 8b56765e6bed435d8dfc3a6abdb477c47957515e
+
 @cache_control(no_cache=True, must_revalidate=True,no_store=True)
 def handlelogin(request):
     if request.method =="POST":
@@ -236,12 +234,11 @@ def handlelogin(request):
  
 
    
-<<<<<<< HEAD
-=======
+
 
         
        
->>>>>>> 8b56765e6bed435d8dfc3a6abdb477c47957515e
+
 
         
 @cache_control(no_cache=True, must_revalidate=True,no_store=True)      
