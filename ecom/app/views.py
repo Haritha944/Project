@@ -1,4 +1,5 @@
 from django.shortcuts import render,redirect
+from django.views.decorators.cache import never_cache
 from math import ceil
 from .forms import SignupForm,LoginForm
 from django.core.mail import send_mail
@@ -23,6 +24,7 @@ from category.models import Category,Sub_Category
 
 
 # Create your views here.
+@cache_control(no_cache=True, must_revalidate=True,no_store=True)  
 def index(request):
     cat = Category.objects.filter(is_visible=True)
     sub_cat = Sub_Category.objects.filter(is_visible=True)
@@ -198,7 +200,11 @@ def signup_otp(request):
        
        
     return render(request,'user/otp_signup.html')  
+<<<<<<< HEAD
+@never_cache
+=======
  
+>>>>>>> 8b56765e6bed435d8dfc3a6abdb477c47957515e
 @cache_control(no_cache=True, must_revalidate=True,no_store=True)
 def handlelogin(request):
     if request.method =="POST":
@@ -230,10 +236,16 @@ def handlelogin(request):
  
 
    
+<<<<<<< HEAD
+=======
 
         
        
+>>>>>>> 8b56765e6bed435d8dfc3a6abdb477c47957515e
 
+        
+@cache_control(no_cache=True, must_revalidate=True,no_store=True)      
+@never_cache
 def logout(request):
     request.session.flush()
     request.session['logged_out'] = True

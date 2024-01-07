@@ -1,0 +1,107 @@
+{% extends 'user/base.html' %}
+{% load static %}
+{% block title %}
+Order
+{% endblock %}
+{% block content %}
+<div class="container-fluid">
+    <div vlass="row">
+        <div class="col-lg-12">
+            <nav aria-label="breadcrumb" style="background-image: url('{% static '/images/cartbread.jpg' %}'); background-size: cover; width:100%; height:150px;">
+                <ol class="breadcrumb justify-content-center mb-0">
+                  <li class="breadcrumb-item"><a class="text-decoration-none text-dark fw-bold" href="{% url 'products:viewshop' %}">Shop</a></li>
+                  <li class="breadcrumb-item active text-dark fw-bold"><a class="text-decoration-none text-dark" href="{% url 'cart:cart' %}">Cart</a></li>
+                  <li class="breadcrumb-item active text-dark fw-bold" aria-current="page">Checkout</li>
+                  <li class="breadcrumb-item active text-dark fw-bold" aria-current="page">Payment</li>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-12 col-md-12">
+            <div class="card">
+                <h5 class="card-header">Billing Address</h5>
+                <div class="card-body">
+                  <p class="card-text mb-0">{{order.address.recipient_name}}</p>
+                  <p class="card-text mb-0">{{order.address.street_name}}</p>
+                  <p class="card-text mb-0">{{order.address.village_name}} - {{order.address.postal_code}}</p>
+                  <p class="card-text mb-0">{{order.address.email}}</p>
+                  <p class="card-text mb-0">{{order.address.mobile}}</p>
+                </div>
+            </div>
+            <br>					
+            <div class="card">
+                <h5 class="card-header">Review Products</h5>
+                <div class="card-body">
+                    <table class="table  align-middle border-collapse: collapse;
+                    width: 80 %; margin:auto; mx-3">
+                        <thead>
+                            <tr>
+                                <th>Products</th>
+                                <th>Quantity</th>
+                                <th>Price</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody class="order-details-body">
+                            {% for cart_item in cart_items %}
+                                <tr>
+                                    <td class="product-image">  <a href="{% url 'products:singleproductview' product_id=cart_item.variant.id %}">
+                                        <img src="{{ cart_item.product.images.url }}" alt="" width="100px">
+                                    </a></td>
+                                    <td>{{ cart_item.quantity }}</td>
+                                    <td>₹{{ cart_item.variant.discount_price }}</td>
+                                    <td>₹{{ cart_item.sub_total }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-5">
+            <div class="total-section ">
+                <table class="total-table ">
+                    <thead class="total-table-head">
+                        <tr class="table-total-row">
+                            <th></th>
+                            <th><h4>Price</h4></th>
+                        </tr>
+                    </thead>
+                   
+                        <tbody class="mx-3">
+                        <tr class="total-data  fs-6" >
+                            <td><strong>Subtotal: </strong></td>
+                            <td>₹ {{ total }}</td>
+                        </tr>
+                        <tr class="total-data fs-6">
+                            <td><strong>GST: </strong></td>
+                            <td>₹ {{ tax }}</td>
+                        </tr>
+                        
+                        <tr class="total-data fs-6">
+                            <td><strong>Discount: </strong></td>
+                            <td>₹ {{ discount }}</td>
+                        </tr>
+                        <tr class="total-data text-danger fs-5" >
+                            <td><strong>Grand Total : </strong></td>
+                            <td> ₹ {{ total_price }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="cart-buttons mt-3 ">
+                    <a type="button" href="{% url 'order:cashdelivery' tracking_no=order.tracking_no  %}" class="btn btn-warning btn-md btn-block">Cash On Delivery</a>
+                    <a type="button" href="#" class="btn btn-warning btn-md btn-block wallet-button mx-2" style="background-color: #F28123;" >Pay with Wallet</a>
+                    <a id="rzp-button1" class="btn btn-primary btn-md btn-block">Pay with Razorpay</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    </div>
+</div>
+
+{% endblock %}
