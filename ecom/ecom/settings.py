@@ -48,10 +48,6 @@ INSTALLED_APPS = [
     'dashboard',
     'user',
     'cart',
-<<<<<<< HEAD
-    'order',
-=======
->>>>>>> 8b56765e6bed435d8dfc3a6abdb477c47957515e
     
 ]
 
@@ -163,8 +159,3 @@ AUTH_USER_MODEL = 'user.User'
 PASSWORD_HASHERS = [
     'django.contrib.auth.hashers.PBKDF2PasswordHasher',
 ]
-<<<<<<< HEAD
-key_id = 'rzp_test_zLLrBmHDjYzLTa'
-key_secret = 'RZzrXnbKkKZyFzvIGk57In95'
-=======
->>>>>>> 8b56765e6bed435d8dfc3a6abdb477c47957515e
