@@ -107,8 +107,55 @@ def orderinvoice(request,order_id):
         }
     return render(request, 'order/orderconfirm.html', context)
         
-        
+def myorders(request):
+    user=request.user  
+    print(user)
+    email = request.user
+    user = User.objects.get(email=email)
+    if request.method == "POST":
+        status=request.POST.get('status')
+        order = Order.objects.filter(user=user)
+        if status == 'status' or status == 'all':
+            order_items = OrderItem.objects.filter(user=user).order_by('-id')
+        else:
+            print(status)
+            order_items = OrderItem.objects.filter(user=user,status=status).order_by('-id')
+            order_items1 = OrderItem.objects.filter(user=user, status='Cancelled').values()
+            print(order_items1)
+        context = {
+            "order": order,
+            "order_items": order_items
+        }
+    else:
+        order = Order.objects.filter(user=user)
+        order_items = OrderItem.objects.filter(user=user).order_by('-id')
+        context = {
+            "order": order,
+            "order_items": order_items
+        }
+    
+    
+    return render(request, 'userprofile/order.html', context)
 
+def cancelorder(request,order_item_id):
+    order_item = OrderItem.objects.get(id=order_item_id)
+    order = Order.objects.get(id=order_item.order.id)
+    if order is not None:
+        order.status = 'Cancelled'
+        order.save()
+        order_items = OrderItem.objects.filter(order=order)
+        print(order.payment.payment_method)
+        for item in order_items:
+            reason = request.POST.get('cancel')
+            item.status = 'Cancelled'
+            item.save()
+        return redirect('order:myorders')    
+    else:
+        pass    
+   
+           
+        
+   
         
         
 
