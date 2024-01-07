@@ -1,0 +1,37 @@
+{% extends 'user/base.html' %}
+{% load static %}
+{% block title %}
+Orderconfirm
+{% endblock %}
+{% block content %}
+
+<div class="container-fluid p-0">
+    <div vlass="row">
+        <div class="col-lg-12 p-0">
+            <nav aria-label="breadcrumb" style="background-image: url('{% static '/images/newyear.jpg' %}'); background-size: cover; width:100%; height:250px;">
+                <ol class="breadcrumb justify-content-center mb-0">
+                  <li class="breadcrumb-item active text-dark fw-bold">Checkout</a></li>
+                  <li class="breadcrumb-item active text-dark fw-bold"><a class="text-decoration-none text-dark" href="#">Placeorder</a></li>
+                  <li class="breadcrumb-item active text-dark fw-bold" aria-current="page">OrderSuccess</li>
+            </nav>
+        </div>
+    </div>
+    <div class="container" style="margin-top:50px">
+        <center><i class="fas fa-check-circle" style="font-size: 72px;margin-bottom: 20px;color: #28A745;"></i></center>
+        <h2 class="text-center">Order Placed!</h2>
+        <br>
+        <div class="text-center">
+            <a href="{% url 'products:viewshop' %}" class="btn btn-success">Shop more</a>
+           
+        </div>
+    
+    </div>
+    <div class="cart-buttons">
+        <a href="{% url 'products:viewshop' %}" class="boxed-btn black">Continue Shopping</a>
+        <a href="{% url 'order:orderinvoice' order_id=order.id %}" class="boxed-btn black">Order Invoice</a>
+    </div>
+
+
+
+</div>
+{% endblock %}

@@ -69,7 +69,59 @@ def cashdelivery(request,tracking_no):
     
     context = {'order': order}
 
+    return render(request, 'order/cashdelivery.html', context)
+
+
+def orderinvoice(request,order_id):
+    user = request.user
+    order = Order.objects.get(id=order_id)
+    order_items = OrderItem.objects.filter(order=order)
+    payment = Payment.objects.get(order=order)
+    #cart_id = _cart_id(request)
+    #cart = Cart.objects.get(cart_id=cart_id)
+   #cart_items = CartItem.objects.filter(cart=cart,is_active=True).order_by('id')
+    cart_items = CartItem.objects.filter(user=user)
+    total = 0
+    tax = 0
+    shipping = 0
+    grand_total = 0
+    subtotal = 0 
+    for order_item in order_items:
+        order_item_total = order_item.variant.discount_price * order_item.quantity
+        total = order_item_total  
+        subtotal += order_item_total
+        tax = (2 * subtotal) / 100
+        
+
+        grand_total = subtotal + tax 
+
+        context = {
+            'order': order,
+            'order_items': order_items,
+            'payment': payment,
+            'grand_total': grand_total,
+            'cart_items': cart_items,
+            'total': total,
+            'tax':tax,
+            'subtotal': subtotal,
+        }
     return render(request, 'order/orderconfirm.html', context)
+        
+        
+
+        
+        
+
+          
+ 
+        
+
+        
+
+    
+    
+
+
 
         
   
