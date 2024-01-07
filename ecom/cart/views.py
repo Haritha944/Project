@@ -7,10 +7,12 @@ from user.models import User
 from django.http import HttpResponse,JsonResponse
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-
+<<<<<<< HEAD
 from order.models import Order,OrderItem,Payment
 import random
+=======
 
+>>>>>>> 8b56765e6bed435d8dfc3a6abdb477c47957515e
 # Create your views here.
 
 #<!- Cart section --->
@@ -270,8 +272,11 @@ def selectedAddress(request):
         response_data={
             'username':address.recipient_name,
             'email':address.email,
+<<<<<<< HEAD
             'phone':address.mobile,
+=======
             'mobile':address.mobile,
+>>>>>>> 8b56765e6bed435d8dfc3a6abdb477c47957515e
             'house_no':address.house_no,
             'street':address.street_name,
             'district':address.district,
@@ -349,7 +354,7 @@ def removecart(request, product_id):
     return render(request, 'cart/cart.html')
         #return JsonResponse({'status': 'empty'})
     
-
+<<<<<<< HEAD
 def checkoutorder(request):
     url = request.META.get('HTTP_REFERER')
     global item,address,cart_items
@@ -616,4 +621,5 @@ def placeorder(request, total=0, quantity=0):
         return render(request, 'order/placeorder.html', context)
     else:
         return redirect('cart:checkout')
-
+=======
+>>>>>>> 8b56765e6bed435d8dfc3a6abdb477c47957515e
