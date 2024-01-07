@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-{% extends 'userprofile/profileinfo.html' %}
-=======
 {% extends 'user/base.html' %}
->>>>>>> 8b56765e6bed435d8dfc3a6abdb477c47957515e
 {% load static %}
 {% block title %}
 Checkout
@@ -15,20 +11,12 @@ Checkout
                 <ol class="breadcrumb justify-content-center mb-0">
                   <li class="breadcrumb-item"><a class="text-decoration-none text-dark fw-bold" href="{% url 'products:viewshop' %}">Shop</a></li>
                   <li class="breadcrumb-item active text-dark fw-bold">Shop Detail</a></li>
-<<<<<<< HEAD
-                  <li class="breadcrumb-item active text-dark fw-bold"><a class="text-decoration-none text-dark" href="{% url 'cart:cart' %}">Cart</a></li>
-=======
                   <li class="breadcrumb-item active text-dark fw-bold"><a class="text-decoration-none" href="{% url 'cart:cart' %}">Cart</a></li>
->>>>>>> 8b56765e6bed435d8dfc3a6abdb477c47957515e
                   <li class="breadcrumb-item active text-dark fw-bold" aria-current="page">Checkout</li>
             </nav>
         </div>
     </div>
 </div>
-<<<<<<< HEAD
-
-=======
->>>>>>> 8b56765e6bed435d8dfc3a6abdb477c47957515e
 <div>
  {% if messages %}
   <div class="container" style="background-color:transparent;">
@@ -51,99 +39,6 @@ Checkout
     <div class='row'>
         <div class="checkout__form ">
             <h4 class="text-center mt-3" style="color:#F08080">Billing Details</h4>
-<<<<<<< HEAD
-        </div>
-    </div>
-</div>
-<div class="container-fluid mt-3 d-flex col-12 col-sm-12 details-block">
-      
-    <div class="col-lg-8 col-md-8 col-sm-12 px-5 mt-5">
-        <button type="button" class="btn text-white mb-3" style="background-color:rgba(127, 173, 57, 1)" data-bs-toggle="modal"
-                        data-bs-target="#exampleModal1">
-                        Add Shipping Address
-        </button>    
-        
-                    </div>
-               
-
-                    <div class="col-lg-4 col-md-4 col-sm-12 mx-0">
-                        <div class="checkout__order">
-
-                        <h4 class="text-center" style="color:#FF0000"> Order Summary </h4>
-                        <form action="{% url 'cart:placeorder' %}" method="POST">
-                            {% csrf_token %}
-                        <table class="table  align-middle border-collapse: collapse;
-                        width: 80 %; margin:auto; mx-3">
-                            <thead>
-                                <tr>
-                                    <th>Products</th>
-                                    <th>Details</th>
-                                    <th>Price </th>
-                                    <th>Total</th>
-                                </tr>
-                
-                            </thead>
-                            <tbody class="order-details-body">
-                                {% for cart_item in cart_items %}
-                                <tr>
-                                    <td class="shoping__cart__item">
-                                        <a href="{% url 'products:singleproductview' product_id=cart_item.variant.id %}">
-                                            <img src="{{ cart_item.product.images.url }}" alt="" width="100px">
-                                        </a>
-                
-                                    </td>
-                                    <td class="shoping__cart__price"><h5>{{cart_item.variant.product.product_name}}</h5>
-                                        Size : {{cart_item.variant.size}}
-                                       <p>Colour : {{cart_item.variant.color}}</p>
-                                       <p>Quantity : {{cart_item.quantity}}</p></td>
-                                    <td class="shoping__cart__price">
-                                        ₹{{cart_item.variant.discount_price}}
-                                        
-                                    </td>
-                                    
-                                    
-                                    <td class="shoping__cart__total" id="total{{ cart_item.variant.id }}">
-                                        ₹{{ cart_item.sub_total }}
-                                    </td>
-                                    {% endfor %}
-                                </tr>
-                                
-                            </tbody>
-                
-                        </table>
-                        <h6 class="px-3" style="color:#A80000;"> Order Total :  ₹ {{total}} </h6>
-                        <h6 class="px-3 checkout__order__total" style="color:#A80000;">Tax <span>₹ {{tax}}</span></h6>
-                        <h6 class="px-3 checkout__order__total" style="color:#A80000;">Total <span>₹ {{grand_total}}</span></h6>
-                        
-                        <p class="px-3">
-                            <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="30" height="30"
-                                 viewBox="0 0 48 48">
-                                <polygon fill="#42a5f5"
-                                         points="29.62,3 33.053,8.308 39.367,8.624 39.686,14.937 44.997,18.367 42.116,23.995 45,29.62 39.692,33.053 39.376,39.367 33.063,39.686 29.633,44.997 24.005,42.116 18.38,45 14.947,39.692 8.633,39.376 8.314,33.063 3.003,29.633 5.884,24.005 3,18.38 8.308,14.947 8.624,8.633 14.937,8.314 18.367,3.003 23.995,5.884">
-                                </polygon>
-                                <polygon fill="#fff"
-                                         points="21.396,31.255 14.899,24.76 17.021,22.639 21.428,27.046 30.996,17.772 33.084,19.926">
-                                </polygon>
-                            </svg>
-                            Safe and Secure Payments.Easy returns.100% Authentic products.
-                        </p>
-                        <button type="submit" name="submit" class="boxered-btn" style="background-color:rgba(127, 173, 57, 1)">Check Out</button>
-
-
-                    </form>
-                        
-                        </div>
-                    </div>
-                    
-                </div>   
-</div>
-
-<div class="container-fluid">
-    <div class="row mx-4 ">
-        {% if default_address %}
-    <div class="col-lg-12 col-md-12 mx-4">
-      <div class="address-card" style=" border: 1px solid #ccc;padding: 10px;margin: 5px;width: 200px;height: 250px;float: left;position: relative;">
-=======
 <div class="container-fluid mt-3">
     <div class="row">
         <div class="col-md-12 col-lg-12 ">
@@ -167,7 +62,6 @@ Checkout
         {% if default_address %}
     <div class="col-lg-6 col-md-6 mx-4">
        
->>>>>>> 8b56765e6bed435d8dfc3a6abdb477c47957515e
         <div><input type="radio" name="selectedAddress" value="{{ default_address.id }}"
                     checked>
                     <p>Default Address</p></div>
@@ -181,16 +75,6 @@ Checkout
             {{default_address.postal_code }}<br>
             {{ default_address.country }}
         </label>
-<<<<<<< HEAD
-      </div>
-   <!--  </div>
-   <div class="col-lg-4 col-md-4 d-flex flex-column mx-4">-->
-        {% for address in address_list %}
-        <div class="address-card mx-4" style=" border: 1px solid #ccc;padding: 10px;margin: 5px;width: 200px;height: 250px;float: left;position: relative;">
-            <div><input type="radio" id="address{{ address.id }}" name="selectedAddress"
-                        value="{{ address.id }}"> </div>
-            <label for="address{{ address.id }}" class="mt-1 mx-3">
-=======
     </div>
     <div class="col-lg-4 col-md-4 d-flex flex-column ">
         {% for address in address_list %}
@@ -198,7 +82,6 @@ Checkout
             <div><input type="radio" id="address{{ address.id }}" name="selectedAddress"
                         value="{{ address.id }}"> <p>Default Address</p></div></div>
             <label for="address{{ address.id }}" class="mt-1">
->>>>>>> 8b56765e6bed435d8dfc3a6abdb477c47957515e
                 <strong>{{ address.recipient_name }}</strong><br>
                 {{ address.house_no }} {{ address.street_name }} {{ address.village_name }} <br>
                 {{ address.district }}, {{ address.state }} {{ address.postal_code }}<br>
@@ -211,372 +94,6 @@ Checkout
     </div>
 </div>
 
-<<<<<<< HEAD
-<div class="container-fluid m-3">
-    <div class="row justify-content-start">
-        <div class="col-7">
-            <h3 class="text-center ">Select a address</h3>
-        </div>
-    </div>
-</div>
-<div class="container d-flex col-12 col-sm-12 address-block">
- <div class="col-lg-7 col-md-7 px-3 py-4" style="border:1px solid #cccccc; border-radius:10px;">
-   <div class="row">
-    <h5 class="m-3">Basic Details</h5>
-    <div class="col-lg-12">
-        <div class="checkout__input pl-2">
-            <p>First Name<span>*</span></p>
-            <input type="text" placeholder="Enter first Name" name="username" id="username"
-                   value="{{default_address.recipient_name}}" disabled>
-        </div>
-    </div>
-   </div>
-
-   <div class="row">
-    <div class="col-lg-6">
-        <div class="checkout__input pl-2 ">
-            <p>Email<span>*</span></p>
-            <input type="email" placeholder="Enter Email" name="email" id="email"
-                   value="{{default_address.email}}" disabled>
-        </div>
-    </div>
-
-    <div class="col-lg-6">
-        <div class="checkout__input pr-2">
-            <p>Phone<span>*</span></p>
-            <input type="tel" placeholder=" Enter Phone" name="phone" id="phone"
-                   value="{{default_address.mobile}}" disabled>
-        </div>
-    </div>
-
-  </div>
-   <div class="row">
-    <div class="col-lg-6">
-        <div class="checkout__input pl-2">
-            <p>House No<span>*</span></p>
-            <input type="text" placeholder="Enter House No" name="house_no" id="house_no"
-                   value="{{default_address.house_no}}" disabled>
-        </div>
-    </div>
-
-    <div class="col-lg-6">
-        <div class="checkout__input pr-2">
-            <p>Street Name<span>*</span></p>
-            <input type="text" placeholder="Enter Street Name" required  name="street"
-                   id="street" value="{{default_address.street_name}}" disabled>
-        </div>
-    </div>
-
-   </div>
-
-   <div class="row">
-
-    <div class="col-lg-6">
-        <div class="checkout__input pl-2">
-            <p>District<span>*</span></p>
-            <input type="text" placeholder="Enter District" required name="district"
-                   id="district" value="{{default_address.district}}" disabled>
-        </div>
-    </div>
-    <div class="col-lg-6">
-        <div class="checkout__input pr-2">
-            <p>State<span>*</span></p>
-            <input type="text" placeholder="Enter State" required name="state" id="state"
-                   value="{{default_address.state}}" disabled>
-        </div>
-    </div>
-
-   </div>
-   <div class="row">
-    <div class="col-lg-6">
-        <div class="checkout__input pl-2">
-            <p>Country<span>*</span></p>
-            <input type="text" placeholder="Enter Country" required name="country"
-                   id="country" value="{{default_address.country}}" disabled>
-        </div>
-    </div>
-    <div class="col-lg-6">
-        <div class="checkout__input pr-2">
-            <p>Pin Code<span>*</span></p>
-            <input type="number" placeholder="Enter Pin Code" required name="pincode"
-                   value="{{default_address.postal_code}}" id="pincode" disabled>
-        </div>
-    </div>
-
-   </div>
-    </div>   
-    </div>
-</div>
-    
-</div>             
-  
-
-    <!--Add Address modal-->
-    <div class="container-fluid">
-        <div class="row">
-        <div class="col-lg-12 col-md-12 ">
-            <div class="modal fade" id="exampleModal1" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true"
-                data-bs-backdrop="static">
-                <div class="modal-dialog modal-dialog-scrollable">
-                    <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModal">ADD ADDRESS</h5>
-                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body" style="max-height: 400px; max-width:600px; overflow-y: auto;">
-                    <form method="post" action="{% url 'cart:addaddresscheck' %}" id="form1">
-                        {% csrf_token %}
-                        <div>
-                            {% if messages %}
-                  <div class="container">
-                        <ul class="messages mx-auto text-center">
-                          {% for message in messages %}
-                        <div id="message">
-                          <div  class="error-alert {% if message.tags %}alert-{{ message.tags }}{% endif %}" role="alert">
-                        <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span></button>
-                        {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %} {% endif %}
-                        {{ message }}
-                           </div>
-                </div>
-                {% endfor %}
-                 </ul>
-        </div>
-        {% endif %}
-        </div>
-            <div class="row">
-                <div class="col-md-6">
-                  <div class="mb-3 mx-1">
-                    <label for="RecipientName" class="form-label">Recipient Name:</label>
-                    <input type="text" class="form-control" id="RecipientName" name="RecipientName"
-                           value="" required>
-                   </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="mb-3 ml-2 mr-1">
-                      <label for="house_no" class="form-label">House No:</label>
-                      <input type="text" class="form-control" id="house_no" name="house_no"
-                             value="" required>
-                     </div>
-                  </div>
-        
-            </div>
-            <div class="row">
-                <div class="col-md-6">
-                  <div class="mb-3 ml-2 mr-1">
-                    <label for="street_name" class="form-label">Street Name:</label>
-                    <input type="text" class="form-control" id="street_name" name="street_name"
-                           value="" required>
-                   </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="mb-3 ml-2 mr-1">
-                      <label for="village_name" class="form-label">Village/City: </label>
-                      <input type="text" class="form-control" id="village_name" name="village_name"
-                             value="" required>
-                     </div>
-                  </div>
-        
-            </div>
-            <div class="row">
-                <div class="col-md-6">
-                  <div class="mb-3 ml-2 mr-1">
-                    <label for="postal_code" class="form-label">Postal code:</label>
-                    <input type="text" class="form-control" id="postal_code" name="postal_code"
-                           value="" required>
-                   </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="mb-3 ml-2 mr-1">
-                      <label for="district" class="form-label">District: </label>
-                      <input type="text" class="form-control" id="district" name="district"
-                             value="" required>
-                     </div>
-                  </div>
-        
-            </div>
-            <div class="row">
-                <div class="col-md-6">
-                  <div class="mb-3 ml-2 mr-1">
-                    <label for="email" class="form-label">Email:</label>
-                    <input type="text" class="form-control" id="email" name="email"
-                           value="" required>
-                   </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="mb-3 ml-2 mr-1">
-                      <label for="mobile" class="form-label">Phone Number: </label>
-                      <input type="tel" class="form-control" id="mobile" name="mobile"
-                             value="" required>
-                     </div>
-                  </div>
-        
-            </div>
-            <div class="row">
-                <div class="col-md-6">
-                  <div class="mb-3 ml-2 mr-1">
-                    <label for="state" class="form-label">State:</label>
-                    <input type="text" class="form-control" id="state" name="state"
-                           value="" required>
-                   </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="mb-3 ml-2 mr-1">
-                      <label for="country" class="form-label">Country: </label>
-                      <input type="text" class="form-control" id="country" name="country"
-                             value="" required>
-                     </div>
-                  </div>
-                  <div class="col-md-6">
-                    <div class="mb-3 ml-2 mr-1 form-check form-switch">
-                      <label for="flexSwitchCheckDefault" class="form-check-label">Make this my default address: </label>
-                      <input type="checkbox" class="form-check-input" id="flexSwitchCheckDefault" name="default_address"
-                             value="" required>
-                     </div>
-                  </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="submit" class="btn btn-primary">Add</button>
-            </div>
-                 </form>
-                </div>
-                </div>   
-            </div>
-           </div>
-            </div> 
-        </div>
-        </div>  
-      {% endblock %}            
-                            
-{% block j-script %}
-<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
-
-<script>
-  $('.payWithRazorpay').click(function (e) {
-    e.preventDefault();
-    console.log("Clicked the payWithRazorpay button");
-    var username = $("[name='username']").val();
-    var email = $("[name='email']").val();
-    var phone = $("[name='phone']").val();
-    var house_no = $("[name='house_no']").val();
-    var street = $("[name='street']").val();
-    var district = $("[name='district']").val();
-    var state = $("[name='state']").val();
-    var country = $("[name='country']").val();
-    var pincode = $("[name='pincode']").val();
-    var token = $("[name='csrfmiddlewaretoken']").val();
-
-    if (username == "" || email == "" || phone == "" || house_no == "" || street == "" || district == "" || state == "" || country == "" || pincode == "") {
-        Swal.fire(
-            'Alert!',
-            'All fields are mandatory !',
-            'error'
-        )
-        return false;
-    } else {
-        $.ajax({
-            url: '/proceed-to-pay/', // The URL you want to request
-            method: 'GET', // HTTP request method (GET, POST, PUT, DELETE, etc.)
-            dataType: 'json',
-            success: function (data) {
-                console.log("JsonResponse Data:", data.total_price);
-                // Callback function to handle the successful response
-                var options = {
-                    "key": "rzp_test_zLLrBmHDjYzLTa",
-                    "amount":data.total_price * 100, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
-                    "currency": "INR",
-                    "name": username,
-                    "description": "Thank you",
-                    "image": "https://example.com/your_logo",
-                    //                    "order_id": "order_9A33XWu170gUtm", //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
-                    "callback_url": "https://eneqd3r9zrjok.x.pipedream.net/",
-                    "handler": function (response) {
-                        data = {
-                            'username': username,
-                            'email': email,
-                            'phone': phone,
-                            'house_no': house_no,
-                            'street': street,
-                            'state': state,
-                            'house_no': house_no,
-                            'district': district,
-                            'country': country,
-                            'pincode': pincode,
-                            'payment_method': 'Paid by Razorpay',
-                            'payment_id': response.razorpay_payment_id,
-                            csrfmiddlewaretoken: token,
-
-                        };
-                        $.ajax({
-                            url: '/cart/placeorder/',
-                            method: 'POST',
-                            data: data,
-                            success: function (responseData) {
-                                console.log(responseData);
-                                swal({
-                                    title: "Congratulations!",
-                                    text: "Your order has been placed successfully",
-                                    icon: "success",
-                                    buttons: true,
-                                    dangerMode: true,
-                                }).then((willDelete) => {
-                                    if (willDelete) {
-                                        console.log('...........');
-
-                                        var id = response.razorpay_payment_id;
-
-                                        var url1 = '/cart/my-order/' + id + "/";
-
-                                        var postData = {
-                                            csrfmiddlewaretoken: token
-                                        };
-                                        console.log(token)
-                                        //    window.location.href = url1;
-                                        $.post(url1, postData, function () {
-
-                                            window.location.href = '/cart/my-order/' + id + "/"; // Replace with the URL you want to redirect to.
-                                        });
-
-                                    } else {
-                                        swal("Your imaginary file is safe!");
-                                    }
-                                });
-
-                            },
-                            error: function (error) {
-                                // Callback function to handle errors
-                                console.error('Error:', error);
-                            }
-                        });
-                    },
-                    "prefill": { //We recommend using the prefill parameter to auto-fill customer's contact information especially their phone number
-                        "name": username, //your customer's name
-                        "email": email,
-                        "contact": phone, //Provide the customer's phone number for better conversion rates
-                    },
-
-                    //                    "notes": {
-                    //                        "address": "Razorpay Corporate Office"
-                    //                    },
-                    "theme": {
-                        "color": "#3399cc"
-                    },
-                };
-                var rzp1 = new Razorpay(options);
-                rzp1.open();
-            },
-            // error: function (error) {
-            //     // Callback function to handle errors
-            //     console.error('Error:', error);
-            // }
-        });
-    }
-});
-</script>
-<script src="{% static 'js/checkout.js' %}"></script>
-{% endblock %}
-=======
 <div class="container-fluid">
     <div class="row">
         <div class="col-md-12 col-lg-12">
@@ -731,4 +248,3 @@ Checkout
 <script src="{% static 'js/jquery-3.3.1.min.js' %}"></script>
 <script src="{% static 'js/jquery-ui.min.js'%}"></script>
 {% endblock %}
->>>>>>> 8b56765e6bed435d8dfc3a6abdb477c47957515e
