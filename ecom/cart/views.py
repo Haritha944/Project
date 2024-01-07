@@ -7,7 +7,12 @@ from user.models import User
 from django.http import HttpResponse,JsonResponse
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+<<<<<<< HEAD
+from order.models import Order,OrderItem,Payment
+import random
+=======
 
+>>>>>>> 8b56765e6bed435d8dfc3a6abdb477c47957515e
 # Create your views here.
 
 #<!- Cart section --->
@@ -267,7 +272,11 @@ def selectedAddress(request):
         response_data={
             'username':address.recipient_name,
             'email':address.email,
+<<<<<<< HEAD
+            'phone':address.mobile,
+=======
             'mobile':address.mobile,
+>>>>>>> 8b56765e6bed435d8dfc3a6abdb477c47957515e
             'house_no':address.house_no,
             'street':address.street_name,
             'district':address.district,
@@ -345,3 +354,272 @@ def removecart(request, product_id):
     return render(request, 'cart/cart.html')
         #return JsonResponse({'status': 'empty'})
     
+<<<<<<< HEAD
+def checkoutorder(request):
+    url = request.META.get('HTTP_REFERER')
+    global item,address,cart_items
+    discount=0
+    #<!------------------checking stock------------------------------->
+    try:
+        email = request.user
+        user = User.objects.get(email=email)
+        if user is not None:
+            cart_items = CartItem.objects.filter(user_id=user.id,is_active=True).order_by('id')
+    except:
+        cart_id = _cart_id(request)
+        cart = Cart.objects.get(cart_id=cart_id)
+        cart_items = CartItem.objects.filter(cart=cart,is_active=True).order_by('id')
+    for item in cart_items:
+        variant = item.variant
+        print(variant.product.product_name,variant.stock,item.quantity)
+        if item.quantity >= variant.stock+1:
+            print("no" , variant.stock,variant.product.product_name)
+            messages.error(request,f"only {variant.stock} stock left on product {variant.product.product_name} size {variant.size}")
+            return redirect("cart:cart")
+        else:
+            print("yes" , variant.stock,variant.product.product_name)
+        #<!------------------checking stock------------------------------->
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        user = User.objects.get(email=email)
+        recipient_name = request.POST.get('username')
+        selected_address_id= request.POST.get('selectedAddress')
+        if recipient_name is None:
+            try:
+                address= Address.objects.get(id=selected_address_id)
+            except:
+                messages.error(request,"Create a address...!")
+        else:
+            address = Address.objects.get(recipient_name=recipient_name)
+        order = Order()
+        order.user=user
+        order.address=address
+        cart = CartItem.objects.filter(user_id=user.id,is_active=True)
+        cart_total_price=0
+        for item in cart:
+            cart_total_price = (cart_total_price + item.variant.discount_price * item.quantity)
+
+        trackno = 'pvkewt' + str(random.randint(1111111, 9999999))
+        while Order.objects.filter(tracking_no=trackno) is None:
+            trackno = 'pvkewt' + str(random.randint(1111111, 9999999))
+        order.tracking_no = trackno
+        #<!--coupn-->
+        payment_method = request.POST.get(payment_method)
+        if payment_method == "Paid by Razorpay":
+            order.payment.payment_method = request.POST.get('payment_method')
+            order.total_price = cart_total_price
+        order.save()
+        neworderitems = CartItem.objects.filter(user=user, is_active=True)
+        for item in neworderitems:
+            OrderItem.objects.create(
+                order=order,
+                product=item.product,
+                variant=item.variant,
+                price=item.variant.selling_price,
+                quantity=item.quantity,
+                user=user
+            )
+            # reduce the product quantity from available stock
+            orderproduct = ProductVariant.objects.get(
+                id=item.variant.id
+            )
+            print(orderproduct.stock)
+            orderproduct.stock = orderproduct.stock - item.quantity
+            print(orderproduct.stock)
+            orderproduct.save()
+
+            # delete cart
+            try:
+               Cart.objects.get(cart_id= item.cart.cart_id).delete()
+            except:
+                pass
+            return render(request, 'order/placeorder.html')
+        
+    if request.user.is_authenticated:
+        cart_id = _cart_id(request)  # Get or generate the cart_id
+        tax = 0
+        total=0
+        grand_total = 0
+        subtotal = 0
+        quantity = 0
+        cart_items = ''
+        try:
+
+            try:
+                email = request.POST.get('email')
+                user = User.objects.get(email=email)
+                cart_items = CartItem.objects.filter(user_id=user.id, is_active=True)
+            except:
+                cart = Cart.objects.get(cart_id=cart_id)
+                cart_items = CartItem.objects.filter(cart=cart, is_active=True)
+            for cart_item in cart_items:
+                subtotal += (cart_item.variant.discount_price * cart_item.quantity)
+                quantity += cart_item.quantity
+            total = subtotal
+            tax = (2 * subtotal) / 100
+            grand_total = subtotal + tax
+
+        except ObjectDoesNotExist:
+            pass
+        try:
+            user = request.user
+           
+            addresses = Address.objects.filter(user_id=user, is_default=False)
+        except:
+            pass
+        try:
+            default_address = Address.objects.get(user_id=user, is_default=True)
+        except:
+            default_address = Address.objects.filter(user_id=user).first()
+        
+        context = {
+            'subtotal': subtotal,
+            'quantity': quantity,
+            'cart_items': cart_items,
+            'addresses': addresses,
+            'grand_total': grand_total,
+            'default_address': default_address,
+            'total': total,
+            'discount': discount
+
+        }
+        return render(request, 'cart/checkout.html', context)
+    return redirect('/login/')
+
+def order(request, id=None):
+    try:
+        if request.session['coupon']:
+            offer = request.session['coupon']
+    except:
+        offer = None
+    total = 0
+    sub_total = 0
+    if id:
+        order = Order.objects.get(payment_id=id)
+        print(order.payment.payment_method)
+        neworderitems = OrderItem.objects.filter(order=order.id)
+        print(neworderitems)
+        for item in neworderitems:
+            total = total + item.variant.discount_price
+        if offer is not None:
+            total = total - offer
+            del request.session['coupon']
+        else:
+            offer = 0
+        sub_total = offer + total
+        context = {
+            'order': order,
+            'cart_items': neworderitems,
+            'total': total,
+            'offer': offer,
+            'sub_total': sub_total
+        }
+        return render(request, 'order/placeorder.html', context)
+    email=request.user
+    print(email)
+    user=User.objects.get(email=email)
+    order = Order.objects.filter(user=user).latest('id')
+    neworderitems = OrderItem.objects.filter(order=order)
+
+    for item in neworderitems:
+        total = total + item.variant.discount_price
+    if offer is not None:
+        offer = request.session['coupon']
+        total = total - offer
+        del request.session['coupon']
+    else:
+        offer = 0
+    sub_total = offer + total
+    context = {
+        'order': order,
+        'cart_items': neworderitems,
+        'total': total,
+        'offer': offer,
+        'sub_total': sub_total
+    }
+    return  render(request, 'order/placeorder.html', context)
+
+
+@login_required
+def placeorder(request, total=0, quantity=0):
+    
+    if request.method == 'POST':
+        email = request.user
+        user = User.objects.get(email=email)
+        print(user)
+        cart_id = _cart_id(request)
+        cart = Cart.objects.get(cart_id=cart_id)
+        cart_items = CartItem.objects.filter(cart=cart,is_active=True).order_by('id')
+        print(cart_items)
+        total = 0
+        grand_total=0
+        tax=0
+        quantity = 0
+        for cart_item in cart_items:
+            total += (cart_item.variant.discount_price * cart_item.quantity)
+            quantity += cart_item.quantity
+        
+            tax = (2 * total) / 100
+            grand_total = total + tax 
+            print(grand_total)
+        if user is not None:
+            try:
+                address = Address.objects.filter(user_id=user.id,is_default=True).first()
+            except:
+                messages.error(request,"Create a address..!")
+        else:
+            address = Address.objects.get(email=email)
+        
+        order = Order()
+        order.user = user
+        order.total_price=grand_total
+        order.address = Address.objects.filter(user_id=user.id,is_default=True).first()
+        trackno = 'pvkewt' + str(random.randint(1111111, 9999999))
+        while Order.objects.filter(tracking_no=trackno) is None:
+            trackno = 'pvkewt' + str(random.randint(1111111, 9999999))
+        order.tracking_no = trackno
+       
+        order.save()
+        neworderitems = CartItem.objects.filter(user=user, is_active=True)
+        for item in neworderitems:
+            OrderItem.objects.create(
+                order=order,
+                product=item.product,
+                variant=item.variant,
+                price=item.variant.discount_price,
+                quantity=item.quantity,
+                user=user
+            )
+            # reduce the product quantity from available stock
+            orderproduct = ProductVariant.objects.get(
+                id=item.variant.id
+                )
+            print(orderproduct.stock)
+            orderproduct.stock = orderproduct.stock - item.quantity
+            print(orderproduct.stock)
+            orderproduct.save()
+
+            # delete cart
+            try:
+                Cart.objects.get(cart_id= item.cart.cart_id).delete()
+            except:
+                pass
+        order = Order.objects.get(user=user,tracking_no=trackno,total_price=grand_total)
+
+        context = {
+            'order': order,
+            'address':address,
+            'cart_items': cart_items,
+            'total_price': grand_total,
+            'tracking_no':trackno,
+            'tax': tax,
+            'discount': 0,
+            'total': total ,
+            'quantity': quantity,
+        }
+
+        return render(request, 'order/placeorder.html', context)
+    else:
+        return redirect('cart:checkout')
+=======
+>>>>>>> 8b56765e6bed435d8dfc3a6abdb477c47957515e

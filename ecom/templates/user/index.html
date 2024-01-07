@@ -12,6 +12,15 @@ Home
   .col-md-3:hover .featured-icons .fa {
     visibility: visible;
   }
+<<<<<<< HEAD
+  
+  .carousel-item img{
+    height:450px; /* set the height for the uniformity
+  }
+  
+  object-fit:contain;
+=======
+>>>>>>> 8b56765e6bed435d8dfc3a6abdb477c47957515e
 </style>
     {% load static %}
     
@@ -25,7 +34,11 @@ Home
             </ol>
             <div class="carousel-inner">
               <div class="carousel-item active">
+<<<<<<< HEAD
+                <img src="{% static '/images/myown.jpg' %}" class="slide d-block w-100" alt="...">
+=======
                 <img src="{% static '/images/yam.png' %}" class="slide d-block w-100" alt="...">
+>>>>>>> 8b56765e6bed435d8dfc3a6abdb477c47957515e
                 <div class="carousel-caption d-none d-md-block">
                     <h2> Comfort is Priority</h2>
                     <button class="btn btn-outline-dark bg-secondary-50" type="submit" id="submit-btn">SHOP NOW</button>
@@ -129,11 +142,23 @@ Home
       {% for variant in products %}
       <div class="col-md-3 mt-3 position-relative">
         <div class="card" style="width:15rem;border:none" >
+<<<<<<< HEAD
+<<<<<<<< HEAD:ecom/templates/user/index.html
+=======
+>>>>>>> 8b56765e6bed435d8dfc3a6abdb477c47957515e
           <a href="{% url 'products:singleproductview' product_id=variant.id %}">
         <img src="/media/{{variant.product.images}}" class="card-img-top" alt="" ></a>
           <div class="card-body text-center">
           <h6 class="card-title text-center" id="namepr{{variant.product.id}}">{{variant.product.product_name}}</h6>
           <p>Product ID: {{variant.product.id}}</p>
+<<<<<<< HEAD
+========
+        <img src="/media/{{i.images}}" class="card-img-top" alt="" >
+        <div class="card-body text-center">
+          <h6 class="card-title text-center" id="namepr{{i.id}}">{{i.product_name}}</h6>
+>>>>>>>> 8b56765e6bed435d8dfc3a6abdb477c47957515e:ecom/app/templates/user/index.html
+=======
+>>>>>>> 8b56765e6bed435d8dfc3a6abdb477c47957515e
           <div class="text-center">
             <span class="price fw-bold">₹ {{variant.product.discount_price}}</span>
             <del class="price-old">₹ {{variant.product.original_price}}</del>
