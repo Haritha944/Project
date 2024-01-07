@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 {% extends 'userprofile/profileinfo.html' %}
-=======
-{% extends 'user/base.html' %}
->>>>>>> 8b56765e6bed435d8dfc3a6abdb477c47957515e
 {% load static %}
 {% block title %}
 Checkout
@@ -15,20 +11,12 @@ Checkout
                 <ol class="breadcrumb justify-content-center mb-0">
                   <li class="breadcrumb-item"><a class="text-decoration-none text-dark fw-bold" href="{% url 'products:viewshop' %}">Shop</a></li>
                   <li class="breadcrumb-item active text-dark fw-bold">Shop Detail</a></li>
-<<<<<<< HEAD
                   <li class="breadcrumb-item active text-dark fw-bold"><a class="text-decoration-none text-dark" href="{% url 'cart:cart' %}">Cart</a></li>
-=======
-                  <li class="breadcrumb-item active text-dark fw-bold"><a class="text-decoration-none" href="{% url 'cart:cart' %}">Cart</a></li>
->>>>>>> 8b56765e6bed435d8dfc3a6abdb477c47957515e
                   <li class="breadcrumb-item active text-dark fw-bold" aria-current="page">Checkout</li>
             </nav>
         </div>
     </div>
 </div>
-<<<<<<< HEAD
-
-=======
->>>>>>> 8b56765e6bed435d8dfc3a6abdb477c47957515e
 <div>
  {% if messages %}
   <div class="container" style="background-color:transparent;">
@@ -51,7 +39,6 @@ Checkout
     <div class='row'>
         <div class="checkout__form ">
             <h4 class="text-center mt-3" style="color:#F08080">Billing Details</h4>
-<<<<<<< HEAD
         </div>
     </div>
 </div>
@@ -143,31 +130,6 @@ Checkout
         {% if default_address %}
     <div class="col-lg-12 col-md-12 mx-4">
       <div class="address-card" style=" border: 1px solid #ccc;padding: 10px;margin: 5px;width: 200px;height: 250px;float: left;position: relative;">
-=======
-<div class="container-fluid mt-3">
-    <div class="row">
-        <div class="col-md-12 col-lg-12 ">
-            <div class="row">
-                <div class="b-5">
-                    <div class="col-md-12 d-flex ">
-                        <a href="{% url 'cart:addaddresscheck' %}?source=checkout" class="btn btn-warning" style="background-color: #F28123; color: white; border-radius: 35px;">
-                            Add Address</a>
-                       
-                    </div>
-            
-                </div>
-        </div>
-    </div>
-</div>
-</div>
-</div>
-</div>
-<div class="container-fluid">
-    <div class="row">
-        {% if default_address %}
-    <div class="col-lg-6 col-md-6 mx-4">
-       
->>>>>>> 8b56765e6bed435d8dfc3a6abdb477c47957515e
         <div><input type="radio" name="selectedAddress" value="{{ default_address.id }}"
                     checked>
                     <p>Default Address</p></div>
@@ -181,7 +143,6 @@ Checkout
             {{default_address.postal_code }}<br>
             {{ default_address.country }}
         </label>
-<<<<<<< HEAD
       </div>
    <!--  </div>
    <div class="col-lg-4 col-md-4 d-flex flex-column mx-4">-->
@@ -190,15 +151,6 @@ Checkout
             <div><input type="radio" id="address{{ address.id }}" name="selectedAddress"
                         value="{{ address.id }}"> </div>
             <label for="address{{ address.id }}" class="mt-1 mx-3">
-=======
-    </div>
-    <div class="col-lg-4 col-md-4 d-flex flex-column ">
-        {% for address in address_list %}
-        <div class="address-card">
-            <div><input type="radio" id="address{{ address.id }}" name="selectedAddress"
-                        value="{{ address.id }}"> <p>Default Address</p></div></div>
-            <label for="address{{ address.id }}" class="mt-1">
->>>>>>> 8b56765e6bed435d8dfc3a6abdb477c47957515e
                 <strong>{{ address.recipient_name }}</strong><br>
                 {{ address.house_no }} {{ address.street_name }} {{ address.village_name }} <br>
                 {{ address.district }}, {{ address.state }} {{ address.postal_code }}<br>
@@ -211,7 +163,6 @@ Checkout
     </div>
 </div>
 
-<<<<<<< HEAD
 <div class="container-fluid m-3">
     <div class="row justify-content-start">
         <div class="col-7">
@@ -576,159 +527,3 @@ Checkout
 </script>
 <script src="{% static 'js/checkout.js' %}"></script>
 {% endblock %}
-=======
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-md-12 col-lg-12">
-           
-            <div class="col-md-12 col-lg-12 mt-5 d-flex flex-column align-items-center">
-                <form method="post">
-                    {% csrf_token %}
-                    <h3 class="text-center ">Select a address</h3>
-                    <div class="col-lg-12 col-md-12 p-2 mx-2" style="border: 1px solid #cccccc; border-radius: 10px;">
-                        
-                        <div class="row">
-                            <h5 class="m-3"><b>Basic Details</b></h5>
-                
-                            <div class="col-lg-12 ">
-                                <div class="checkout__input pl-2">
-                                    <p>First Name<span>*</span></p>
-                                    <input type="text" placeholder="Enter first Name" name="username" id="username"
-                                           value="{{default_address.recipient_name}}" disabled>
-                                </div>
-                            </div>
-                
-                        </div>
-
-                        <div class="row">
-                            <div class="col-lg-6">
-                                <div class="checkout__input pl-2">
-                                    <p>Email<span>*</span></p>
-                                    <input type="email" placeholder="Enter Email" name="email" id="email"
-                                           value="{{default_address.email}}" disabled>
-                                </div>
-                            </div>
-                            <div class="col-lg-6">
-                                <div class="checkout__input pr-2">
-                                    <p>Phone<span>*</span></p>
-                                    <input type="tel" placeholder=" Enter Phone" name="phone" id="phone"
-                                           value="{{default_address.mobile}}" disabled>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="row">
-                            <div class="col-lg-6">
-                                <div class="checkout__input pl-2">
-                                    <p>House No<span>*</span></p>
-                                    <input type="text" placeholder="Enter House No" name="house_no" id="house_no"
-                                           value="{{default_address.house_no}}" disabled>
-                                </div>
-                            </div>
-                            <div class="col-lg-6">
-                                <div class="checkout__input pr-2">
-                                    <p>Street Name<span>*</span></p>
-                                    <input type="text" placeholder="Enter Street Name" required name="street"
-                                           id="street" value="{{default_address.street_name}}" disabled>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-lg-6">
-                                <div class="checkout__input pl-2">
-                                    <p>District<span>*</span></p>
-                                    <input type="text" placeholder="Enter District" required name="district"
-                                           id="district" value="{{default_address.district}}" disabled>
-                                </div>
-                            </div>
-                            <div class="col-lg-6">
-                                <div class="checkout__input pr-2">
-                                    <p>State<span>*</span></p>
-                                    <input type="text" placeholder="Enter State" required name="state" id="state"
-                                           value="{{default_address.state}}" disabled>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-lg-6">
-                                <div class="checkout__input pl-2">
-                                    <p>Country<span>*</span></p>
-                                    <input type="text" placeholder="Enter Country" required name="country"
-                                           id="country" value="{{default_address.country}}" disabled>
-                                </div>
-                            </div>
-                            <div class="col-lg-6">
-                                <div class="checkout__input pr-2">
-                                    <p>Pin Code<span>*</span></p>
-                                    <input type="number" placeholder="Enter Pin Code" required name="pincode"
-                                           value="{{default_address.postal_code}}" id="pincode" disabled>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-                </form>
-             </div>
-       
-        </div>
-    </div>
-</div>
-    <div class="container-fluid" >
-        <div class="row">
-            
-        <div class="col-md-12 col-lg-12">
-
-            <form action="#" method="POST">
-                {% csrf_token %}
-                <table class="table  align-middle border-collapse: collapse;
-                width: 100 %; margin:auto;">
-                    <thead>
-                        <tr>
-                            <th>Products</th>
-                            <th>Quantity</th>
-                            <th>Price</th>
-                            <th>Total</th>
-                        </tr>
-
-                    </thead>
-                    <tbody class="order-details-body">
-                        {% for cart_item in cart_items %}
-                        <tr>
-                            <td class="shoping__cart__item">
-                                <a href="{% url 'products:singleproductview' product_id=cart_item.variant.id %}">
-                                    <img src="{{ cart_item.product.images.url }}" alt="" width="100px">
-                                </a>
-    
-                            </td>
-                            <td class="shoping__cart__price"><h5>{{cart_item.variant.product.product_name}}</h5>
-                                Size : {{cart_item.variant.size}}
-                               <p>Colour : {{cart_item.variant.color}}</p></td>
-                            <td class="shoping__cart__price">
-                                ₹{{cart_item.variant.discount_price}}
-                            </td>
-                            
-                            <td class="shoping__cart__total" id="total{{ cart_item.variant.id }}">
-                                ₹{{ cart_item.sub_total }}
-                            </td>
-                            
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-
-                </table>
-                <button type="button" class="btn text-white bg-success payWithRazorpay">Payment </button>
-                <button type="submit" class="mx-2 site-btn btn text-white bg-success">Cash On Delivery</button>
-            </form>
-        </div>
-        </div>
-    </div>
-      
-      {% endblock %}            
-                            
- {% block script %}                          
-<script src="{% static 'js/jquery-3.3.1.min.js' %}"></script>
-<script src="{% static 'js/jquery-ui.min.js'%}"></script>
-{% endblock %}
->>>>>>> 8b56765e6bed435d8dfc3a6abdb477c47957515e

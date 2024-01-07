@@ -19,13 +19,10 @@ urlpatterns = [
          name='addaddresscheck'),
     path('selectedaddress/', views.selectedAddress, name='selectedaddress'),
     path('removecart/<int:product_id>/', views.removecart, name='removecart'),
-<<<<<<< HEAD
     path('checkoutorder/', views.checkoutorder, name='checkoutorder'),
     #path('my-order/<str:id>/', views.order, name='my_order'),
     #path('my-order/', views.order, name='my_order'),
     path('placeorder/', views.placeorder, name='placeorder'),
-=======
->>>>>>> 8b56765e6bed435d8dfc3a6abdb477c47957515e
     
     
 

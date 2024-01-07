@@ -186,11 +186,7 @@ Cart
              console.log(variantId);
             $.ajax({
                 type: 'POST',
-<<<<<<< HEAD
                 url: "#".replace('0', variantId),
-=======
-                url: "{% url 'increment_cart' 0 %}".replace('0', variantId),
->>>>>>> 8b56765e6bed435d8dfc3a6abdb477c47957515e
                 data: {
                     'variant_id': variantId,
                     csrfmiddlewaretoken: csrftoken
@@ -240,11 +236,7 @@ Cart
     
             $.ajax({
                 type: 'POST',
-<<<<<<< HEAD
                 url: "#".replace('0', variantId),
-=======
-                url: "{% url 'remove_cart' 0 %}".replace('0', variantId),
->>>>>>> 8b56765e6bed435d8dfc3a6abdb477c47957515e
                 data: {
                     'variant_id': variantId,
                     csrfmiddlewaretoken: csrftoken
@@ -252,11 +244,7 @@ Cart
                 success: function (data) {
                 if (data.status === 'empty') {
                 // Redirect to the 'cart' page
-<<<<<<< HEAD
                 window.location.href = "{% url 'cart:cart' %}";
-=======
-                window.location.href = "{% url 'cart' %}";
->>>>>>> 8b56765e6bed435d8dfc3a6abdb477c47957515e
                 }else{
                     quantityField.val(data.quantity);
                     console.log(data.quantity);
