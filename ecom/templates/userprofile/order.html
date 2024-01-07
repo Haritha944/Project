@@ -21,6 +21,7 @@ User profile
      </div>
   </div>
 </div>
+<!--
 <div class="container-fluid">
     <div class="row">
         <div class="d-flex mx-4">
@@ -42,7 +43,7 @@ User profile
                 {% endif %}
             </div>
     </div>    
-</div>
+</div>-->
     {% if order_items %}
     <div class="container" style="bg-color: white !important;">
         <div class="d-flex">
@@ -137,7 +138,7 @@ User profile
                             </a>
                         </td>
                         <td>
-                            <a class="dropdown-item" href="{% url 'order:cancelorder' order_item_id=item.id %}"><i class="bx bx-trash me-1 text-danger"></i>X</a>
+                            <a class="text-danger" href="{% url 'order:cancelorder' order_item_id=item.id %}"><i class="bx bx-trash me-1 "></i>X</a>
                         </td>
       
                     </tr>

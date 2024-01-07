@@ -152,8 +152,25 @@ def cancelorder(request,order_item_id):
         return redirect('order:myorders')    
     else:
         pass    
-   
-           
+
+#<!---------admin---------->  
+def vieworder(request):
+    try:
+        if request.method=="POST":
+            status=request.POST.get('status')
+            print(status)
+            if status == 'status' or status == 'all':
+               orders = Order.objects.all().order_by('-id')
+            else:
+               orders = Order.objects.filter(status=status).order_by('-id')
+            context = {
+            'orders': orders
+            }
+        return render(request, 'admin/vieworder.html', context)
+       
+
+    except:
+        pass    
         
    
         

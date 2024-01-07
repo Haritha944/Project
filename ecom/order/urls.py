@@ -11,5 +11,6 @@ urlpatterns = [
     path('orderinvoice/<int:order_id>/', views.orderinvoice, name='orderinvoice'),
     path('myorders', views.myorders, name='myorders'),
     path('cancelorder/<int:order_item_id>/', views.cancelorder, name='cancelorder'),
-   
+   #admin
+    path('vieworder/', views.vieworder, name='vieworder'),
 ]
