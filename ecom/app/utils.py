@@ -10,7 +10,7 @@ from django.core.mail import send_mail
 import threading
 from threading import local
 from app.middleware import request_local
-from django.contrib.auth.models import User
+from user.models import User
 otp_generated = Signal()
 
 # @receiver(otp_generated)

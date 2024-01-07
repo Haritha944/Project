@@ -1,0 +1,65 @@
+{% extends 'user/base.html' %}
+{% load static %}
+{% block title%}
+adminlogin
+{% endblock%}
+
+{% block content %}
+<div class="container-fluid mb-5">
+  <div class="row">
+   <div class="col-lg- col-md-6"> <!--Breadcrumb begins-->
+    <nav aria-label="breadcrumb" class="breadcrumb-nav border-0 mb-0">
+        <div class="container">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a class="text-decoration-none text-dark" href="index.html">Home</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Login</li>
+            </ol>
+        </div><!-- End .container -->
+     </nav>
+   </div>
+</div>
+</div>
+   <div class="container-fluid">
+   <div class="row justify-content-center align-items-center" >
+    <div class="col-lg-6 col-md-6 ">
+     <div class="card"><!--not close-->
+        <div class="card-header">
+            <h3 class="mb-0 text-center">Login</h3>
+        </div>
+        {% if messages %}
+        <div class="d-flex justify-content-center align-items-center"
+             style="color:red; background-color:rgba(225, 225, 225, 1);">
+            {% for message in messages %}
+            {{ message }}
+            {% endfor %}
+        </div>
+        {% endif %}
+    
+        <div class="card-body "><!--not close-->
+            <form method="post"><!--not close-->
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="text">Email</label>
+                    <input type="text" class="form-control" name="email"
+                           placeholder="Enter your Email">
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" class="form-control" name="password"
+                           placeholder="Enter your password">
+                </div>
+                <div class="row justify-content-center">
+                    <div class="col-md-6 text-center mt-3">
+                        <button type="submit" class="btn btn-primary">Login</button>
+                    </div>
+                </div>
+                <div class="text-center">
+                    <a href="#" class="forgotpass  text-decoration-none text-dark">Don’t have an account?</a><br>
+                </div>
+            </form>
+         </div>
+    </div>
+    </div>
+</div>
+</div>
+{% endblock %}
