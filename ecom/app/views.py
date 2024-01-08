@@ -6,7 +6,9 @@ from django.core.mail import send_mail
 from django.contrib import messages
 from django.contrib.auth.hashers import make_password
 import re
-#from app.models import Profile
+from django.utils.encoding import force_bytes
+from django.contrib.auth.tokens import default_token_generator
+from django.core.mail import EmailMessage
 from user.models import User
 from django.contrib.auth import get_user_model
 from django.contrib.auth import authenticate,login
@@ -19,6 +21,9 @@ from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from products.models import Product,ProductVariant
 from category.models import Category,Sub_Category
+from django.contrib.sites.shortcuts import get_current_site
+from django.template.loader import render_to_string
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 
 
 
@@ -255,60 +260,78 @@ def ResentOtpSignup(request):
     except Exception as e:
         print(e)
 
-import uuid
+
 def forgot_password(request):
     try:
         if request.method == 'POST':
             email= request.POST.get('email')
-            if not User.objects.filter(email=email).first():
-                messages.error(request,'No user with this email')
-                return redirect('/forgot_password/')
-            user_obj=User.objects.get(email=email)
-            token=str(uuid.uuid4())
-           # profile_obj=Profile.objects.get(pk=1)
-           # profile_obj.forget_password_token = token
-            print(token)
-           # profile_obj.save()
-            send_forget_password_mail(user_obj,token)
-            messages.success(request,'An email sended')
-            return redirect('/forgot_password/')        
+            if User.objects.filter(email=email).exists():
+                user = User.objects.get(email__exact=email)
+
+                current_site = get_current_site(request)
+                mail_subject = "Reset Your Password"
+                message = render_to_string('user/password_verify.html',{
+                    'user': user,
+                    'domain': current_site,
+                    'uid':urlsafe_base64_encode(force_bytes(user.pk)),
+                    'token': default_token_generator.make_token(user),
+                })
+                to_email = email
+                send_email  = EmailMessage(mail_subject, message, to=[to_email])
+                send_email.send()
+
+                messages.success(request,"Password reset email has been sent to your email address ")
+                return redirect('user:handlelogin')
+
+            else:
+                messages.warning(request, 'Account does not exist!')
+                return redirect('/forgot_password/')        
             
     except Exception as e:
         print(e)
     return render(request, "user/forgot_password.html")
 
-
-def confirm_password(request, token):
-    context = {'user_id': None}
+def password_verify(request, uidb64, token):
     try:
-        #profile_obj = Profile.objects.filter(forget_password_token = token).first()
-        print(token)
-        
-        
-        #context= {'user_id' : profile_obj.user.id} 
-        if request.method == 'POST':
-            new_password = request.POST.get('new_password')
-            reconfirm_password = request.POST.get('reconfirm_password')
-            user_id= request.POST.get('user_id')
-            print(user_id)
-            
-            if user_id is None:
-                messages.warning(request,'No user found')
-                return redirect(f'/confirm_password/{token}/')     
-            if new_password != reconfirm_password:
-                messages.warning(request, 'Passwords do not match')
-                return redirect(f'/confirm_password/{token}/') 
-            
-            user_obj=User.objects.get(id=user_id)
-            user_obj.set_password(new_password)
-            user_obj.save()
-            messages.success(request, 'Password updated successfully')
-            return redirect('/login/')
-   
-    except Exception as e:
-        print(e)
+        uid = urlsafe_base64_decode(uidb64).decode()
+        user = User._default_manager.get(pk=uid)
+    except(TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = None
 
-    return render(request, 'user/confirm_password.html', context)
+    if user is not None and default_token_generator.check_token(user, token):
+        request.session['uid'] = uid
+        messages.success(request, 'Please Reset your Password!!')
+        return redirect('user:confirm_password')
+    else:
+        messages.warning(request, 'Link has been expired')
+        return redirect('user:handlelogin')
+
+
+
+def confirm_password(request):
+    if request.method == "POST":
+        password = request.POST['password']
+        confirm_password = request.POST['confirm_password']
+        if not (password and confirm_password):
+                raise ValueError("Password fields are empty")
+
+
+        if password == confirm_password:
+            uid = request.session.get('uid')
+            user = User.objects.get(pk=uid)
+            user.set_password(password)
+            user.save()
+            messages.success(request, 'Password reset Successfull')
+            return redirect('user:handlelogin')
+
+        else:
+            messages.warning(request, 'Passwords do not match')
+            return redirect("user:confirm_password")
+    else:
+        return render(request, 'user/confirm_password.html')
+           
+   
+
 
                                     
 
