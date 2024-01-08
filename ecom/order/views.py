@@ -7,6 +7,7 @@ from user.models import User
 from order.models import Order,OrderItem,Payment
 from products.models import Product,ProductVariant
 from django.db import transaction
+
 # Create your views here.
 
 def _cart_id(request):
@@ -14,23 +15,53 @@ def _cart_id(request):
     if not cart:
         cart=request.session.create()
     return cart
-       
-def razorpaycheck(request):
-    email = request.user
-    user = User.objects.get(email=email)
-    cart = CartItem.objects.filter(user_id=user.id)
-    total_price = 0
-    for item in cart:
-        total_price = total_price + item.variant.discount_price * item.quantity
+@transaction.atomic      
+def confirmrazorpayment(request,tracking_no):
+    user = request.user
     try:
-        if request.session['coupon']:
-            offer = request.session['coupon']
-            total_price = total_price - offer
-    except:
-        pass
-    return JsonResponse({
-        'total_price': total_price
-    })
+        order = Order.objects.get(tracking_no=tracking_no, user=user)
+    except Order.DoesNotExist:
+        return redirect('cart:cart')
+    
+    total_amount = order.total_price 
+
+    payment = Payment(
+        user=user,
+        payment_method="Razorpay",
+        status="Paid",
+        amount_paid=total_amount,
+    )
+    payment.save()
+
+    order.tracking_no = tracking_no
+    order.payment = payment
+    order.save()
+
+
+
+    cart_items = CartItem.objects.filter(user=user)
+    for cart_item in cart_items:
+        product=cart_item.product
+        stock=product.quantity-cart_item.quantity
+        product.quantity=stock
+        product.save()
+        order_product = OrderItem(
+            order=order,
+            payment=payment,
+            user=user,
+            product=cart_item.product,
+            quantity=cart_item.quantity,
+            product_price=cart_item.variant.discount_price,
+           
+        )
+        order_product.save()
+
+    cart_items.delete()
+
+    context = {'order': order}
+
+    return render(request, 'order/orderconfirm.html', context)
+    
 @transaction.atomic
 def cashdelivery(request,tracking_no):
     user=request.user
@@ -205,7 +236,7 @@ def updatestatus(request, order_id, new_status):
     
     order.save()
     
-    messages.success(request, f"Order #{order.tracking_no} has been updated to '{new_status}' status.")
+    #messages.success(request, f"Order #{order.tracking_no} has been updated to '{new_status}' status.")
     
     return redirect('order:vieworder')
    

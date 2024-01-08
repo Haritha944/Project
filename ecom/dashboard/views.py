@@ -40,6 +40,7 @@ def adminlogout(request):
         print("User logged out.")
     return redirect('/adminlogin/')
 
+
 def usersdetails(request):
     if request.method == 'POST':
         search = request.POST.get('search')
@@ -65,7 +66,8 @@ def usersdetails(request):
 
     }
     return render(request,'admin/userdetail.html',context)
-    
+
+   
 def userblock(request, user_id):
     user = User.objects.get(id=user_id)
     if user.is_active:

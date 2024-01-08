@@ -186,7 +186,7 @@ Cart
              console.log(variantId);
             $.ajax({
                 type: 'POST',
-                url: "#".replace('0', variantId),
+                url: "{% url 'cart:increment' 0 %}".replace('0', variantId),
                 data: {
                     'variant_id': variantId,
                     csrfmiddlewaretoken: csrftoken
@@ -236,7 +236,7 @@ Cart
     
             $.ajax({
                 type: 'POST',
-                url: "#".replace('0', variantId),
+                url: "{% url 'cart:removecart' 0 %}".replace('0', variantId),
                 data: {
                     'variant_id': variantId,
                     csrfmiddlewaretoken: csrftoken

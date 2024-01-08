@@ -314,7 +314,7 @@ def removecart(request, product_id):
     productvariant = get_object_or_404(ProductVariant, id=product_id)
     print(productvariant)
     try:
-        email = request.POST.get('email')
+        email = request.user
         user=User.objects.get(email=request.user.email)
         cart_item = CartItem.objects.get(variant=productvariant, user_id=user.id)
     except:
@@ -323,28 +323,23 @@ def removecart(request, product_id):
     if cart_item.quantity > 1:
         cart_item.quantity -= 1
         cart_item.save()
-        total = 0
+        sub_total = 0
         try:
-            cart_items = CartItem.objects.filter(user_id=request.user.id, is_active=True)
+            cart_items = CartItem.objects.filter(user=request.user, is_active=True)
         except:
             cart = Cart.objects.get(cart_id=cart_id)
             cart_items = CartItem.objects.filter(cart=cart, is_active=True)
         for item in cart_items:
-            total += (item.variant.discount_price * item.quantity)
-        #total = cart_item.quantity * cart_item.variant.discount_price
-        context={
-            'cart_items': cart_items,
-            'quantity': cart_item.quantity,
-              'total': total
-        }
-        return render(request,'cart/cart.html',context)
-        #return JsonResponse({'quantity': cart_item.quantity, 'total': total})
+            sub_total += (item.variant.discount_price * item.quantity)
+        total = cart_item.quantity * cart_item.variant.discount_price
+        return JsonResponse({'quantity': cart_item.quantity, 'total': total,'sub_total': sub_total})
+        
+    else:
+        cart_item.delete()
+        return JsonResponse({'status': 'empty'})
     
 
 
-
-    return render(request, 'cart/cart.html')
-        #return JsonResponse({'status': 'empty'})
     
 def checkoutorder(request):
     url = request.META.get('HTTP_REFERER')
@@ -612,3 +607,46 @@ def placeorder(request, total=0, quantity=0):
         return render(request, 'order/placeorder.html', context)
     else:
         return redirect('cart:checkout')
+    
+
+def increment(request, product_id):
+    cart_id = _cart_id(request)  # Get or generate the cart_id
+    productvariant = get_object_or_404(ProductVariant, id=product_id)
+
+    try:
+        email = request.user
+        user = User.objects.get(email=email)
+        cart_item = CartItem.objects.get(variant=productvariant, user=user)
+    except:
+        cart = Cart.objects.get(cart_id=cart_id)
+        cart_item = CartItem.objects.get(variant=productvariant, cart=cart)
+
+    if productvariant.stock <= cart_item.quantity:
+
+        sub_total = 0
+        try:
+            cart_items = CartItem.objects.filter(user=request.user, is_active=True)
+        except:
+            cart = Cart.objects.get(cart_id=cart_id)
+            cart_items = CartItem.objects.filter(cart=cart, is_active=True)
+        for item in cart_items:
+            sub_total += (item.variant.discount_price * item.quantity)
+        total = cart_item.quantity * cart_item.variant.discount_price
+        return JsonResponse(
+            {'quantity': cart_item.quantity, 'total': total, 'sub_total': sub_total, 'messages': "error"})
+    # if cart_item.quantity > 1:
+    else:
+        cart_item.quantity += 1
+        cart_item.save()
+        # calculating subtotal
+        sub_total = 0
+        try:
+            cart_items = CartItem.objects.filter(user=request.user, is_active=True)
+        except:
+            cart = Cart.objects.get(cart_id=cart_id)
+            cart_items = CartItem.objects.filter(cart=cart, is_active=True)
+        for item in cart_items:
+            sub_total += (item.variant.discount_price * item.quantity)
+        total = cart_item.quantity * cart_item.variant.discount_price
+        return JsonResponse(
+            {'quantity': cart_item.quantity, 'total': total, 'sub_total': sub_total, "messages": "success"})

@@ -23,6 +23,7 @@ urlpatterns = [
     #path('my-order/<str:id>/', views.order, name='my_order'),
     #path('my-order/', views.order, name='my_order'),
     path('placeorder/', views.placeorder, name='placeorder'),
+    path('increment/<int:product_id>/', views.increment,name='increment'),
     
     
 
