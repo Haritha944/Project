@@ -47,6 +47,7 @@
                         <th scope="col">PAYMENT MODE</th>
                         <th scope="col">VIEW ORDER</th>
                         <th scope="col">STATUS</th>
+                        <th scope="col">CHANGE STATUS</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -54,14 +55,35 @@
                     {% for order in orders %}
                     <tr>
                         <td>{{order.id}}</td>
-                        <td>{{order.user.username}}</td>
+                        <td>{{order.user.name}}</td>
                         <td>{{order.created_at}}</td>
                         <td>{{order.total_price}}</td>
-                        <td>{{order.payment_mode}}</td>
-                        <td><a href="{% url 'view_single_order_admin' order_id=order.id %}">
+                        <td>{{order.payment.payment_method}}</td>
+                        <td><a href="{% url 'order:viewsingleadmin' order_id=order.id %}">
                             <button type="button" class="btn btn-primary">view</button>
                         </a></td>
                         <td>{{order.status}}</td>
+                        <td>
+                            <div class="dropdown">
+                                <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
+                                    <i class="bx bx-dots-vertical-rounded"></i>
+                                </button>
+                                <div class="dropdown-menu">
+                                    <a class="dropdown-item" href="{% url 'order:updatestatus' order.id 'Order Confirmed' %}">
+                                        <i class="bx bx-package me-1"></i> Order Confirmed
+                                    </a>
+                                    <a class="dropdown-item" href="{% url 'order:updatestatus' order.id 'Shipped' %}">
+                                        <i class="bx bx-check me-1"></i> Shipped
+                                    </a>
+                                    <a class="dropdown-item" href="{% url 'order:updatestatus' order.id 'Out for Delivery' %}">
+                                        <i class="bx bx-user-check me-1"></i> Out for Delivery
+                                    </a>
+                                    <a class="dropdown-item" href="{% url 'order:updatestatus' order.id 'Cancelled' %}">
+                                        <i class="bx bx-trash me-1"></i> Canceled
+                                    </a>
+                                </div>
+                            </div>
+                        </td>       
                     </tr>
                     {% endfor %}
 

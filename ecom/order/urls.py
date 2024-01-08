@@ -13,4 +13,6 @@ urlpatterns = [
     path('cancelorder/<int:order_item_id>/', views.cancelorder, name='cancelorder'),
    #admin
     path('vieworder/', views.vieworder, name='vieworder'),
+    path('viewsingleadmin/<int:order_id>', views.viewsingleadmin, name='viewsingleadmin'),
+    path('updatestatus/<int:order_id>/<str:new_status>/', views.updatestatus, name='updatestatus'),
 ]

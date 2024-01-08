@@ -1,0 +1,109 @@
+{% extends 'admin/adminmain.html' %}
+{% load static %}
+{% block styles %}
+<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+{% endblock %}
+{% block content%}
+
+
+<div class="container" style="height: 50%;">
+    <div class="box" style="flex: 1;min-width: 200px;margin: 10px;padding: 20px;border: 1px solid #ccc;
+    position: relative;">
+        <!-- Content for the first div -->
+        <h2 class="head-main text-center">ORDER ADDRESS</h2>
+        <div class="inner-box" >
+            <table>
+                <tr>
+                    <td>Username</td>
+                    <td>: {{order.user.name}}</td>
+                </tr>
+                <tr>
+                    <td>Phone Number</td>
+                    <td>: {{order.user.mobile}}</td>
+                </tr>
+                <tr>
+                    <td>Email</td>
+                    <td>: {{order.user.email}}</td>
+                </tr>
+                <tr>
+                    <td>Address</td>
+                    <td>: {{order.address.house_no}} {{order.address.village_name}}</td>
+                </tr>
+                <tr>
+                    <td>District</td>
+                    <td>: {{order.address.district}}</td>
+                </tr>
+                <tr>
+                    <td>Country</td>
+                    <td>: {{order.address.country}}</td>
+                </tr>
+                <tr>
+                    <td>State</td>
+                    <td>: {{order.address.state}}</td>
+                </tr>
+                <tr>
+                    <td>Pin Code</td>
+                    <td>: {{order.address.postal_code}}</td>
+                </tr>
+                <tr>
+                    <td>Order Note</td>
+                    <td>: {{order.message}}</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div class="box">
+        <!-- Content for the second div -->
+       
+        <div class="inner-box mt-3"style="flex: 1;min-width: 200px;margin: 10px;padding: 20px;border: 1px solid #ccc;
+        position: relative;">
+        <h2 class="text-center ">ORDER DETAILS</h2>
+            <table>
+                {% for order in order_item %}
+                <tr>
+                    <td>Order id</td>
+                    <td>: {{order.order.id}}</td>
+                </tr>
+                <tr>
+                    <td>Product Name</td>
+                    <td>:{{order.product.product_name}}</td>
+                </tr>
+                <tr>
+                    <td> Product Image </td>
+                <td><img src="{{ order.product.images.url }}" alt="{{ order.product.product_name }}" width="100"></td>
+                </tr>
+                <tr>
+                    <td>Quantity</td>
+                    <td>:{{order.quantity}}</td>
+                </tr>
+                <tr>
+                    <td>Total Price</td>
+                    <td>: {{order.price}}</td>
+                </tr>
+                <tr>
+                    <td>Payment Method</td>
+                    <td>: {{order.order.payment.payment_method}}</td>
+                </tr>
+                <tr>
+                    <td>Payment Id</td>
+                    <td>: {{order.order.payment_id}}</td>
+                </tr>
+                <tr>
+                    <td>Tracking No</td>
+                    <td>: {{order.order.tracking_no}}</td>
+                </tr>
+                <tr>
+                    <td>Ordered Date</td>
+                    <td>: {{order.order.created_at}}</td>
+                </tr>
+                <tr>
+                    <td>Order Status</td>
+                    <td>: {{order.status}}</td>
+                </tr>
+            </table>
+                 {% endfor %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}

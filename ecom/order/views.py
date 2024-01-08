@@ -1,4 +1,4 @@
-from django.shortcuts import render,redirect
+from django.shortcuts import render,redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from cart.models import Cart,CartItem,Address
 from django.http import JsonResponse, HttpResponse
@@ -155,23 +155,59 @@ def cancelorder(request,order_item_id):
 
 #<!---------admin---------->  
 def vieworder(request):
-    try:
-        if request.method=="POST":
-            status=request.POST.get('status')
-            print(status)
-            if status == 'status' or status == 'all':
-               orders = Order.objects.all().order_by('-id')
-            else:
-               orders = Order.objects.filter(status=status).order_by('-id')
-            context = {
+    if request.method=="POST":
+        status=request.POST.get('status')
+        print(status)
+        if status == 'status' or status == 'all':
+            orders = Order.objects.all().order_by('-id')
+        else:
+            orders = Order.objects.filter(status=status).order_by('-id')
+        context = {
             'orders': orders
-            }
+        }
         return render(request, 'admin/vieworder.html', context)
-       
+    else:
+        orders = Order.objects.all().order_by('-id')
+        context = {
+            "orders": orders,
+            
+        }
+        return render(request, 'admin/vieworder.html', context)
+def viewsingleadmin(request, order_id):
+    order = Order.objects.get(id=order_id)
+    order_item = OrderItem.objects.filter(order=order)
+    user=User.objects.get(id=order.user.id)
+    payments = Payment.objects.filter(order__id=order_id)
+    # user.wallet = user.wallet+order.total_price
+    user.save()
+    context = {
+        'order': order,
+        'order_item': order_item,
+        'payments': payments,
+        # 'order_return_message': order_return_message
+    }
+    return render(request, 'admin/viewdetailorder.html', context)
 
-    except:
-        pass    
-        
+def updatestatus(request, order_id, new_status):
+    
+    order = get_object_or_404(Order, pk=order_id)
+    
+    if new_status == 'Order Confirmed':
+        order.status = 'Order Confirmed'
+    elif new_status == 'Shipped':
+        order.status = 'Shipped'
+    elif new_status == 'Out for Delivery':
+        order.status = 'Out for Delivery'
+    elif new_status == 'Delivered':
+        order.status = 'Delivered'
+    elif new_status == 'Cancelled':
+        order.status = 'Cancelled'
+    
+    order.save()
+    
+    messages.success(request, f"Order #{order.tracking_no} has been updated to '{new_status}' status.")
+    
+    return redirect('order:vieworder')
    
         
         
