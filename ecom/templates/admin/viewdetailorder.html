@@ -12,7 +12,7 @@
         <!-- Content for the first div -->
         <h2 class="head-main text-center">ORDER ADDRESS</h2>
         <div class="inner-box" >
-            <table>
+            <table >
                 <tr>
                     <td>Username</td>
                     <td>: {{order.user.name}}</td>
@@ -58,11 +58,13 @@
         <div class="inner-box mt-3"style="flex: 1;min-width: 200px;margin: 10px;padding: 20px;border: 1px solid #ccc;
         position: relative;">
         <h2 class="text-center ">ORDER DETAILS</h2>
-            <table>
-                {% for order in order_item %}
+        {% for order in order_item %}
+            <table class="col-lg-12 col-md-6 col-sm-3 table  align-middle border-collapse: collapse;
+            width: 80 %; margin:auto; mx-3">
+               
                 <tr>
                     <td>Order id</td>
-                    <td>: {{order.order.id}}</td>
+                    <td>: {{order.id}}</td>
                 </tr>
                 <tr>
                     <td>Product Name</td>
