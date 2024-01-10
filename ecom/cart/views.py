@@ -215,7 +215,7 @@ def deleteaddress(request,address_id):
     
 @login_required
 def checkout(request,total=0,quantity=0,cart_items=None):
-
+    user=request.user
     url = request.META.get('HTTP_REFERER')
     try:
         try:
@@ -242,10 +242,10 @@ def checkout(request,total=0,quantity=0,cart_items=None):
         pass
     except CartItem.DoesNotExist:
         print("CartIT does not exist")
-        pass
+        pass  
+       
     address_list = Address.objects.filter(user_id=request.user)
-    default_address = address_list.filter(is_default=True).first()
-
+    default_address = address_list.filter(user_id=request.user).first()
 
     context = {
         'total':total,
@@ -253,32 +253,13 @@ def checkout(request,total=0,quantity=0,cart_items=None):
         'grand_total':grand_total,
         'cart_items': cart_items,
         'tax': tax,
+        #'selected_address': selected_address,
         'address_list':address_list,
         'default_address': default_address,
     }
 
     return render(request,'cart/checkout.html',context)
 
-
-def selectedAddress(request):
-    if request.method == 'GET':
-        selected_option = request.GET.get("selected_option")
-        address = Address.objects.get(id=selected_option)
-        print(selected_option)
-        response_data={
-            'username':address.recipient_name,
-            'email':address.email,
-            'phone':address.mobile,
-            'house_no':address.house_no,
-            'street':address.street_name,
-            'district':address.district,
-            'state':address.state,
-            'country':address.country,
-            'pincode':address.postal_code
-
-        }
-        return JsonResponse(response_data)
-    
 def addaddresscheck(request):
     email = request.POST.get('email')
     user=User.objects.get(email=request.user.email)
@@ -307,7 +288,7 @@ def addaddresscheck(request):
             return redirect('cart:checkout')
     except:
         messages.error(request, "This user address already exist..!")
-        return redirect('cart:checkout')
+        return redirect('cart:checkout',new_address_id=address.id)
 
 def removecart(request, product_id):  
     cart_id = _cart_id(request)  # Get or generate the cart_id
@@ -472,6 +453,7 @@ def checkoutorder(request):
         return render(request, 'cart/checkout.html', context)
     return redirect('/login/')
 
+@login_required
 def order(request, id=None):
     try:
         if request.session['coupon']:
@@ -548,18 +530,20 @@ def placeorder(request, total=0, quantity=0):
             tax = (2 * total) / 100
             grand_total = total + tax 
             print(grand_total)
+        
         if user is not None:
             try:
-                address = Address.objects.filter(user_id=user.id,is_default=True).first()
+                address=Address.objects.filter(user_id=user.id).last()
             except:
-                messages.error(request,"Create a address..!")
+                messages.error(request,"Create a address...!")
         else:
-            address = Address.objects.get(email=email)
+            address=Address.objects.filter(email=user.email).last()
+        
         
         order = Order()
         order.user = user
         order.total_price=grand_total
-        order.address = Address.objects.filter(user_id=user.id,is_default=True).first()
+        order.address = address
         trackno = 'pvkewt' + str(random.randint(1111111, 9999999))
         while Order.objects.filter(tracking_no=trackno) is None:
             trackno = 'pvkewt' + str(random.randint(1111111, 9999999))

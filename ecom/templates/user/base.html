@@ -52,7 +52,9 @@
                     <i class="fa-solid fa-user mx-2"></i>
                     <a href="{% url 'user:handlelogin' %}"><button type="button btn-outline-dark">Profile</button></a>
                     {% else %}
+                    {% if not request.user.is_superuser %}
                     <a href="{% url 'cart:profile' %}"><button type="button btn-outline-dark">Hi {{user.name}}</button></a>
+                    {% endif %}
                     <a href="{% url 'user:logout' %}"><button type="button btn-outline-dark">Logout</button></a>
                     <i class="fa-solid fa-cart-shopping mx-5"></i>
                     {% endif %}

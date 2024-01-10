@@ -42,8 +42,8 @@ def confirmrazorpayment(request,tracking_no):
     cart_items = CartItem.objects.filter(user=user)
     for cart_item in cart_items:
         product=cart_item.product
-        stock=product.quantity-cart_item.quantity
-        product.quantity=stock
+        stock=product.stock-cart_item.quantity
+        product.stock=stock
         product.save()
         order_product = OrderItem(
             order=order,
@@ -102,7 +102,7 @@ def cashdelivery(request,tracking_no):
 
     return render(request, 'order/cashdelivery.html', context)
 
-
+@login_required
 def orderinvoice(request,order_id):
     user = request.user
     order = Order.objects.get(id=order_id)
@@ -137,7 +137,7 @@ def orderinvoice(request,order_id):
             'subtotal': subtotal,
         }
     return render(request, 'order/orderconfirm.html', context)
-        
+@login_required        
 def myorders(request):
     user=request.user  
     print(user)
@@ -167,7 +167,7 @@ def myorders(request):
     
     
     return render(request, 'userprofile/order.html', context)
-
+@login_required
 def cancelorder(request,order_item_id):
     order_item = OrderItem.objects.get(id=order_item_id)
     order = Order.objects.get(id=order_item.order.id)

@@ -38,22 +38,62 @@ Checkout
 <div class="container-fluid">
     <div class='row'>
         <div class="checkout__form ">
-            <h4 class="text-center mt-3" style="color:#F08080">Billing Details</h4>
+            <h4 class="text-center mt-3" style="color:#DC143C">Billing Details</h4>
         </div>
     </div>
 </div>
 <div class="container-fluid mt-3 d-flex col-12 col-sm-12 details-block">
       
-    <div class="col-lg-8 col-md-8 col-sm-12 px-5 mt-5">
-        <button type="button" class="btn text-white mb-3" style="background-color:rgba(127, 173, 57, 1)" data-bs-toggle="modal"
+    <div class="col-lg-8 col-md-8 col-sm-12 mt-5">
+        <button type="button" class="btn text-white mb-3 mx-3" style="background-color:rgba(127, 173, 57, 1)" data-bs-toggle="modal"
                         data-bs-target="#exampleModal1">
                         Add Shipping Address
         </button>    
-        
+        <div class="container-fluid mt-3">
+            <div class="row justify-content-start">
+                <div class="col-12">
+                    <h4 class="text-center mt-3" style="color:#FF0000">Select Address</h4>
+                    <form method="post" action="{% url 'cart:checkout' %}">
+                        {% csrf_token %}
+                          {% comment %} loop for address {% endcomment %}
+                    {% if default_address %}
+                    
+                <div class="col-lg-12 col-md-12 mx-1">
+                  <div class="address-card mt-4" style=" border: 1px solid #ccc;padding: 10px;margin: 5px;width: 200px;height: 250px;float: left;position: relative;">
+                    <div>
+                                <p>Default Address {{ forloop.counter }}</p></div>
+                    <label class="mt-1">
+                       
+                        <strong>{{ default_address.recipient_name }}</strong><br>
+                        {{ default_address.house_no }} {{ default_address.street_name }}
+                        {{default_address.village_name }}
+                        <br>
+                        {{ default_address.district }}, {{ default_address.state }}
+                        {{default_address.postal_code }}<br>
+                        {{ default_address.country }}
+                    </label>
+                  </div>
+                  {% endif %}
+               <!--  </div>
+               <div class="col-lg-4 col-md-4 d-flex flex-column mx-4">-->
+                {% for address in address_list %}
+                    <div class="address-card mx-3 mt-4" style=" border: 1px solid #ccc;padding: 10px;margin: 5px;width: 200px;height: 250px;float: left;position: relative;">
+                        <label for="address{{ address.id }}" class="mt-1 mx-3">
+                            <strong>{{ address.recipient_name }}</strong><br>
+                            {{ address.house_no }} {{ address.street_name }} {{ address.village_name }} <br>
+                            {{ address.district }}, {{ address.state }} {{ address.postal_code }}<br>
+                            {{ address.country }}
+                        </label>
                     </div>
-               
-
-                    <div class="col-lg-4 col-md-4 col-sm-12 mx-0">
+                    {% endfor %}
+                
+                </div>
+            </form>
+                </div>
+            </div>
+        </div>
+        </div>
+            <div class="col-lg-4 col-md-4 col-sm-12 mx-0">
                         <div class="checkout__order">
 
                         <h4 class="text-center" style="color:#FF0000"> Order Summary </h4>
@@ -75,7 +115,7 @@ Checkout
                                 <tr>
                                     <td class="shoping__cart__item">
                                         <a href="{% url 'products:singleproductview' product_id=cart_item.variant.id %}">
-                                            <img src="{{ cart_item.product.images.url }}" alt="" width="100px">
+                                            <img src="{{ cart_item.product.images.url }}" alt="" width="50px">
                                         </a>
                 
                                     </td>
@@ -124,143 +164,6 @@ Checkout
                     
                 </div>   
 </div>
-
-<div class="container-fluid">
-    <div class="row mx-4 ">
-        {% if default_address %}
-    <div class="col-lg-12 col-md-12 mx-4">
-      <div class="address-card" style=" border: 1px solid #ccc;padding: 10px;margin: 5px;width: 200px;height: 250px;float: left;position: relative;">
-        <div><input type="radio" name="selectedAddress" value="{{ default_address.id }}"
-                    checked>
-                    <p>Default Address</p></div>
-        <label class="mt-1">
-           
-            <strong>{{ default_address.recipient_name }}</strong><br>
-            {{ default_address.house_no }} {{ default_address.street_name }}
-            {{default_address.village_name }}
-            <br>
-            {{ default_address.district }}, {{ default_address.state }}
-            {{default_address.postal_code }}<br>
-            {{ default_address.country }}
-        </label>
-      </div>
-   <!--  </div>
-   <div class="col-lg-4 col-md-4 d-flex flex-column mx-4">-->
-        {% for address in address_list %}
-        <div class="address-card mx-4" style=" border: 1px solid #ccc;padding: 10px;margin: 5px;width: 200px;height: 250px;float: left;position: relative;">
-            <div><input type="radio" id="address{{ address.id }}" name="selectedAddress"
-                        value="{{ address.id }}"> </div>
-            <label for="address{{ address.id }}" class="mt-1 mx-3">
-                <strong>{{ address.recipient_name }}</strong><br>
-                {{ address.house_no }} {{ address.street_name }} {{ address.village_name }} <br>
-                {{ address.district }}, {{ address.state }} {{ address.postal_code }}<br>
-                {{ address.country }}
-            </label>
-        </div>
-        {% endfor %}
-    {% endif %}
-    </div>
-    </div>
-</div>
-
-<div class="container-fluid m-3">
-    <div class="row justify-content-start">
-        <div class="col-7">
-            <h3 class="text-center ">Select a address</h3>
-        </div>
-    </div>
-</div>
-<div class="container d-flex col-12 col-sm-12 address-block">
- <div class="col-lg-7 col-md-7 px-3 py-4" style="border:1px solid #cccccc; border-radius:10px;">
-   <div class="row">
-    <h5 class="m-3">Basic Details</h5>
-    <div class="col-lg-12">
-        <div class="checkout__input pl-2">
-            <p>First Name<span>*</span></p>
-            <input type="text" placeholder="Enter first Name" name="username" id="username"
-                   value="{{default_address.recipient_name}}" disabled>
-        </div>
-    </div>
-   </div>
-
-   <div class="row">
-    <div class="col-lg-6">
-        <div class="checkout__input pl-2 ">
-            <p>Email<span>*</span></p>
-            <input type="email" placeholder="Enter Email" name="email" id="email"
-                   value="{{default_address.email}}" disabled>
-        </div>
-    </div>
-
-    <div class="col-lg-6">
-        <div class="checkout__input pr-2">
-            <p>Phone<span>*</span></p>
-            <input type="tel" placeholder=" Enter Phone" name="phone" id="phone"
-                   value="{{default_address.mobile}}" disabled>
-        </div>
-    </div>
-
-  </div>
-   <div class="row">
-    <div class="col-lg-6">
-        <div class="checkout__input pl-2">
-            <p>House No<span>*</span></p>
-            <input type="text" placeholder="Enter House No" name="house_no" id="house_no"
-                   value="{{default_address.house_no}}" disabled>
-        </div>
-    </div>
-
-    <div class="col-lg-6">
-        <div class="checkout__input pr-2">
-            <p>Street Name<span>*</span></p>
-            <input type="text" placeholder="Enter Street Name" required  name="street"
-                   id="street" value="{{default_address.street_name}}" disabled>
-        </div>
-    </div>
-
-   </div>
-
-   <div class="row">
-
-    <div class="col-lg-6">
-        <div class="checkout__input pl-2">
-            <p>District<span>*</span></p>
-            <input type="text" placeholder="Enter District" required name="district"
-                   id="district" value="{{default_address.district}}" disabled>
-        </div>
-    </div>
-    <div class="col-lg-6">
-        <div class="checkout__input pr-2">
-            <p>State<span>*</span></p>
-            <input type="text" placeholder="Enter State" required name="state" id="state"
-                   value="{{default_address.state}}" disabled>
-        </div>
-    </div>
-
-   </div>
-   <div class="row">
-    <div class="col-lg-6">
-        <div class="checkout__input pl-2">
-            <p>Country<span>*</span></p>
-            <input type="text" placeholder="Enter Country" required name="country"
-                   id="country" value="{{default_address.country}}" disabled>
-        </div>
-    </div>
-    <div class="col-lg-6">
-        <div class="checkout__input pr-2">
-            <p>Pin Code<span>*</span></p>
-            <input type="number" placeholder="Enter Pin Code" required name="pincode"
-                   value="{{default_address.postal_code}}" id="pincode" disabled>
-        </div>
-    </div>
-
-   </div>
-    </div>   
-    </div>
-</div>
-    
-</div>             
-  
 
     <!--Add Address modal-->
     <div class="container-fluid">
@@ -397,9 +300,45 @@ Checkout
             </div> 
         </div>
         </div>  
-      {% endblock %}            
+      {% endblock %} 
+      
+{% block j-script %}
+<script>
+$(document).ready(function () {
+
+    $('input[type="radio"]').on('change', function () {
+        const selectedOption = $('input[name="selectedAddress"]:checked').val();
+        console.log(selectedOption);
+
+        // Make a GET request with data as query parameters
+        $.ajax({
+            url: '/selectedaddress/',
+            method: 'GET',
+            data: { selectedOption: selectedOption }, // Send data as query parameters
+            dataType: 'json', // Specify the expected response data type
+            success: function (response) {
+                $('#username').val(response.username);
+                $('#email').val(response.email);
+                $('#phone').val(response.phone);
+                $('#house_no').val(response.house_no);
+                $('#street').val(response.street);
+                $('#district').val(response.district);
+                $('#state').val(response.state);
+                $('#country').val(response.country);
+                $('#pincode').val(response.pincode);
+
+
+            },
+            error: function (error) {
+                console.error('Error:', error);
+            }
+        });
+    });
+});
+</script>
+{% endblock %}
                             
-<!--{% block j-script %}
+<!--
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 
@@ -526,4 +465,3 @@ Checkout
 });
 </script>
 <script src="{% static 'js/checkout.js' %}"></script>-->
-{% endblock %}
