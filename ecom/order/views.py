@@ -190,15 +190,15 @@ def vieworder(request):
         status=request.POST.get('status')
         print(status)
         if status == 'status' or status == 'all':
-            orders = Order.objects.all().order_by('-id')
+            orders = Order.objects.filter(payment__isnull=False).order_by('-id')
         else:
-            orders = Order.objects.filter(status=status).order_by('-id')
+            orders = Order.objects.filter(status=status,payment__isnull=False).order_by('-id')
         context = {
             'orders': orders
         }
         return render(request, 'admin/vieworder.html', context)
     else:
-        orders = Order.objects.all().order_by('-id')
+        orders = Order.objects.filter(payment__isnull=False).order_by('-id')
         context = {
             "orders": orders,
             
@@ -209,12 +209,16 @@ def viewsingleadmin(request, order_id):
     order_item = OrderItem.objects.filter(order=order)
     user=User.objects.get(id=order.user.id)
     payments = Payment.objects.filter(order__id=order_id)
+    tax = (2*order.total_price/100)
+    grand_total = order.total_price + tax
     # user.wallet = user.wallet+order.total_price
     user.save()
     context = {
         'order': order,
         'order_item': order_item,
         'payments': payments,
+        'tax':tax,
+        'grand_total':grand_total,
         # 'order_return_message': order_return_message
     }
     return render(request, 'admin/viewdetailorder.html', context)

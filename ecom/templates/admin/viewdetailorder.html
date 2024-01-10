@@ -58,33 +58,67 @@
         <div class="inner-box mt-3"style="flex: 1;min-width: 200px;margin: 10px;padding: 20px;border: 1px solid #ccc;
         position: relative;">
         <h2 class="text-center ">ORDER DETAILS</h2>
-        {% for order in order_item %}
+       
+        <table class="table text-start align-middle table-bordered table-hover mb-0 table-stripped">
+            <thead>
+                <tr class="text-dark">
+                    <th scope="col">Order Number</th>
+                    <th scope="col">Product Details</th>
+                    <th scope="col">Image</th>
+                    <th scope="col">Price Details</th>
+                    <th scope="col">Tax Details</th>
+                    <th scope="col">Payment Details </th>
+                    <th scope="col">Ordered Date</th>
+                    <th scope="col">Status</th>
+                </tr>
+            </thead>
+        <tbody>
+            {% for order in order_item %}
+            <tr>
+                <td>{{forloop.counter}}  {{order.order.tracking_no}}</td>
+                <td>{{order.product.product_name}}
+                    <p>Quantity: {{order.quantity}}</p><p>Colour:{{order.variant.color}}</p>
+                </td>
+                <td>
+                    <img src="{{ order.product.images.url }}" alt="{{ order.product.product_name }}" width="100"> 
+                </td>
+                <td>{{order.price}} </td>
+                <td>{{tax}} </td>
+                <td>{{order.order.payment.payment_method}}</td>
+                <td>{{order.order.created_at}}</td>
+                <td>{{order.status}}</td>
+               
+               
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table><!---
             <table class="col-lg-12 col-md-6 col-sm-3 table  align-middle border-collapse: collapse;
             width: 80 %; margin:auto; mx-3">
                
                 <tr>
                     <td>Order id</td>
-                    <td>: {{order.id}}</td>
+                    <td>: {{order.tax}}</td>
                 </tr>
                 <tr>
                     <td>Product Name</td>
-                    <td>:{{order.product.product_name}}</td>
+                    <td>:</td>
                 </tr>
                 <tr>
                     <td> Product Image </td>
-                <td><img src="{{ order.product.images.url }}" alt="{{ order.product.product_name }}" width="100"></td>
+                <td></td>
                 </tr>
                 <tr>
                     <td>Quantity</td>
-                    <td>:{{order.quantity}}</td>
+                    <td>:</td>
                 </tr>
                 <tr>
                     <td>Total Price</td>
-                    <td>: {{order.price}}</td>
+                    <td>:</td>
                 </tr>
                 <tr>
                     <td>Payment Method</td>
-                    <td>: {{order.order.payment.payment_method}}</td>
+                    <td>: </td>
                 </tr>
                 <tr>
                     <td>Payment Id</td>
@@ -92,18 +126,18 @@
                 </tr>
                 <tr>
                     <td>Tracking No</td>
-                    <td>: {{order.order.tracking_no}}</td>
+                    <td>:</td>
                 </tr>
                 <tr>
                     <td>Ordered Date</td>
-                    <td>: {{order.order.created_at}}</td>
+                    
                 </tr>
                 <tr>
                     <td>Order Status</td>
-                    <td>: {{order.status}}</td>
+                   
                 </tr>
-            </table>
-                 {% endfor %}
+            </table>-->
+                
         </div>
     </div>
 </div>
