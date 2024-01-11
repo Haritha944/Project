@@ -209,16 +209,25 @@ def viewsingleadmin(request, order_id):
     order_item = OrderItem.objects.filter(order=order)
     user=User.objects.get(id=order.user.id)
     payments = Payment.objects.filter(order__id=order_id)
-    tax = (2*order.total_price/100)
-    grand_total = order.total_price + tax
+    subtotal=0
+    for item in order_item:
+        item_total = item.variant.discount_price * item.quantity
+        total = item_total  
+        subtotal += item_total
+        tax = (2 *subtotal) / 100
+        
+
+        grand_total = subtotal + tax 
+
     # user.wallet = user.wallet+order.total_price
     user.save()
     context = {
         'order': order,
         'order_item': order_item,
         'payments': payments,
-        'tax':tax,
-        'grand_total':grand_total,
+        'tax': tax,
+        'grand_total': grand_total,
+        
         # 'order_return_message': order_return_message
     }
     return render(request, 'admin/viewdetailorder.html', context)

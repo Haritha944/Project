@@ -65,11 +65,10 @@
                     <th scope="col">Order Number</th>
                     <th scope="col">Product Details</th>
                     <th scope="col">Image</th>
-                    <th scope="col">Price Details</th>
-                    <th scope="col">Tax Details</th>
+                    <th scope="col">Status</th>
                     <th scope="col">Payment Details </th>
                     <th scope="col">Ordered Date</th>
-                    <th scope="col">Status</th>
+                    <th scope="col">Price Details</th>
                 </tr>
             </thead>
         <tbody>
@@ -82,61 +81,29 @@
                 <td>
                     <img src="{{ order.product.images.url }}" alt="{{ order.product.product_name }}" width="100"> 
                 </td>
-                <td>{{order.price}} </td>
-                <td>{{tax}} </td>
+                <td>{{order.status}}</td>
                 <td>{{order.order.payment.payment_method}}</td>
                 <td>{{order.order.created_at}}</td>
-                <td>{{order.status}}</td>
+                <td>{{order.price}} </td>
                
-               
+                {% endfor %}
             </tr>
-            {% endfor %}
+            <tr>
+                <td colspan="5"></td>
+                <td>Total Tax:</td>
+                <td>{{tax}}</td>
+                
+            </tr>
+            <tr>
+                <td colspan="5"></td>
+                <td>Grand Total:</td>
+                <td>{{grand_total}}</td>
+                
+            </tr>
+            
+            
         </tbody>
-    </table><!---
-            <table class="col-lg-12 col-md-6 col-sm-3 table  align-middle border-collapse: collapse;
-            width: 80 %; margin:auto; mx-3">
-               
-                <tr>
-                    <td>Order id</td>
-                    <td>: {{order.tax}}</td>
-                </tr>
-                <tr>
-                    <td>Product Name</td>
-                    <td>:</td>
-                </tr>
-                <tr>
-                    <td> Product Image </td>
-                <td></td>
-                </tr>
-                <tr>
-                    <td>Quantity</td>
-                    <td>:</td>
-                </tr>
-                <tr>
-                    <td>Total Price</td>
-                    <td>:</td>
-                </tr>
-                <tr>
-                    <td>Payment Method</td>
-                    <td>: </td>
-                </tr>
-                <tr>
-                    <td>Payment Id</td>
-                    <td>: {{order.order.payment_id}}</td>
-                </tr>
-                <tr>
-                    <td>Tracking No</td>
-                    <td>:</td>
-                </tr>
-                <tr>
-                    <td>Ordered Date</td>
-                    
-                </tr>
-                <tr>
-                    <td>Order Status</td>
-                   
-                </tr>
-            </table>-->
+    </table>
                 
         </div>
     </div>
