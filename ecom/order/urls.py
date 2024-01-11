@@ -9,7 +9,9 @@ urlpatterns = [
     path('confirmrazorpayment/<str:tracking_no>/', views.confirmrazorpayment, name='confirmrazorpayment'),
     path('cashdelivery/<str:tracking_no>/', views.cashdelivery, name='cashdelivery'),
     path('orderinvoice/<int:order_id>/', views.orderinvoice, name='orderinvoice'),
-    path('myorders', views.myorders, name='myorders'),
+     path('myorder', views.myorder, name='myorder'),
+    path('myorderdetail/<int:order_id>/', views.myorderdetail, name='myorderdetail'),
+    path('returnorder/<int:order_item_id>/', views.returnorder, name='returnorder'),
     path('cancelorder/<int:order_item_id>/', views.cancelorder, name='cancelorder'),
    #admin
     path('vieworder/', views.vieworder, name='vieworder'),

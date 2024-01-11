@@ -4,7 +4,7 @@ from cart.models import Cart,CartItem,Address
 from django.http import JsonResponse, HttpResponse
 from django.contrib import messages
 from user.models import User
-from order.models import Order,OrderItem,Payment
+from order.models import Order,OrderItem,Payment,ReturnOrder
 from products.models import Product,ProductVariant
 from django.db import transaction
 
@@ -137,12 +137,22 @@ def orderinvoice(request,order_id):
             'subtotal': subtotal,
         }
     return render(request, 'order/orderconfirm.html', context)
+
+def myorder(request):
+    orders = Order.objects.filter(user=request.user,payment__isnull=False).order_by('-id')
+    order_items = OrderItem.objects.filter(user=request.user).order_by('-id')
+    context = {
+        'orders': orders,
+        "order_items": order_items,
+    }
+    return render(request, 'userprofile/myorder.html',context)
 @login_required        
-def myorders(request):
+def myorderdetail(request,order_id):
     user=request.user  
     print(user)
     email = request.user
     user = User.objects.get(email=email)
+    order = Order.objects.get(id=order_id)
     if request.method == "POST":
         status=request.POST.get('status')
         order = Order.objects.filter(user=user)
@@ -151,15 +161,14 @@ def myorders(request):
         else:
             print(status)
             order_items = OrderItem.objects.filter(user=user,status=status).order_by('-id')
-            order_items1 = OrderItem.objects.filter(user=user, status='Cancelled').values()
+            order_items1 = OrderItem.objects.filter(user=user, status='Cancelled',).values()
             print(order_items1)
         context = {
             "order": order,
             "order_items": order_items
         }
     else:
-        order = Order.objects.filter(user=user)
-        order_items = OrderItem.objects.filter(user=user).order_by('-id')
+        order_items = OrderItem.objects.filter(user=user,order=order).order_by('-id')
         context = {
             "order": order,
             "order_items": order_items
@@ -180,7 +189,7 @@ def cancelorder(request,order_item_id):
             reason = request.POST.get('cancel')
             item.status = 'Cancelled'
             item.save()
-        return redirect('order:myorders')    
+        return redirect('order:myorder')    
     else:
         pass    
 
@@ -253,7 +262,25 @@ def updatestatus(request, order_id, new_status):
     
     return redirect('order:vieworder')
    
-        
+
+def returnorder(request,order_item_id):
+    order_item = OrderItem.objects.get(id=order_item_id)
+    order = Order.objects.get(id=order_item.order.id)
+    if request.method == 'POST':
+        reason = request.POST.get('reason')
+        returnorder = ReturnOrder()
+        returnorder.order_item = order_item
+        returnorder.order = order
+        returnorder.return_comment = reason
+        returnorder.save()
+        order_items = OrderItem.objects.filter(order=order)
+        for item in order_items:
+            reason = request.POST.get('return')
+            item.status = 'Return requested'
+            item.save()
+            order.status = "Return requested"
+            order.save()
+    return redirect('order:myorderdetail')   
         
 
           

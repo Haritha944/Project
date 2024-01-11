@@ -9,11 +9,11 @@ User profile
 {% block content%}
 <div class="container-fluid page-header">
     <div class="row ">
-     <div class="col-lg-12 col-md-12"> <!--Breadcrumb begins-->
+     <div class="col-lg-12 col-md-12 text-center"> <!--Breadcrumb begins-->
       <nav aria-label="breadcrumb" class="breadcrumb-nav border-0 mb-0">
           <div class="container">
               <ol class="breadcrumb">
-                  <li class="breadcrumb-item"><a class="text-decoration-none text-dark" href="{% url 'cart:profile' %}">Profile</a></li>
+                  <li class="breadcrumb-item"><a class="text-decoration-none text-dark fw-bold" href="{% url 'cart:profile' %}">Profile</a></li>
                   <li class="breadcrumb-item active" aria-current="page">Order</li>
               </ol>
           </div><!-- End .container -->
@@ -72,10 +72,26 @@ User profile
         </div>
         <div class="row justify-content-center">
             <div class="col-lg-12 m-5">
-                <table class="col-lg-12 col-md-6 col-sm-3 table  align-middle border-collapse: collapse;
-                width: 80 %; margin:auto; mx-3 ">
+                <table class="table text-start align-middle table-bordered table-hover mb-0 table-stripped ">
+                    <thead>
+                        <tr>
+                          <th scope="col">Order No.</th>
+                          <th scope="col">Product</th>
+                          <th scope="col">Image</th>
+                          <th scope="col">Address</th>
+                          <th scope="col">Total Amount</th>
+                          <th scope="col">Status</th>
+                          {% if order.status != 'Cancelled' %}
+                          <th scope="col">Actions</th>
+                          {% endif %}
+                        </tr>
+                      </thead>
+                      <tbody>
                     {% for item in order_items %}
                     <tr>
+                        <td><div class="ms-3 mt-5">
+                            <h5>{{item.order.tracking_no}}</h5> </div>
+                        </td>
                         <td>
                             <div class="mt-5">
                                 <a href="#" class="text-decoration-none">
@@ -94,21 +110,19 @@ User profile
                                 </div>
                             </a>
                         </td>
+                        
+                        <td>
+                            <a href="#" class="text-decoration-none text-dark">
+                                    <div class="mb-0">{{item.order.address.house_no}},{{item.order.address.street_name}},{{item.order.address.district}} </div>
+                                    <div class="mb-0">Phone: {{item.order.address.mobile}} </div>
+                            </a>
+                        </td>
                         <td>
                             <a href="#" class="text-decoration-none text-dark">
                                 <div class="mt-5">
                                     <div style="width: 50px;">
                                         <h5 class="fw-normal mb-0">₹{{item.order.total_price}}</h5>
                                     </div>
-                                </div>
-                            </a>
-                        </td>
-                        <td>
-                            <a href="#" class="text-decoration-none text-dark">
-                                <div class="ms-3 mt-5">
-                                    <h5>{{item.order.tracking_no}}</h5>
-                                    <p class="small mb-0">Address: {{item.order.address.house_no}},{{item.order.address.street_name}},{{item.order.address.district}} </p>
-                                    <p class="small mb-0">Phone: {{item.order.address.mobile}} </p>
                                 </div>
                             </a>
                         </td>
@@ -137,9 +151,16 @@ User profile
                                 </div>
                             </a>
                         </td>
+                        {% if order.status != 'Cancelled' and  order.status != "Returned" %}
                         <td>
-                            <a class="text-danger text-decoration-none" href="{% url 'order:cancelorder' order_item_id=item.id %}"><i class="bx bx-trash me-1 "></i>X</a>
+                            <a class="btn btn-danger" style="border-radius: 35px;" href="{% url 'order:cancelorder' order_item_id=item.id %}">Cancel</a>
+                            <button type="button" style="border-radius: 35px;"  class="btn btn-info mt-3" data-bs-toggle="modal"
+                            data-bs-target="#exampleModal">
+                              Return
+                               </button>
                         </td>
+                        
+                        {% endif %}
       
                     </tr>
                     {% endfor %}
@@ -154,17 +175,17 @@ User profile
         <div class="d-flex justify-content-center align-item-center"><h3>Your order list is empty</h3></div>
         <br>
         <div class="d-flex justify-content-center align-item-center"><a href="{% url 'products:viewshop' %}"
-                                                                        class="btn btn-warning">Go to Shope</a></div>
+                                                                        class="btn btn-warning">Go to Shop</a></div>
     </div>
     {% endif %}
    
 </div>
 <div class="">
-    <div class="modal fade col-lg-12 col-md-6 col-sm-3" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel"
+    <div class="modal fade col-lg-12 col-md-6 col-sm-3" id="exampleModal1" tabindex="-1" aria-labelledby="exampleModalLabel"
     aria-hidden="true">
-   <div class="modal-dialog">
+   <div class="modal-dialog modal-dialog-scrollable">
        <div class="modal-content">
-           <form method="post" action="#">
+           <form method="post" action="{% url 'order:returnorder' order_item_id=item.id %}">
                {% csrf_token %}
                <div class="modal-header">
                    <h5 class="modal-title" id="exampleModalLabel">Order Cancellation</h5>
@@ -209,8 +230,76 @@ User profile
        </div>
    </div>
 </div>
-
-
 </div>
-
+<!--Return Product Modal -->
+<div class="modal fade col-lg-12 col-md-6 col-sm-3" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel"
+     aria-hidden="true">
+ <div class="modal-dialog modal-dialog-scrollable">
+    <div class="modal-content">
+        <form method="post" action="{% url 'order:returnorder' order_item_id=item.id %}" >
+            {% csrf_token %}
+            <div class="modal-header">
+                <h5 class="modal-title" id="">Return Product </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <h3>REASON FOR RETURN PRODUCT</h3>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="return" id="noLongerHaveItem1"
+                    value="I no longer have this item">
+                <label class="form-check-label" for="noLongerHaveItem">I no longer have this item</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" name="return" id="foundDefective1" value="I found the item to be defective">
+                  <label class="form-check-label" for="foundDefective">I found the item to be defective</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="return" id="otherReason1" value="other">
+                    <label class="form-check-label" for="otherReason">Other</label>
+                </div>
+                    <div class="form-group" id="otherReasonInput1" style="display: none;">
+                        <textarea class="form-control" name="reason" placeholder="Enter your reason"></textarea>
+                    </div>
+               </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </div>
+           
+        </form>
+    </div>
+ </div>
+</div>
 {% endblock %}
+
+{% block j-script %}
+
+<!-- Add this in the head section of your HTML file -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+$(document).ready(function() {
+    // When the "Other" radio button is selected, show the textarea
+   
+     $('input[name="return"]').change(function() {
+        if (this.value === "other") {
+            $('#otherReasonInput1').show();
+        } else {
+            $('#otherReasonInput1').hide();
+        }
+    });
+});
+
+
+
+
+
+
+
+
+
+
+</script>
+{% endblock %}
+

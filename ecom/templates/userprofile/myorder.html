@@ -1,0 +1,65 @@
+{% extends 'userprofile/profileinfo.html' %}
+{% load static %}
+{% block title %}
+User profile
+{% endblock %}
+{% block style %} 
+<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+{% endblock%}
+{% block content%}
+<div class="container-fluid">
+    <div class="breadcrumb-section breadcrumb-bg">
+            <div class="col-lg-8 offset-lg-2 text-center">
+              <div class="breadcrumb-text">
+                  <ol class="breadcrumb justify-content-center mb-0">
+                    <li class="breadcrumb-item active text-dark fw-bold" aria-current="page">Your Profile</li>
+                    <li class="breadcrumb-item active text-dark fw-bold" aria-current="page">Orders</li>
+              </nav>
+              </div>
+        </div>
+      </div>
+</div>
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-lg-2 col-md-2 col-sm-12">
+      
+    </div>
+    <div class="col-lg-9 col-md-9 col-sm-12 pt-3">
+    <main class="main-content mt-3">
+      <table class="table text-start align-middle table-bordered table-hover mb-0 table-stripped">
+        <thead>
+          <tr>
+            <th scope="col">Order No.</th>
+            <th scope="col">Full Address</th>
+            <th scope="col">Mobile</th>
+            <th scope="col">Total Amount</th>
+            <th scope="col">Date</th>
+            <th scope="col">Status</th>
+            <th scope="col">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for order in order_items %}
+          <tr>
+            <td>{{ order.order.tracking_no }}</td>
+            <td>
+              <p>{{ order.order.address.house_no }},{{ order.order.address.street_name}},
+                {{ order.order.address.state}}
+              </p>
+            </td>
+            <td>{{ order.order.address.mobile }}</td>
+            <td>₹ {{ order.order.total_price }}</td>
+            <td>{{ order.order.created_at|date:"F j, Y" }}</td>
+            <td>{{ order.order.status }}</td>
+            <td>
+            <a href="{% url 'order:myorderdetail' order_id=order.order.id %}" class="btn btn-warning" style="background-color: #F28123; color: white; border-radius: 35px;">Details</a>
+          </td>          
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </main>
+  </div>
+  <div>
+</div>
+{% endblock %}

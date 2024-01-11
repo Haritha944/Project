@@ -60,3 +60,12 @@ class OrderItem(models.Model):
 
     def _str_(self):
         return f"{self.order.id, self.order.tracking_no}"
+    
+class ReturnOrder(models.Model):
+    order_item=models.ForeignKey(OrderItem,on_delete=models.CASCADE)
+    order= models.ForeignKey(Order, on_delete=models.CASCADE)
+    return_reason = models.CharField(max_length=100, null=True)
+    return_comment = models.TextField(max_length=500, null=True)
+
+    def __str__(self):
+        return f"{self.id}"
