@@ -69,6 +69,12 @@
                     <th scope="col">Payment Details </th>
                     <th scope="col">Ordered Date</th>
                     <th scope="col">Price Details</th>
+                    {% if order.status == 'Return requested' %}
+                    <th scope="col">
+                        Action
+                    </th>
+                    {% endif %}
+                   
                 </tr>
             </thead>
         <tbody>
@@ -81,10 +87,16 @@
                 <td>
                     <img src="{{ order.product.images.url }}" alt="{{ order.product.product_name }}" width="100"> 
                 </td>
-                <td>{{order.status}}</td>
+                <td>{{order.order.status}}</td>
                 <td>{{order.order.payment.payment_method}}</td>
                 <td>{{order.order.created_at}}</td>
                 <td>{{order.price}} </td>
+                {% if order.status == 'Return requested' %}
+                <td> <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                    Return requested.!
+                </button>
+                </td>
+                {% endif %}
                
                 {% endfor %}
             </tr>
@@ -108,5 +120,28 @@
         </div>
     </div>
 </div>
+<!--Modal Return-->
+{% for item in order_item %}
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Return request</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" action="{% url 'order:returnapprove' item.order.id  %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="fs-5">I am request to cancel order {{item.order.tracking_no}}</div>
+                    <p>{{item.order.return_reason}}</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Approve</button>
+                </div>
+            </form>
 
+        </div>
+    </div>
+</div>
+{% endfor %}
 {% endblock %}

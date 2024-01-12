@@ -280,7 +280,23 @@ def returnorder(request,order_item_id):
             item.save()
             order.status = "Return requested"
             order.save()
-    return redirect('order:myorderdetail')   
+    return redirect('order:myorder')   
+
+
+def returnapprove(request,order_id):
+    order = Order.objects.get(id=order_id)
+    order.status = "Returned"
+    order.save()
+    order_item = OrderItem.objects.filter(order=order)
+    for item in order_item:
+        item.status = "Returned"
+        item.save()
+    context = {
+        'order' : order,
+        'order_item' : order_item,
+    }
+    return render(request,"admin/viewdetailorder.html")
+
         
 
           

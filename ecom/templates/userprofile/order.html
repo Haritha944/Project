@@ -81,7 +81,7 @@ User profile
                           <th scope="col">Address</th>
                           <th scope="col">Total Amount</th>
                           <th scope="col">Status</th>
-                          {% if order.status != 'Cancelled' %}
+                          {% if order.status != 'Cancelled' and  order.status != "Return requested" %}
                           <th scope="col">Actions</th>
                           {% endif %}
                         </tr>
@@ -130,31 +130,31 @@ User profile
                             <a href="#" class="text-decoration-none text-dark">
                                 <div class="d-flex flex-row align-items-center mt-5">
                                     <div class="ms-3">
-                                        {% if item.status == 'Canceled' %}
-                                        <div class="btn btn-danger text-white"><h5>{{item.status}}</h5></div>
-                                        {% elif item.status == 'Delivered'%}
-                                        <div class="btn btn-success  text-white"><h5>{{item.status}}</h5></div>
-                                        {% elif item.status == 'Order confirmed' %}
-                                        <div class="btn btn-success text-white"><h5>{{item.status}}</h5></div>
-                                        {% elif item.status == 'Shipped' %}
-                                        <div class="btn btn-info text-white"><h5>{{item.status}}</h5></div>
-                                        {% elif item.status == 'Out for delivery' %}
-                                        <h5 style="color:orange;">{{item.status}}</h5>
-                                        {% elif item.status == 'Return requested' %}
-                                        <div class="btn btn-success text-white"><h5>{{item.status}}</h5></div>
-                                        {% elif item.status == 'Return processing' %}
-                                        <div class="btn btn-warning"><h5>{{item.status}}</h5></div>
+                                        {% if item.order.status == 'Canceled' %}
+                                        <div class="btn btn-danger text-white"><h5>{{item.order.status}}</h5></div>
+                                        {% elif item.order.status == 'Delivered'%}
+                                        <div class="btn btn-success  text-white"><h5>{{item.order.status}}</h5></div>
+                                        {% elif item.order.status == 'Order confirmed' %}
+                                        <div class="btn btn-success text-white"><h5>{{item.order.status}}</h5></div>
+                                        {% elif item.order.status == 'Shipped' %}
+                                        <div class="btn btn-info text-white" ><h5>{{item.order.status}}</h5></div>
+                                        {% elif item.order.status == 'Out for delivery' %}
+                                        <h5 style="color:orange;">{{item.order.status}}</h5>
+                                        {% elif item.order.status == 'Return requested' %}
+                                        <div class="btn btn-success text-white"><h5>{{item.order.status}}</h5></div>
+                                        {% elif item.order.status == 'Return processing' %}
+                                        <div class="btn btn-warning"><h5>{{item.order.status}}</h5></div>
                                         {% else %}
-                                        <h5 style="color:green;">{{item.status}}</h5>
+                                        <h5 style="color:green;">{{item.order.status}}</h5>
                                         {% endif %}
                                     </div>
                                 </div>
                             </a>
                         </td>
-                        {% if order.status != 'Cancelled' and  order.status != "Returned" %}
+                        {% if order.status != 'Cancelled' and  order.status != "Return requested" %}
                         <td>
                             <a class="btn btn-danger" style="border-radius: 35px;" href="{% url 'order:cancelorder' order_item_id=item.id %}">Cancel</a>
-                            <button type="button" style="border-radius: 35px;"  class="btn btn-info mt-3" data-bs-toggle="modal"
+                            <button type="button" style="border-radius: 35px;"  class="btn btn-info mt-3 text-white" data-bs-toggle="modal"
                             data-bs-target="#exampleModal">
                               Return
                                </button>
@@ -163,7 +163,7 @@ User profile
                         {% endif %}
       
                     </tr>
-                    {% endfor %}
+                    {% endfor %} 
                 </table>
     
             </div>
@@ -185,7 +185,7 @@ User profile
     aria-hidden="true">
    <div class="modal-dialog modal-dialog-scrollable">
        <div class="modal-content">
-           <form method="post" action="{% url 'order:returnorder' order_item_id=item.id %}">
+           <form method="post" action="#">
                {% csrf_token %}
                <div class="modal-header">
                    <h5 class="modal-title" id="exampleModalLabel">Order Cancellation</h5>
@@ -236,6 +236,7 @@ User profile
      aria-hidden="true">
  <div class="modal-dialog modal-dialog-scrollable">
     <div class="modal-content">
+        {% for item in order_items %}
         <form method="post" action="{% url 'order:returnorder' order_item_id=item.id %}" >
             {% csrf_token %}
             <div class="modal-header">
@@ -265,7 +266,7 @@ User profile
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                     <button type="submit" class="btn btn-primary">Submit</button>
                 </div>
-           
+              {% endfor %} 
         </form>
     </div>
  </div>
