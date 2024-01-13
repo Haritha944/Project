@@ -17,6 +17,23 @@ Order
         </div>
     </div>
 </div>
+<div>
+    {% if messages %}
+    <div class="container" style="background-color:transparent;">
+        <ul class="messages mx-auto text-center">
+            {% for message in messages %}
+            <div id="message">
+                <div style="background-color:transparent;" class="error-alert {% if message.tags %}alert-{{ message.tags }}{% endif %}" role="alert">
+                    <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span></button>
+                    {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %} {% endif %}
+                    {{ message }}
+                </div>
+            </div>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+</div>
 
 <div class="container-fluid">
     <div class="row">
@@ -93,7 +110,7 @@ Order
                 </table>
                 <div class="cart-buttons mt-3 ">
                     <a type="button" href="{% url 'order:cashdelivery' tracking_no=order.tracking_no  %}" class="btn btn-warning btn-md btn-block">Cash On Delivery</a>
-                    <a type="button" href="#" class="btn btn-warning btn-md btn-block wallet-button mx-2" style="background-color: #F28123;" >Pay with Wallet</a>
+                    <a type="button" href="{% url 'order:walletpay' order_id=order.id %}" class="btn btn-warning btn-md btn-block wallet-button mx-2" style="background-color: #F28123;" >Pay with Wallet</a>
                     <a id="rzp-button1" class="btn btn-primary btn-md btn-block">Pay with Razorpay</a>
                 </div>
             </div>

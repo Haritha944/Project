@@ -185,7 +185,7 @@ def cancelorder(request,order_item_id):
         order.save()
         order_items = OrderItem.objects.filter(order=order)
         print(order.payment.payment_method)
-        if order.payment.payment_method == 'Paid by Razorpay' or order.payment.payment_method == 'wallet':
+        if order.payment.payment_method == 'Paid by Razorpay' or order.payment.payment_method == 'Wallet':
             email = request.user
             user = User.objects.get(email=email)
             userwallet = UserWallet()
@@ -367,7 +367,7 @@ def walletpay(request,order_id):
         cart_items.delete()
     else:
         messages.warning(request, 'Not Enough Balance in Wallet')
-        return render(request, 'order/orderconfirm.html')
+        return render(request, 'userprofile/wallet.html')
     context = {
         'order': order,
         'tracking_no': order.tracking_no,

@@ -39,3 +39,8 @@ class Address(models.Model):
 
     def __str__(self):
         return "{}-{}".format(self.recipient_name, self.user_id.name)
+
+class Wishlist(models.Model):
+    user = models.ForeignKey(User,  on_delete=models.CASCADE)
+    variant = models.ForeignKey(ProductVariant, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
