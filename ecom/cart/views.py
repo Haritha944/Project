@@ -220,7 +220,7 @@ def checkout(request,total=0,quantity=0,cart_items=None):
     try:
         try:
             email = request.POST.get('email')
-            user=User.objects.get(email=email)
+            user=User.objects.get(user=request.user,email=email)
             print(user)
             if user is not None:
                cart_items = CartItem.objects.filter(user_id=user.id, is_active=True).order_by('id')
@@ -246,6 +246,8 @@ def checkout(request,total=0,quantity=0,cart_items=None):
        
     address_list = Address.objects.filter(user_id=request.user)
     default_address = address_list.filter(user_id=request.user).first()
+    if not default_address:
+        return redirect('cart:address')
 
     context = {
         'total':total,

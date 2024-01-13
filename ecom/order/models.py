@@ -69,3 +69,10 @@ class ReturnOrder(models.Model):
 
     def __str__(self):
         return f"{self.id}"
+class UserWallet(models.Model):
+    user = models.ForeignKey(User,on_delete=models.CASCADE)
+    transaction = models.CharField(max_length=50)
+    created_at = models.DateTimeField(auto_now_add=True)
+    amount = models.FloatField()
+    def __str__(self):
+        return f'{self.user.name} amount {self.amount}'

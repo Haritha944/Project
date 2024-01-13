@@ -81,7 +81,7 @@ User profile
                           <th scope="col">Address</th>
                           <th scope="col">Total Amount</th>
                           <th scope="col">Status</th>
-                          {% if order.status != 'Cancelled' and  order.status != "Return requested" %}
+                          {% if order.status != 'Cancelled' and  order.status != "Return requested" and order.status != "Returned" %}
                           <th scope="col">Actions</th>
                           {% endif %}
                         </tr>
@@ -151,7 +151,7 @@ User profile
                                 </div>
                             </a>
                         </td>
-                        {% if order.status != 'Cancelled' and  order.status != "Return requested" %}
+                        {% if order.status != 'Cancelled' and  order.status != "Return requested" and order.status != "Returned" %}
                         <td>
                             <a class="btn btn-danger" style="border-radius: 35px;" href="{% url 'order:cancelorder' order_item_id=item.id %}">Cancel</a>
                             <button type="button" style="border-radius: 35px;"  class="btn btn-info mt-3 text-white" data-bs-toggle="modal"

@@ -1,0 +1,67 @@
+{% extends 'userprofile/profileinfo.html' %}
+{% load static %}
+{% block title %}
+User profile
+{% endblock %}
+{% block content %}
+<div class="container-fluid">
+<div class="row">
+    <div class="breadcrumb-section breadcrumb-bg">
+        <div class="col-lg-8 offset-lg-2 text-center">
+          <div class="breadcrumb-text">
+              <ol class="breadcrumb justify-content-center mb-0">
+                <li class="breadcrumb-item active text-dark fw-bold" aria-current="page"><a class="text-decoration-none text-dark" href="{% url 'cart:profile' %}">Your Profile</a></li>
+                <li class="breadcrumb-item active text-dark fw-bold" aria-current="page">Wallet</li>
+              </div>
+          </div>
+    </div>
+  </div>
+</div>
+</div>
+<div>
+    {% if messages %}
+    <div class="container" style="background-color:transparent;">
+        <ul class="messages mx-auto text-center">
+            {% for message in messages %}
+            <div id="message">
+                <div style="background-color:transparent;" class="error-alert {% if message.tags %}alert-{{ message.tags }}{% endif %}" role="alert">
+                    <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span></button>
+                    {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %} {% endif %}
+                    {{ message }}
+                </div>
+            </div>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+</div>
+<div class="container">
+<div class="row">
+<div class="col-lg-9 mt-4 mx-3">
+    <div>
+        <h4 style="color:#DC143C" >Wallet balance : ₹ {{wallet_amount}}</h4>
+    </div>
+    <table class="table text-start table-striped align-middle table-bordered table-hover mb-0 mt-3">
+        <thead>
+        <tr class="text-dark">
+            <th scope="col">Date</th>
+            <th scope="col">Amount</th>
+            <th scope="col">Transaction</th>
+
+        </tr>
+        </thead>
+        <tbody>
+        {% for item in wallet_transaction %}
+        <tr>
+            <td>{{item.created_at}}</td>
+            <td>{{item.amount}}</td>
+            <td>{{item.transaction}}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+   </table>
+
+</div>
+</div>
+</div>
+{% endblock %}

@@ -4,7 +4,7 @@ from cart.models import Cart,CartItem,Address
 from django.http import JsonResponse, HttpResponse
 from django.contrib import messages
 from user.models import User
-from order.models import Order,OrderItem,Payment,ReturnOrder
+from order.models import Order,OrderItem,Payment,ReturnOrder,UserWallet
 from products.models import Product,ProductVariant
 from django.db import transaction
 
@@ -185,6 +185,15 @@ def cancelorder(request,order_item_id):
         order.save()
         order_items = OrderItem.objects.filter(order=order)
         print(order.payment.payment_method)
+        if order.payment.payment_method == 'Paid by Razorpay' or order.payment.payment_method == 'wallet':
+            email = request.user
+            user = User.objects.get(email=email)
+            userwallet = UserWallet()
+            userwallet.user = request.user
+            userwallet.amount = order.total_price
+            userwallet.transaction = 'Credited'
+            userwallet.save()
+            user.save()
         for item in order_items:
             reason = request.POST.get('cancel')
             item.status = 'Cancelled'
@@ -257,10 +266,24 @@ def updatestatus(request, order_id, new_status):
         order.status = 'Cancelled'
     
     order.save()
+    if order.status == 'Returned':
+        email = order.user.email
+        user = User.objects.get(email=email)
+        userwallet = UserWallet()
+        userwallet.user = user
+        userwallet.amount += order.total_price
+        userwallet.transaction = 'Credited'
+        userwallet.save()
+        user.save()
+        order_item = OrderItem.objects.filter(order=order)
+        context = {
+                'order': order,
+                'order_item': order_item
+            }
     
     #messages.success(request, f"Order #{order.tracking_no} has been updated to '{new_status}' status.")
     
-    return redirect('order:vieworder')
+    return render(request, 'admin/viewdetailorder.html', context)
    
 
 def returnorder(request,order_item_id):
@@ -295,10 +318,61 @@ def returnapprove(request,order_id):
         'order' : order,
         'order_item' : order_item,
     }
-    return render(request,"admin/viewdetailorder.html")
+    return render(request,"admin/viewdetailorder.html",context)
 
+def mywallet(request):
+    user = request.user 
+    try:
+        wallet = UserWallet.objects.get(user=user)
+    except UserWallet.DoesNotExist:
+        wallet = UserWallet.objects.create(user=user,amount=0)
+    wallet_amount=wallet.amount
+     
+    context = {'wallet_amount': wallet_amount}
+
+    return render(request, 'userprofile/wallet.html', context)
+
+def walletpay(request,order_id):
+    user=request.user
+    order = Order.objects.get(id=order_id)
+    try:
+        wallet = UserWallet.objects.get(user=request.user)
+    except:
+        wallet = UserWallet.objects.create(user=request.user,amount=0)
+        wallet.save()
+    if wallet.amount > order.total_price:
+        payment = Payment.objects.create(user=request.user,payment_method='Wallet',amount_paid=order.total_price,status='Paid')
+        payment.save()
+        order.payment=payment
+        order.save()
+        wallet.amount -= order.total_price
+        wallet.save()
+        cart_items = CartItem.objects.filter(user=user)
+        for cart_item in cart_items:
+            product=cart_item.product
+            stock=product.stock-cart_item.quantity
+            product.stock=stock
+            product.save()
+            order_product = OrderItem(
+                order=order,
+                user=user,
+                product=cart_item.product,
+                variant=cart_item.variant,
+                quantity=cart_item.quantity,
+                price=cart_item.product.discount_price
+                
+            )
+            order_product.save()
         
-
+        cart_items.delete()
+    else:
+        messages.warning(request, 'Not Enough Balance in Wallet')
+        return render(request, 'order/orderconfirm.html')
+    context = {
+        'order': order,
+        'tracking_no': order.tracking_no,
+        }
+    return render(request, 'order/cashdelivery.html', context)
           
  
         
