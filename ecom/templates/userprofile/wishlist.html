@@ -17,4 +17,92 @@ User profile
         </div>
     </div>
 </div>
+<div>
+    {% if messages %}
+    <div class="container" style="background-color:transparent;">
+        <ul class="messages mx-auto text-center">
+            {% for message in messages %}
+            <div class="alert alert-{{message.tags}} alert-dismissible fade show" role="alert">
+                 {{message}}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+</div>
+<div class="container-fluid">
+    <div class="row">
+  <div class="col-lg-12 col-md-12">
+    {% if not wishlist %}
+    <h2 class="text-center mt-4">Your wishlist is empty!!!!</h2>
+    <br>
+    <div class="text-center mb-4 mt-3">
+        <a href="{% url 'products:viewshop'%}" class="boxed-btn black">Continue Shopping</a>
+    </div>
+    {% else %}
+<section class="shoping-cart spad">
+ <div class="container mt-4">
+ <div class="row">
+    <div class="col-lg-1">
+    </div>
+   <div class="col-lg-10">
+        <div class="shoping__cart__table mt-4">
+     <table class="table text-start align-middle table-bordered table-hover mb-0 table-stripped">
+        <thead>
+        <tr>
+            <th class="shoping__product">Products</th>
+            <th> Details</th>
+            <th>Price</th>
+            <th></th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for item in wishlist %}
+        <tr>
+            <td class="shoping__cart__item">
+                <a href="#" class="text-decoration-none text-dark">
+                    <img src="{{ item.variant.product.images.url }}" alt="" width="100px">
+                    <h5>{{item.variant.product.product_name}}</h5>
+                </a>
+
+            </td>
+            <td class="shoping__cart__price">Size: {{item.variant.size}},
+                <br>
+                Colour: {{item.variant.color}},
+                <br>
+                Material: {{item.variant.material}}
+            </td>
+            <td class="shoping__cart__price">
+                ₹ {{item.variant.discount_price}}
+            </td>
+
+            <td class="shoping__cart__total">
+               <a href="#" class="btn btn-warning">Add to Cart</a>
+            </td>
+            <td class="shoping__cart__item__close">
+                <a href="{% url 'dashboard:removewish' wish_id=item.id %}">
+                    <i class="material-icons" data-toggle="tooltip" title="Delete" style="color: red;">delete</i>
+                </a>
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+  </div>
+
+           </div>
+        </div>
+    </div>
+
+    </section>
+    {% endif %}
+
+  </div>
+
+</div>
+</div>
 {% endblock %}

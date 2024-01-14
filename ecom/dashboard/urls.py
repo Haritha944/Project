@@ -10,4 +10,6 @@ urlpatterns = [
     path('usersdetails/', views.usersdetails, name="usersdetails"),
     path('userblock/<int:user_id>/', views.userblock, name="userblock"),
     path('wishlist/', views.wishlist, name="wishlist"),
+    path('addwishlist/<int:variant_id>/', views.addwishlist, name='addwishlist'),
+     path('removewish/<int:wish_id>', views.removewish, name='removewish'),
 ]

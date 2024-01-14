@@ -2,6 +2,7 @@ from django.shortcuts import render,redirect
 from django.contrib.auth import authenticate,login,logout
 from user.models import User
 from cart.models import Wishlist
+from products.models import ProductVariant,Product
 from django.core.paginator import Paginator
 from django.contrib import messages
 from django.db.models import Q
@@ -97,5 +98,34 @@ def wishlist(request):
     }
     return render(request,'userprofile/wishlist.html',context)
 
+def addwishlist(request,variant_id):
+    variant=ProductVariant.objects.get(id=variant_id)
+    product = Product.objects.get(id=variant.product.id)
+    try:
+        is_exist = Wishlist.objects.filter(user=request.user,variant=variant).exists()
+        if is_exist:
+            messages.warning(request,'This product is already in your wishlist.')
+        else:
+            wishlist = Wishlist.objects.create(user=request.user,variant=variant)
+            wishlist.save()
+            messages.success(request,'Product is added to your wishlist.')
+        return redirect('user:index')
+    except Exception as e:
+        print(e)
+        messages.error(request,'Failed to add the product to the wishlist.')
+        return redirect('user:index')
+    
+
+def removewish(request,wish_id):
+    try:
+        wishlist_item = Wishlist.objects.get(id=wish_id, user=request.user)
+        wishlist_item.delete()  # Remove the wishlist item
+    except Wishlist.DoesNotExist:
+        pass
+    wishlist = Wishlist.objects.filter(user=request.user)
+    context = {
+        'wishlist': wishlist,
+    }
+    return render(request, 'userprofile/wishlist.html', context)
 
 
