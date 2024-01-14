@@ -1,6 +1,7 @@
 from django.shortcuts import render,redirect
 from django.contrib.auth import authenticate,login,logout
 from user.models import User
+from cart.views import addcart
 from cart.models import Wishlist
 from products.models import ProductVariant,Product
 from django.core.paginator import Paginator
@@ -108,12 +109,12 @@ def addwishlist(request,variant_id):
         else:
             wishlist = Wishlist.objects.create(user=request.user,variant=variant)
             wishlist.save()
-            messages.success(request,'Product is added to your wishlist.')
+           # messages.success(request,'Product is added to your wishlist.')
         return redirect('user:index')
     except Exception as e:
         print(e)
         messages.error(request,'Failed to add the product to the wishlist.')
-        return redirect('user:index')
+        return redirect('dashboard:wishlist')
     
 
 def removewish(request,wish_id):
@@ -127,5 +128,18 @@ def removewish(request,wish_id):
         'wishlist': wishlist,
     }
     return render(request, 'userprofile/wishlist.html', context)
+
+def addwishcart(request,wish_id):
+    try:
+        wishlist_item = Wishlist.objects.get(id=wish_id,user=request.user)
+        addcart(request,product_id=wishlist_item.variant.id)
+        wishlist_item.delete()
+    except Wishlist.DoesNotExist:
+        pass
+    wishlist = Wishlist.objects.filter(user=request.user)
+    context = {
+        'wishlist': wishlist,
+    }
+    return render(request,'userprofile/wishlist.html',context)
 
 

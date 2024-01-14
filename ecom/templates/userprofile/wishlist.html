@@ -81,7 +81,7 @@ User profile
             </td>
 
             <td class="shoping__cart__total">
-               <a href="#" class="btn btn-warning">Add to Cart</a>
+               <a href="{% url 'dashboard:addwishcart' wish_id=item.id %}" class="btn btn-warning">Add to Cart</a>
             </td>
             <td class="shoping__cart__item__close">
                 <a href="{% url 'dashboard:removewish' wish_id=item.id %}">
@@ -97,7 +97,16 @@ User profile
            </div>
         </div>
     </div>
+<div class="row px-4 ">
+    <div class="col-lg-12 text-center">
+        <div class="shopping__cart__btns">
+        <a href="{% url "products:viewshop" %}" class=" mt-3 btn btn-info text-decoration-none">
+            Continue Shopping
+        </a>
 
+        </div>
+    </div>
+</div>
     </section>
     {% endif %}
 
