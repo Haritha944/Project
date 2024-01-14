@@ -1,5 +1,6 @@
 from django.shortcuts import render,redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.cache import never_cache
 from cart.models import Cart,CartItem,Address
 from django.http import JsonResponse, HttpResponse
 from django.contrib import messages
@@ -7,6 +8,7 @@ from user.models import User
 from order.models import Order,OrderItem,Payment,ReturnOrder,UserWallet
 from products.models import Product,ProductVariant
 from django.db import transaction
+from django.views.decorators.cache import cache_control
 
 # Create your views here.
 
@@ -319,7 +321,7 @@ def returnapprove(request,order_id):
         'order_item' : order_item,
     }
     return render(request,"admin/viewdetailorder.html",context)
-
+@login_required
 def mywallet(request):
     user = request.user 
     try:
@@ -332,6 +334,8 @@ def mywallet(request):
 
     return render(request, 'userprofile/wallet.html', context)
 
+@login_required   
+@never_cache
 def walletpay(request,order_id):
     user=request.user
     order = Order.objects.get(id=order_id)

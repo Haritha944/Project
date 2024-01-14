@@ -1,0 +1,20 @@
+{% extends 'userprofile/profileinfo.html' %}
+{% load static %}
+{% block title %}
+User profile
+{% endblock %}
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="breadcrumb-section breadcrumb-bg">
+            <div class="col-lg-8 offset-lg-2 text-center">
+                <div class="breadcrumb-text">
+                  <ol class="breadcrumb justify-content-center mb-0">
+                    <li class="breadcrumb-item active text-dark fw-bold" aria-current="page"><a class="text-decoration-none text-dark" href="{% url 'cart:profile' %}">Your Profile</a></li>
+                    <li class="breadcrumb-item active text-dark fw-bold" aria-current="page">Wishlist</li>
+                </div>  
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

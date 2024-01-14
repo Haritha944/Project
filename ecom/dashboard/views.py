@@ -1,6 +1,7 @@
 from django.shortcuts import render,redirect
 from django.contrib.auth import authenticate,login,logout
 from user.models import User
+from cart.models import Wishlist
 from django.core.paginator import Paginator
 from django.contrib import messages
 from django.db.models import Q
@@ -86,6 +87,15 @@ def userblock(request, user_id):
             'users': users
         }
         return render(request, 'admin/userdetail.html', context)
+    
+@login_required
+@cache_control(no_cache=True,must_revalidate=True,no_store=True)
+def wishlist(request):
+    wishlist = Wishlist.objects.filter(user=request.user)
+    context = {
+        'wishlist':wishlist,
+    }
+    return render(request,'userprofile/wishlist.html',context)
 
 
 
