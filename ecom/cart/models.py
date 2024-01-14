@@ -44,3 +44,16 @@ class Wishlist(models.Model):
     user = models.ForeignKey(User,  on_delete=models.CASCADE)
     variant = models.ForeignKey(ProductVariant, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
+
+class Coupon(models.Model):
+    coupon_name=models.CharField(max_length=20)
+    coupon_code=models.CharField(max_length=20)
+    min_purchase=models.FloatField()
+    coupon_discount=models.FloatField()
+    start_date = models.DateTimeField()
+    end_date = models.DateTimeField()
+    active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.coupon_name
