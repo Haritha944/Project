@@ -123,8 +123,29 @@ Cart
 </div>
 <div class="container-fluid">
     <div class="row">
-<div class="col-lg-6">
-
+<div class="col-lg-6 mt-4">
+    <form method="post" action="#">
+        {% csrf_token %}
+        <div class="coupon-section bg-light mt-4 px-2">
+            <h4 class="text-center">COUPON CODES</h4>
+            <div class="coupon-form-wrap">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                {% endfor %}
+                <p><input type="text" name="coupon_code" class="form-control mt-3" placeholder="Enter your Coupon"></p>
+                <a href="#" class="text-decoration-none text-dark mt-3">
+                    Have Coupon ?
+                </a>
+                <p><input type="hidden" name="order_id" class="form-control" value="{{order.id}}"></p>
+                <button type="submit" class=" mx-auto d-block btn btn-warning py-2 px-4">Apply</button>
+            </div>
+        </div>
+    </form>		
 </div>
 <div class="col-lg-6">
     <div class="shoping__checkout bg-light mt-5">

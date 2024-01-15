@@ -57,3 +57,10 @@ class Coupon(models.Model):
 
     def __str__(self):
         return self.coupon_name
+class UserCoupons(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+    coupon = models.ForeignKey(Coupon, on_delete=models.CASCADE)
+    is_used = models.BooleanField(default=True)
+
+    def __str__(self):
+        return self.coupon.coupon_code

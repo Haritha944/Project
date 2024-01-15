@@ -67,7 +67,7 @@ Singleproduct
                     </div>
                     <div class="featured-icons mt-2">
                         <a href="{% url 'cart:addcart' product.id %}" class="text-decoration-none btn btn-block px-5 py-2" style="background-color:#E9967A;">Add Cart</a>
-                        <a href="#" class="text-decoration-none mx-4"><i class="fa fa-heart fs-3 "style="color:#E9967A;" title="Add to Wishlist"></i></a>
+                        <a href="{% url 'dashboard:addwishlist' variant_id=product.id%}" class="text-decoration-none mx-4"><i class="fa fa-heart fs-3 "style="color:#E9967A;" title="Add to Wishlist"></i></a>
                       </div>
                    </button>
                 <div class="row">
@@ -172,7 +172,7 @@ Singleproduct
                   </div>
                   <div class="featured-icons mt-2">
                     <a href="{% url 'cart:addcart' product.id %}" class="text-decoration-none btn btn-block px-3"style="background-color:#E9967A;">Add Cart</a>
-                    <a href="#" class="text-decoration-none mx-2"><i class="fa fa-heart fs-5"style="color:#E9967A;" title="Add to Wishlist"></i></a>
+                    <a href="{% url 'dashboard:addwishlist' variant_id=product.id%}" class="text-decoration-none mx-2"><i class="fa fa-heart fs-5"style="color:#E9967A;" title="Add to Wishlist"></i></a>
                   </div>
                 </div>
               </div>
@@ -207,7 +207,7 @@ Singleproduct
                   </div>
                   <div class="featured-icons mt-2">
                     <a href="#" class="text-decoration-none btn btn-block px-3"style="background-color:#E9967A;">Add Cart</a>
-                    <a href="#" class="text-decoration-none mx-2"><i class="fa fa-heart fs-5"style="color:#E9967A;" title="Add to Wishlist"></i></a>
+                    <a href="{% url 'dashboard:addwishlist' variant_id=product.id%}" class="text-decoration-none mx-2"><i class="fa fa-heart fs-5"style="color:#E9967A;" title="Add to Wishlist"></i></a>
                   </div>
                 </div>
               </div>
