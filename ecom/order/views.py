@@ -1,7 +1,7 @@
 from django.shortcuts import render,redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.cache import never_cache
-from cart.models import Cart,CartItem,Address
+from cart.models import Cart,CartItem,Address,Coupon
 from django.http import JsonResponse, HttpResponse
 from django.contrib import messages
 from user.models import User
@@ -377,8 +377,68 @@ def walletpay(request,order_id):
         'tracking_no': order.tracking_no,
         }
     return render(request, 'order/cashdelivery.html', context)
-          
- 
+
+@login_required          
+def viewcoupon(request):
+    coupons = Coupon.objects.all().order_by('-id')
+    context = {
+        'coupons': coupons
+    }
+    return render(request,'admin/viewcoupon.html',context)
+
+def addcoupon(request):
+    url = request.META.get('HTTP_REFERER')
+    if request.method == 'POST':
+        coupon = Coupon()
+        coupon_name = request.POST.get('coupon_name')
+        if Coupon.objects.filter(coupon_name=coupon_name).exists():
+            messages.warning(request,'Coupon name already exists')
+            return redirect(url)
+        else:
+            coupon.coupon_name = request.POST.get('coupon_name')
+        coupon_code = request.POST.get('coupon_code')
+        if Coupon.objects.filter(coupon_code=coupon_code).exists():
+            messages.warning(request,'Coupon code already exists')
+            return redirect(url)
+        else:
+            coupon.coupon_code = request.POST.get('coupon_code')
+        coupon.min_purchase=request.POST.get('min_price')
+        coupon.coupon_discount = request.POST.get('discount_amount')
+        coupon.start_date=request.POST.get('start_date')
+        coupon.end_date=request.POST.get('end_date')
+        coupon.save()
+        return redirect('order:viewcoupon')
+
+def editcoupon(request,id):
+    url = request.META.get('HTTP_REFERER')
+    if request.method == 'POST':
+        coupon = Coupon.objects.get(id=id)
+        coupon_name = request.POST.get('coupon_name')
+        if coupon_name != coupon.coupon_name:
+            if Coupon.objects.filter(coupon_name=coupon_name).exists():
+                messages.error(request, "coupon name already exist ")
+                return redirect(url)
+            else:
+                coupon.coupon_name = request.POST.get('coupon_name')
+
+        coupon_code = request.POST.get('coupon_code')
+        if coupon_code !=coupon.coupon_code:
+            if Coupon.objects.filter(coupon_code=coupon_code).exists():
+                messages.error(request, "coupon code already exist ")
+                return redirect(url)
+            else:
+                coupon.min_purchase = request.POST.get('min_price')
+        coupon.coupon_discount = request.POST.get('discount_amount')
+        coupon.start_date = request.POST.get('start_date')
+        coupon.end_date = request.POST.get('end_date')
+        coupon.save()
+        return redirect('order:viewcoupon')
+    
+def deletecoupon(request,id):
+    coupons = Coupon.objects.get(id=id)
+    coupons.delete()
+    return redirect('order:viewcoupon')
+
         
 
         

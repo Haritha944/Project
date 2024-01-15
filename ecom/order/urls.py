@@ -21,4 +21,8 @@ urlpatterns = [
     path('viewsingleadmin/<int:order_id>', views.viewsingleadmin, name='viewsingleadmin'),
     path('updatestatus/<int:order_id>/<str:new_status>/', views.updatestatus, name='updatestatus'),
     path('returnapprove/<int:order_id>', views.returnapprove, name='returnapprove'),
+    path('viewcoupon/',views.viewcoupon,name='viewcoupon'),
+    path('addcoupon/',views.addcoupon,name='addcoupon'),
+    path('deletecoupon/<int:id>/', views.deletecoupon, name='deletecoupon'),
+    path('editcoupon/<int:id>/', views.editcoupon, name='editcoupon'),
 ]
