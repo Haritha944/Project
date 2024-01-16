@@ -9,15 +9,13 @@ User profile
 {% block content%}
 <div class="container-fluid page-header">
     <div class="row ">
-     <div class="col-lg-12 col-md-12 text-center"> <!--Breadcrumb begins-->
-      <nav aria-label="breadcrumb" class="breadcrumb-nav border-0 mb-0">
-          <div class="container">
+     <div > <!--Breadcrumb begins-->
+          <div class="col-lg-8 offset-lg-2 text-center">
               <ol class="breadcrumb">
                   <li class="breadcrumb-item"><a class="text-decoration-none text-dark fw-bold" href="{% url 'cart:profile' %}">Profile</a></li>
                   <li class="breadcrumb-item active" aria-current="page">Order</li>
               </ol>
           </div><!-- End .container -->
-       </nav>
      </div>
   </div>
 </div>

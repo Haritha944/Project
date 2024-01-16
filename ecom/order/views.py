@@ -1,7 +1,7 @@
 from django.shortcuts import render,redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.cache import never_cache
-from cart.models import Cart,CartItem,Address,Coupon
+from cart.models import Cart,CartItem,Address,Coupon,UserCoupons
 from django.http import JsonResponse, HttpResponse
 from django.contrib import messages
 from user.models import User
@@ -9,6 +9,8 @@ from order.models import Order,OrderItem,Payment,ReturnOrder,UserWallet
 from products.models import Product,ProductVariant
 from django.db import transaction
 from django.views.decorators.cache import cache_control
+from django.utils import timezone
+from django.core.exceptions import ObjectDoesNotExist  
 
 # Create your views here.
 
@@ -448,15 +450,60 @@ def mycoupons(request):
         coupon_statuses = []
 
         for coupon in coupons:
-            is_used = Coupon.objects.filter(coupon=coupon, user=user, is_used=True).exists()
+            is_used = UserCoupons.objects.filter(coupon=coupon, user=user, is_used=True).exists()
             coupon_statuses.append("Used" if is_used else "Active")
 
         coupon_data = zip(coupons, coupon_statuses)
 
         context = {'coupon_data': coupon_data}
-        return render(request, 'userapp/my_coupons.html', context)
+        return render(request, 'userprofile/mycoupons.html', context)
     else:
-        return redirect('user_login')
+        return redirect('user:handlelogin')
+    
+def _cart_id(request):
+    cart=request.session.session_key
+    if not cart:
+        cart=request.session.create()
+    return cart
+    
+def applycoupon(request):
+    if request.method == 'POST':
+        coupon_code = request.POST.get('coupon_code')
+        cart_id = _cart_id(request)
+        cart = Cart.objects.get(cart_id=cart_id)
+        cart_items = CartItem.objects.filter(cart=cart, is_active=True).order_by('id')
+        request.session['coupon_code'] = coupon_code
+        try:
+            coupon = Coupon.objects.get(coupon_code=coupon_code)
+            cart = Cart.objects.get(cart_id=cart_id)
+            cart_items = CartItem.objects.filter(cart=cart, is_active=True).order_by('id')
+            if coupon.start_date <= timezone.now() <= coupon.end_date:
+                cart_total = sum(cart_item.variant.discount_price * cart_item.quantity for cart_item in cart_items)
+                if cart_total >= coupon.min_purchase:
+                    if UserCoupons.objects.filter(user=request.user, coupon=coupon, is_used=True).exists():
+                        messages.warning(request, 'Coupon has already been Used')
+                    else:
+                        for cart_item in cart_items:
+                            updated_total = cart_item.variant.discount_price - float(coupon.coupon_discount)
+                            cart_item.variant.discount_price = updated_total
+                            cart_item.save()
+
+                        used_coupons = UserCoupons(user=request.user, coupon=coupon, is_used=True)
+                        used_coupons.save()
+                        messages.success(request, 'Coupon applied successfully!')
+
+                        return redirect('cart:cart')
+                else:
+                    messages.warning(request, 'Coupon is not Applicable for Order Total')
+            else:
+                messages.warning(request, 'Coupon is not Applicable for the current date')
+        except ObjectDoesNotExist:
+            messages.warning(request, 'Coupon code is Invalid')
+            return redirect('cart:cart')
+           
+
+    return redirect('cart:cart')
+
 
         
 

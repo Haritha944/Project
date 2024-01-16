@@ -15,6 +15,8 @@ urlpatterns = [
     path('cancelorder/<int:order_item_id>/', views.cancelorder, name='cancelorder'),
     path('mywallet', views.mywallet, name='mywallet'),
     path('walletpay/<int:order_id>/', views.walletpay, name='walletpay'),
+    path('mycoupons/',views.mycoupons,name='mycoupons'),
+    path('applycoupon/',views.applycoupon,name='applycoupon'),
 
    #admin
     path('vieworder/', views.vieworder, name='vieworder'),
@@ -25,4 +27,5 @@ urlpatterns = [
     path('addcoupon/',views.addcoupon,name='addcoupon'),
     path('deletecoupon/<int:id>/', views.deletecoupon, name='deletecoupon'),
     path('editcoupon/<int:id>/', views.editcoupon, name='editcoupon'),
+   
 ]

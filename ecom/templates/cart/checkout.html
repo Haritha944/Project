@@ -140,6 +140,7 @@ Checkout
                         </table>
                         <h6 class="px-3" style="color:#A80000;"> Order Total :  ₹ {{total}} </h6>
                         <h6 class="px-3 checkout__order__total" style="color:#A80000;">Tax <span>₹ {{tax}}</span></h6>
+                        <h6 class="px-3 checkout__order__total" style="color:#A80000;">Discount <span>₹ {% if discount %}{{discount|floatformat:2}}{% else %}0{% endif %}</span></h6>
                         <h6 class="px-3 checkout__order__total" style="color:#A80000;">Total <span>₹ {{grand_total}}</span></h6>
                         
                         <p class="px-3">

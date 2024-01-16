@@ -1,5 +1,5 @@
 from django.shortcuts import render,redirect,get_object_or_404
-from cart.models import Cart,CartItem,Address
+from cart.models import Cart,CartItem,Address,Coupon,UserCoupons
 from products.models import Product,ProductVariant
 from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist
@@ -51,6 +51,7 @@ def cart(request,total=0,quantity=0,cart_items=None):
     url = request.META.get('HTTP_REFERER')
     cart_id = _cart_id(request)
     tax=0
+    discount=0
     grand_total=0
     current_date = timezone.now()
     try:
@@ -59,6 +60,34 @@ def cart(request,total=0,quantity=0,cart_items=None):
         for cart_item in cart_items:
             total += (cart_item.product.discount_price * cart_item.quantity)
             quantity += cart_item.quantity
+        if 'coupon_code' in request.session:
+            coupon_code = request.session['coupon_code']
+            try:
+                coupon = Coupon.objects.get(coupon_code=coupon_code)
+                # Check if the coupon is valid and not expired
+                if coupon.start_date <= current_date <= coupon.end_date:
+                    # Check if the coupon is applicable to the current cart total
+                    if total >= coupon.min_purchase:
+                        
+                        # Apply the coupon discount
+                        discount=float(coupon.coupon_discount)
+                        total -= discount
+
+                        # Save the coupon details for the user
+                        used_coupons = UserCoupons(user=request.user, coupon=coupon, is_used=True)
+                        used_coupons.save()
+
+                        #messages.success(request, 'Coupon applied successfully!')
+                        
+                    else:
+                        messages.warning(request, 'Coupon is not applicable for the current cart total.')
+                else:
+                    messages.warning(request, 'Coupon has expired.')
+            except Coupon.DoesNotExist:
+                messages.warning(request, 'Invalid coupon code.')
+
+            # Remove the coupon code from the session
+            del request.session['coupon_code']
         tax = (2*total)/100
         grand_total = total + tax
     except ObjectDoesNotExist:
@@ -69,6 +98,7 @@ def cart(request,total=0,quantity=0,cart_items=None):
         'cart_items':cart_items,
         'tax':tax,
         'grand_total':grand_total,
+        'discount':discount,
 
     }
 
@@ -217,6 +247,7 @@ def deleteaddress(request,address_id):
 def checkout(request,total=0,quantity=0,cart_items=None):
     user=request.user
     url = request.META.get('HTTP_REFERER')
+    discount=0
     try:
         try:
             email = request.POST.get('email')
@@ -230,12 +261,34 @@ def checkout(request,total=0,quantity=0,cart_items=None):
             cart_items = CartItem.objects.filter(cart=cart, is_active=True).order_by('id')
             print(cart_items)
            
-        for cart_item in cart_items:
-            total += (cart_item.variant.discount_price * cart_item.quantity)
-            quantity += cart_item.quantity
+            for cart_item in cart_items:
+                total += (cart_item.variant.discount_price * cart_item.quantity)
+                quantity += cart_item.quantity
+            if 'coupon_code' in request.session:
+                coupon_code = request.session['coupon_code']
+                try:
+                    coupon = Coupon.objects.get(coupon_code=coupon_code)
+                    if coupon.start_date <= timezone.now() <= coupon.end_date:
+                        if total >= coupon.min_purchase:
+                    # Apply the coupon discount
+                            discount = float(coupon.coupon_discount)
+                            total -= discount
+                            used_coupons = UserCoupons(user=request.user, coupon=coupon, is_used=True)
+                            used_coupons.save()
+                            messages.success(request, 'Coupon applied successfully!')
+                        else:
+                            messages.warning(request, 'Coupon is not applicable for the current cart total.')
+                    else:
+                        messages.warning(request, 'Coupon has expired.')
+                except Coupon.DoesNotExist:
+                    messages.warning(request, 'Invalid coupon code.')
+
+        # Remove the coupon code from the session
+                del request.session['coupon_code']
+
            
-            tax = (2 * total) / 100
-            grand_total = total + tax
+        tax = (2 * total) / 100
+        grand_total = total + tax
   
     except Cart.DoesNotExist:
         print("Cart does not exist")
@@ -255,6 +308,7 @@ def checkout(request,total=0,quantity=0,cart_items=None):
         'grand_total':grand_total,
         'cart_items': cart_items,
         'tax': tax,
+        'discount':discount,
         #'selected_address': selected_address,
         'address_list':address_list,
         'default_address': default_address,
