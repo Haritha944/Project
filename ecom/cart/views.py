@@ -73,7 +73,7 @@ def cart(request,total=0,quantity=0,cart_items=None):
                         # Apply the coupon discount
                             discount=float(coupon.coupon_discount)
                             total -= discount
-                            request.session['coupon_applied'] = True
+                            #request.session['coupon_applied'] = True
                             messages.success(request, 'Coupon applied successfully!')
                         
                         else:
@@ -607,7 +607,9 @@ def placeorder(request, total=0, quantity=0):
         order.save()
         neworderitems = CartItem.objects.filter(user=user, is_active=True)
         for item in neworderitems:
-            if 'coupon_applied' in request.session:
+            if 'coupon_code' in request.session:
+                coupon_code = request.session['coupon_code']
+                coupon = Coupon.objects.get(coupon_code=coupon_code)
                 discount = float(coupon.coupon_discount)
                 price=item.variant.discount_price-discount
             else:

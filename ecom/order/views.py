@@ -89,13 +89,21 @@ def cashdelivery(request,tracking_no):
         stock=variant.stock-cart_item.quantity
         variant.product.quantity = stock
         variant.product.save()
+        if 'coupon_code' in request.session:
+            coupon_code = request.session['coupon_code']
+            coupon = Coupon.objects.get(coupon_code=coupon_code)
+            discount = float(coupon.coupon_discount)
+            price=cart_item.variant.discount_price-discount
+        else:
+            price=cart_item.variant.discount_price
+
         order_product = OrderItem.objects.create(
             order=order,
             user=user,
             product=cart_item.product,
             variant=cart_item.variant,
             quantity=cart_item.quantity,
-            price=cart_item.variant.discount_price,
+            price=price,
             
         )
         order_product.save()
@@ -123,9 +131,20 @@ def orderinvoice(request,order_id):
     subtotal = 0 
     for order_item in order_items:
         order_item_total = order_item.variant.discount_price * order_item.quantity
-        total = order_item_total  
-        subtotal += order_item_total
-        tax = (2 * subtotal) / 100
+       
+        if 'coupon_code' in request.session:
+            coupon_code = request.session['coupon_code']
+            coupon = Coupon.objects.get(coupon_code=coupon_code)
+            discount = float(coupon.coupon_discount)
+            total=order_item.variant.discount_price-discount
+        else:
+            total = order_item_total
+            
+
+        
+        subtotal += total
+        tax = (2 * subtotal) / 100  
+        
         
 
         grand_total = subtotal + tax 
@@ -138,6 +157,7 @@ def orderinvoice(request,order_id):
             'cart_items': cart_items,
             'total': total,
             'tax':tax,
+            'discount':discount,
             'subtotal': subtotal,
         }
     return render(request, 'order/orderconfirm.html', context)

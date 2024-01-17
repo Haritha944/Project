@@ -70,7 +70,7 @@ Order
                                     </a></td>
                                     <td>{{ cart_item.quantity }}</td>
                                     <td>₹{{ cart_item.variant.discount_price }}</td>
-                                    <td>₹{{ cart_item.sub_total }}</td>
+                                    <td>₹{{total}}</td>
                                 </tr>
                             {% endfor %}
                         </tbody>
@@ -91,20 +91,20 @@ Order
                         <tbody class="mx-3">
                         <tr class="total-data  fs-6" >
                             <td><strong>Subtotal: </strong></td>
-                            <td>₹ {{ total }}</td>
+                            <td>₹ {{total}}</td>
                         </tr>
                         <tr class="total-data fs-6">
                             <td><strong>GST: </strong></td>
-                            <td>₹ {{ tax }}</td>
+                            <td>₹ {{tax}}</td>
                         </tr>
                         
                         <tr class="total-data fs-6">
                             <td><strong>Discount: </strong></td>
-                            <td>₹ {{ discount }}</td>
+                            <td>₹ {{discount}}</td>
                         </tr>
                         <tr class="total-data text-danger fs-5" >
                             <td><strong>Grand Total : </strong></td>
-                            <td> ₹ {{ total_price }}</td>
+                            <td> ₹ {{total}}</td>
                         </tr>
                     </tbody>
                 </table>
