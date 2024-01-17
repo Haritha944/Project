@@ -61,33 +61,30 @@ def cart(request,total=0,quantity=0,cart_items=None):
             total += (cart_item.product.discount_price * cart_item.quantity)
             quantity += cart_item.quantity
         if 'coupon_code' in request.session:
-            coupon_code = request.session['coupon_code']
-            try:
-                coupon = Coupon.objects.get(coupon_code=coupon_code)
+            if 'coupon_applied' not in request.session:
+                coupon_code = request.session['coupon_code']
+                try:
+                    coupon = Coupon.objects.get(coupon_code=coupon_code)
                 # Check if the coupon is valid and not expired
-                if coupon.start_date <= current_date <= coupon.end_date:
+                    if coupon.start_date <= current_date <= coupon.end_date:
                     # Check if the coupon is applicable to the current cart total
-                    if total >= coupon.min_purchase:
+                        if total >= coupon.min_purchase:
                         
                         # Apply the coupon discount
-                        discount=float(coupon.coupon_discount)
-                        total -= discount
-
-                        # Save the coupon details for the user
-                        used_coupons = UserCoupons(user=request.user, coupon=coupon, is_used=True)
-                        used_coupons.save()
-
-                        #messages.success(request, 'Coupon applied successfully!')
+                            discount=float(coupon.coupon_discount)
+                            total -= discount
+                            request.session['coupon_applied'] = True
+                            messages.success(request, 'Coupon applied successfully!')
                         
+                        else:
+                            messages.warning(request,f'This Coupon only applicable for minimum amount{coupon.min_purchase}')
                     else:
-                        messages.warning(request, 'Coupon is not applicable for the current cart total.')
-                else:
-                    messages.warning(request, 'Coupon has expired.')
-            except Coupon.DoesNotExist:
-                messages.warning(request, 'Invalid coupon code.')
+                        messages.warning(request, 'Coupon has expired.')
+                except Coupon.DoesNotExist:
+                    messages.warning(request, 'Invalid coupon code.')
 
             # Remove the coupon code from the session
-            del request.session['coupon_code']
+            #del request.session['coupon_code']
         tax = (2*total)/100
         grand_total = total + tax
     except ObjectDoesNotExist:
@@ -249,53 +246,35 @@ def checkout(request,total=0,quantity=0,cart_items=None):
     url = request.META.get('HTTP_REFERER')
     discount=0
     try:
-        try:
-            email = request.POST.get('email')
-            user=User.objects.get(user=request.user,email=email)
-            print(user)
-            if user is not None:
-               cart_items = CartItem.objects.filter(user_id=user.id, is_active=True).order_by('id')
-        except:
-            cart_id = _cart_id(request)
-            cart = Cart.objects.get(cart_id=cart_id)
-            cart_items = CartItem.objects.filter(cart=cart, is_active=True).order_by('id')
-            print(cart_items)
+        email = request.POST.get('email')
+        user=User.objects.get(user=request.user,email=email)
+        print(user)
+        if user is not None:
+            cart_items = CartItem.objects.filter(user_id=user.id, is_active=True).order_by('id')
+    except:
+        cart_id = _cart_id(request)
+        cart = Cart.objects.get(cart_id=cart_id)
+        cart_items = CartItem.objects.filter(cart=cart, is_active=True).order_by('id')
+        print(cart_items)
            
-            for cart_item in cart_items:
-                total += (cart_item.variant.discount_price * cart_item.quantity)
-                quantity += cart_item.quantity
-            if 'coupon_code' in request.session:
-                coupon_code = request.session['coupon_code']
-                try:
-                    coupon = Coupon.objects.get(coupon_code=coupon_code)
-                    if coupon.start_date <= timezone.now() <= coupon.end_date:
-                        if total >= coupon.min_purchase:
+        for cart_item in cart_items:
+            total += (cart_item.variant.discount_price * cart_item.quantity)
+            quantity += cart_item.quantity
+        if 'coupon_code' in request.session:
+            coupon_code = request.session['coupon_code']
+            try:
+                coupon = Coupon.objects.get(coupon_code=coupon_code)
+                if coupon.start_date <= timezone.now() <= coupon.end_date:
+                    if total >= coupon.min_purchase:
                     # Apply the coupon discount
-                            discount = float(coupon.coupon_discount)
-                            total -= discount
-                            used_coupons = UserCoupons(user=request.user, coupon=coupon, is_used=True)
-                            used_coupons.save()
-                            messages.success(request, 'Coupon applied successfully!')
-                        else:
-                            messages.warning(request, 'Coupon is not applicable for the current cart total.')
-                    else:
-                        messages.warning(request, 'Coupon has expired.')
-                except Coupon.DoesNotExist:
-                    messages.warning(request, 'Invalid coupon code.')
-
-        # Remove the coupon code from the session
-                del request.session['coupon_code']
-
-           
+                        discount = float(coupon.coupon_discount)
+                        total -= discount
+            except Coupon.DoesNotExist:
+                messages.warning(request, 'Invalid coupon code')
+    
+            #del request.session['coupon_code']          
         tax = (2 * total) / 100
         grand_total = total + tax
-  
-    except Cart.DoesNotExist:
-        print("Cart does not exist")
-        pass
-    except CartItem.DoesNotExist:
-        print("CartIT does not exist")
-        pass  
        
     address_list = Address.objects.filter(user_id=request.user)
     default_address = address_list.filter(user_id=request.user).first()
@@ -576,6 +555,7 @@ def placeorder(request, total=0, quantity=0):
         cart_items = CartItem.objects.filter(cart=cart,is_active=True).order_by('id')
         print(cart_items)
         total = 0
+        discount=0
         grand_total=0
         tax=0
         quantity = 0
@@ -583,9 +563,28 @@ def placeorder(request, total=0, quantity=0):
             total += (cart_item.variant.discount_price * cart_item.quantity)
             quantity += cart_item.quantity
         
-            tax = (2 * total) / 100
-            grand_total = total + tax 
-            print(grand_total)
+        if 'coupon_code' in request.session:
+            coupon_code = request.session['coupon_code']
+            try:
+                coupon = Coupon.objects.get(coupon_code=coupon_code)
+                if coupon.start_date <= timezone.now() <= coupon.end_date and total >= coupon.min_purchase:
+                            # Apply the coupon discount
+                    discount = float(coupon.coupon_discount)
+                    total -= discount
+
+                    # Mark coupon as used for the user
+                    used_coupon = UserCoupons.objects.create(
+                        user=user,
+                        coupon=coupon,
+                        is_used=True
+                    )
+                    used_coupon.save()
+                    del request.session['coupon_code']
+            except Coupon.DoesNotExist:
+                messages.warning(request, 'Invalid coupon code')
+        tax = (2 * total) / 100
+        grand_total = total + tax 
+        print(grand_total)
         
         if user is not None:
             try:
@@ -608,11 +607,17 @@ def placeorder(request, total=0, quantity=0):
         order.save()
         neworderitems = CartItem.objects.filter(user=user, is_active=True)
         for item in neworderitems:
+            if 'coupon_applied' in request.session:
+                discount = float(coupon.coupon_discount)
+                price=item.variant.discount_price-discount
+            else:
+                price=item.variant.discount_price
+
             OrderItem.objects.create(
                 order=order,
                 product=item.product,
                 variant=item.variant,
-                price=item.variant.discount_price,
+                price=price,
                 quantity=item.quantity,
                 user=user
             )
@@ -639,7 +644,7 @@ def placeorder(request, total=0, quantity=0):
             'total_price': grand_total,
             'tracking_no':trackno,
             'tax': tax,
-            'discount': 0,
+            'discount': discount,
             'total': total ,
             'quantity': quantity,
         }
