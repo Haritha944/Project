@@ -112,7 +112,7 @@ Orderconfirm
                     <td ><img src="/media/{{order_item.product.images}}" width="50px" height="65px"></td>
                     <td class="text-right">{{ order_item.quantity }}</td>
                     <td class="text-right">₹{{ order_item.variant.discount_price }}</td>
-                    <td class="text-right">₹{{ order_item.order.total_price }}</td>
+                    <td class="text-right">₹{{ order_item.price }}</td>
                 </tr>
                 {% endfor %}
                 <tr>
@@ -120,7 +120,7 @@ Orderconfirm
                 <tfoot>
                     <tr>
                         <th colspan="3" class="text-right">Sub Total:</th>
-                        <th class="text-center">₹ {{ total }}</th>
+                        <th class="text-center">₹ {{ subtotal }}</th>
                     </tr>
                     <tr>
                         <th colspan="3" class="text-right"> Tax:</th>
@@ -132,7 +132,7 @@ Orderconfirm
                     </tr>
                     <tr>
                         <th colspan="3" class="text-right">Grand Total:</th>
-                        <th class="text-center">₹ {{ total_price }}</th>
+                        <th class="text-center">₹ {{ grand_total }}</th>
                     </tr>
                 </tfoot>
             </table>

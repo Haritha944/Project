@@ -70,7 +70,7 @@ Order
                                     </a></td>
                                     <td>{{ cart_item.quantity }}</td>
                                     <td>₹{{ cart_item.variant.discount_price }}</td>
-                                    <td>₹{{total}}</td>
+                                    <td>₹{{cart_item.sub_total}}</td>
                                 </tr>
                             {% endfor %}
                         </tbody>
@@ -104,7 +104,7 @@ Order
                         </tr>
                         <tr class="total-data text-danger fs-5" >
                             <td><strong>Grand Total : </strong></td>
-                            <td> ₹ {{total}}</td>
+                            <td> ₹ {{total_price}}</td>
                         </tr>
                     </tbody>
                 </table>

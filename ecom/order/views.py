@@ -93,9 +93,9 @@ def cashdelivery(request,tracking_no):
             coupon_code = request.session['coupon_code']
             coupon = Coupon.objects.get(coupon_code=coupon_code)
             discount = float(coupon.coupon_discount)
-            price=cart_item.variant.discount_price-discount
+            pricevalue=cart_item.variant.discount_price-discount
         else:
-            price=cart_item.variant.discount_price
+            pricevalue=cart_item.variant.discount_price
 
         order_product = OrderItem.objects.create(
             order=order,
@@ -103,7 +103,7 @@ def cashdelivery(request,tracking_no):
             product=cart_item.product,
             variant=cart_item.variant,
             quantity=cart_item.quantity,
-            price=price,
+            price=pricevalue,
             
         )
         order_product.save()
@@ -126,40 +126,35 @@ def orderinvoice(request,order_id):
     cart_items = CartItem.objects.filter(user=user)
     total = 0
     tax = 0
-    shipping = 0
+    discount = 0
     grand_total = 0
     subtotal = 0 
     for order_item in order_items:
         order_item_total = order_item.variant.discount_price * order_item.quantity
+        subtotal += order_item_total
        
-        if 'coupon_code' in request.session:
-            coupon_code = request.session['coupon_code']
-            coupon = Coupon.objects.get(coupon_code=coupon_code)
-            discount = float(coupon.coupon_discount)
-            total=order_item.variant.discount_price-discount
-        else:
-            total = order_item_total
-            
+        try:
+            user_coupon = UserCoupons.objects.get(user=user,is_used=True)
+            total=subtotal
+            discount = float(user_coupon.coupon.coupon_discount)
+            total-=discount
+        except UserCoupons.DoesNotExist:
+            total = subtotal     
+        #subtotal += total
+    tax = (2 * total) / 100  
+    grand_total = total + tax 
 
-        
-        subtotal += total
-        tax = (2 * subtotal) / 100  
-        
-        
-
-        grand_total = subtotal + tax 
-
-        context = {
-            'order': order,
-            'order_items': order_items,
-            'payment': payment,
-            'grand_total': grand_total,
-            'cart_items': cart_items,
-            'total': total,
-            'tax':tax,
-            'discount':discount,
-            'subtotal': subtotal,
-        }
+    context = {
+        'order': order,
+        'order_items': order_items,
+        'payment': payment,
+        'grand_total': grand_total,
+        'cart_items': cart_items,
+        'total': total,
+        'tax':tax,
+        'discount':discount,
+        'subtotal': subtotal,
+    }
     return render(request, 'order/orderconfirm.html', context)
 
 def myorder(request):
@@ -508,8 +503,8 @@ def applycoupon(request):
                             cart_item.variant.discount_price = updated_total
                             cart_item.save()
 
-                        used_coupons = UserCoupons(user=request.user, coupon=coupon, is_used=True)
-                        used_coupons.save()
+                        #used_coupons = UserCoupons(user=request.user, coupon=coupon, is_used=True)
+                        #used_coupons.save()
                         messages.success(request, 'Coupon applied successfully!')
 
                         return redirect('cart:cart')

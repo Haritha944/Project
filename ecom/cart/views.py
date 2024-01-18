@@ -62,17 +62,18 @@ def cart(request,total=0,quantity=0,cart_items=None):
             quantity += cart_item.quantity
         if 'coupon_code' in request.session:
             if 'coupon_applied' not in request.session:
+                value=total
                 coupon_code = request.session['coupon_code']
                 try:
                     coupon = Coupon.objects.get(coupon_code=coupon_code)
                 # Check if the coupon is valid and not expired
                     if coupon.start_date <= current_date <= coupon.end_date:
                     # Check if the coupon is applicable to the current cart total
-                        if total >= coupon.min_purchase:
+                        if value >= coupon.min_purchase:
                         
                         # Apply the coupon discount
                             discount=float(coupon.coupon_discount)
-                            total -= discount
+                            value -= discount
                             #request.session['coupon_applied'] = True
                             messages.success(request, 'Coupon applied successfully!')
                         
@@ -82,15 +83,18 @@ def cart(request,total=0,quantity=0,cart_items=None):
                         messages.warning(request, 'Coupon has expired.')
                 except Coupon.DoesNotExist:
                     messages.warning(request, 'Invalid coupon code.')
+        else:
+            value=total
 
             # Remove the coupon code from the session
             #del request.session['coupon_code']
-        tax = (2*total)/100
-        grand_total = total + tax
+        tax = (2*value)/100
+        grand_total = value + tax
     except ObjectDoesNotExist:
         pass  #just ignore
     context = {
         'total':total,
+        'value':value,
         'quantity':quantity,
         'cart_items':cart_items,
         'tax':tax,
@@ -265,16 +269,19 @@ def checkout(request,total=0,quantity=0,cart_items=None):
             try:
                 coupon = Coupon.objects.get(coupon_code=coupon_code)
                 if coupon.start_date <= timezone.now() <= coupon.end_date:
-                    if total >= coupon.min_purchase:
+                    value=total
+                    if value >= coupon.min_purchase:
                     # Apply the coupon discount
                         discount = float(coupon.coupon_discount)
-                        total -= discount
+                        value -= discount
             except Coupon.DoesNotExist:
                 messages.warning(request, 'Invalid coupon code')
+        else:
+            value=total
     
             #del request.session['coupon_code']          
-        tax = (2 * total) / 100
-        grand_total = total + tax
+        tax = (2 * value) / 100
+        grand_total = value + tax
        
     address_list = Address.objects.filter(user_id=request.user)
     default_address = address_list.filter(user_id=request.user).first()
@@ -283,6 +290,7 @@ def checkout(request,total=0,quantity=0,cart_items=None):
 
     context = {
         'total':total,
+        'value':value,
         'quantity':quantity,
         'grand_total':grand_total,
         'cart_items': cart_items,
@@ -564,13 +572,14 @@ def placeorder(request, total=0, quantity=0):
             quantity += cart_item.quantity
         
         if 'coupon_code' in request.session:
+            value=total
             coupon_code = request.session['coupon_code']
             try:
                 coupon = Coupon.objects.get(coupon_code=coupon_code)
                 if coupon.start_date <= timezone.now() <= coupon.end_date and total >= coupon.min_purchase:
                             # Apply the coupon discount
                     discount = float(coupon.coupon_discount)
-                    total -= discount
+                    value -= discount
 
                     # Mark coupon as used for the user
                     used_coupon = UserCoupons.objects.create(
@@ -579,11 +588,13 @@ def placeorder(request, total=0, quantity=0):
                         is_used=True
                     )
                     used_coupon.save()
-                    del request.session['coupon_code']
+                    
             except Coupon.DoesNotExist:
                 messages.warning(request, 'Invalid coupon code')
-        tax = (2 * total) / 100
-        grand_total = total + tax 
+        else:
+            value=total
+        tax = (2 * value) / 100
+        grand_total = value + tax 
         print(grand_total)
         
         if user is not None:
@@ -612,6 +623,7 @@ def placeorder(request, total=0, quantity=0):
                 coupon = Coupon.objects.get(coupon_code=coupon_code)
                 discount = float(coupon.coupon_discount)
                 price=item.variant.discount_price-discount
+                del request.session['coupon_code']
             else:
                 price=item.variant.discount_price
 
@@ -648,6 +660,7 @@ def placeorder(request, total=0, quantity=0):
             'tax': tax,
             'discount': discount,
             'total': total ,
+            'value':value,
             'quantity': quantity,
         }
 

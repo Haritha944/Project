@@ -152,7 +152,7 @@ Cart
         <ul class="list-unstyled">
             <li class="d-flex justify-content-between px-4 fs-5">Subtotal <span id="subtotal" class="text-danger"> ₹ {{total}}</span></li>
             <li class="d-flex justify-content-between px-4 fs-5">Discount <span id="discount" class="text-danger"> ₹ {% if discount %}{{discount}}{% else %}0{% endif %}</span></li>
-            <li class="d-flex justify-content-between px-4 fs-5">Total <span id="total_amount"class="text-danger" > ₹ {% if total_value %} {{total_value}} {% else %}  {{total}} {% endif %}</span></li>
+            <li class="d-flex justify-content-between px-4 fs-5">Total <span id="total_amount"class="text-danger" > ₹ {% if total_value %} {{total_value}} {% else %}  {{value}} {% endif %}</span></li>
         </ul>
         <a href="{% url 'cart:checkout' %}" class="text-decoration-none"><button type="button" class="mx-2 mx-auto d-block btn btn-warning">PROCEED TO CHECKOUT</button></a>
     </div>
