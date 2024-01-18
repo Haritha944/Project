@@ -90,7 +90,7 @@
                 <td>{{order.order.status}}</td>
                 <td>{{order.order.payment.payment_method}}</td>
                 <td>{{order.order.created_at}}</td>
-                <td>{{total}} </td>
+                <td>{{subtotal}} </td>
                 {% if order.status == 'Return requested' %}
                 <td> <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#exampleModal">
                     Return requested.!
@@ -106,10 +106,18 @@
                 <td>{{tax}}</td>
                 
             </tr>
+            {% if discount != 0 %}
+            <tr>
+                <td colspan="5"></td>
+                <td>Discount:</td>
+                <td>{{discount}}</td>
+                
+            </tr>
+            {% endif %}
             <tr>
                 <td colspan="5"></td>
                 <td>Grand Total:</td>
-                <td>{{total_price}}</td>
+                <td>{{grand_total}}</td>
                 
             </tr>
             

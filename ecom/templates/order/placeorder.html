@@ -97,11 +97,12 @@ Order
                             <td><strong>GST: </strong></td>
                             <td>₹ {{tax}}</td>
                         </tr>
-                        
+                        {% if discount != 0 %}
                         <tr class="total-data fs-6">
                             <td><strong>Discount: </strong></td>
                             <td>₹ {{discount}}</td>
                         </tr>
+                        {% endif %}
                         <tr class="total-data text-danger fs-5" >
                             <td><strong>Grand Total : </strong></td>
                             <td> ₹ {{total_price}}</td>

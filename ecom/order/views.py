@@ -133,13 +133,13 @@ def orderinvoice(request,order_id):
         order_item_total = order_item.variant.discount_price * order_item.quantity
         subtotal += order_item_total
        
-        try:
-            user_coupon = UserCoupons.objects.get(user=user,is_used=True)
-            total=subtotal
-            discount = float(user_coupon.coupon.coupon_discount)
-            total-=discount
-        except UserCoupons.DoesNotExist:
-            total = subtotal     
+    try:
+        user_coupon = UserCoupons.objects.get(user=user,is_used=True)
+        total=subtotal
+        discount = float(user_coupon.coupon.coupon_discount)
+        total-=discount
+    except UserCoupons.DoesNotExist:
+        total = subtotal     
         #subtotal += total
     tax = (2 * total) / 100  
     grand_total = total + tax 
@@ -249,12 +249,17 @@ def viewsingleadmin(request, order_id):
     subtotal=0
     for item in order_item:
         item_total = item.variant.discount_price * item.quantity
-        total = item_total  
+        #total = item_total  
         subtotal += item_total
-        tax = (2 *subtotal) / 100
-        
+    try:
+        user_coupon = UserCoupons.objects.get(user=user, is_used=True)
+        discount = float(user_coupon.coupon.coupon_discount)
+        total = subtotal - discount
+    except UserCoupons.DoesNotExist:
+        total = subtotal
 
-        grand_total = subtotal + tax 
+    tax = (2 * total) / 100
+    grand_total = total + tax 
 
     # user.wallet = user.wallet+order.total_price
     user.save()
@@ -262,7 +267,10 @@ def viewsingleadmin(request, order_id):
         'order': order,
         'order_item': order_item,
         'payments': payments,
+        'subtotal':subtotal,
+        'discount':discount,
         'tax': tax,
+        'total':total,
         'grand_total': grand_total,
         
         # 'order_return_message': order_return_message
