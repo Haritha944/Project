@@ -119,6 +119,8 @@ def orderinvoice(request,order_id):
     user = request.user
     order = Order.objects.get(id=order_id)
     order_items = OrderItem.objects.filter(order=order)
+    coupon_code = request.session.get('coupon_code', None) 
+    coupon = None 
     payment = Payment.objects.get(order=order)
     #cart_id = _cart_id(request)
     #cart = Cart.objects.get(cart_id=cart_id)
@@ -131,15 +133,21 @@ def orderinvoice(request,order_id):
     subtotal = 0 
     for order_item in order_items:
         order_item_total = order_item.variant.discount_price * order_item.quantity
-        subtotal += order_item_total
-       
-    try:
-        user_coupon = UserCoupons.objects.get(user=user,is_used=True)
-        total=subtotal
-        discount = float(user_coupon.coupon.coupon_discount)
-        total-=discount
-    except UserCoupons.DoesNotExist:
-        total = subtotal     
+        subtotal += order_item_total  
+        try:
+            coupon = Coupon.objects.get(coupon_code=coupon_code)
+         
+            user_coupon = UserCoupons.objects.filter(user=user,coupon=coupon,is_used=True)
+            if user_coupon.exists():
+                total=subtotal
+                discount = float(user_coupon.first().coupon.coupon_discount)
+                total-=discount
+        except Coupon.DoesNotExist:
+            total = subtotal
+            coupon = None
+        except UserCoupons.DoesNotExist:
+            total = subtotal 
+          
         #subtotal += total
     tax = (2 * total) / 100  
     grand_total = total + tax 
@@ -452,7 +460,8 @@ def editcoupon(request,id):
                 messages.error(request, "coupon code already exist ")
                 return redirect(url)
             else:
-                coupon.min_purchase = request.POST.get('min_price')
+                coupon.coupon_code = request.POST.get('coupon_code')        
+        coupon.min_purchase = request.POST.get('min_price')
         coupon.coupon_discount = request.POST.get('discount_amount')
         coupon.start_date = request.POST.get('start_date')
         coupon.end_date = request.POST.get('end_date')
