@@ -238,12 +238,9 @@ def editproduct(request, product_id):
 def viewvariant(request, variant_id):
     product = Product.objects.get(id=variant_id) 
     variants = ProductVariant.objects.filter(product=product).order_by('id') 
-
     context = {
-        'variants': variants,
-        
+        'variants': variants,    
     }
-
     return render(request, 'admin/viewvariant.html', context)
 
 #<!--admin viewvariant  ---------------------------------->

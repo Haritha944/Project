@@ -1,6 +1,7 @@
 from django.shortcuts import render,redirect
 from django.views.decorators.cache import never_cache
 from math import ceil
+from django.db.models import Q
 from .forms import SignupForm,LoginForm
 from django.core.mail import send_mail
 from django.contrib import messages
@@ -329,16 +330,20 @@ def confirm_password(request):
             return redirect("user:confirm_password")
     else:
         return render(request, 'user/confirm_password.html')
-           
-   
-
-
-                                    
-
 
 def search(request):
-    product_objects=Product.objects.all()
-    keyword= request.GET.get('item_name')
-    if keyword !='' and keyword is not None:
-         product_objects = product_objects.filter(title__icontains=keyword)
-    return render(request,'user/index.html',{'product_objects':product_objects})
+    if 'keyword' in request.GET:
+        keyword = request.GET['keyword']
+        if keyword:
+            products = ProductVariant.objects.filter(Q(is_available=True) &
+                                                     Q(Q(product__description__icontains=keyword) |
+                                                       Q(product__product_name__icontains=keyword)))
+   
+    sub_cat = Category.objects.all()
+
+    context = {
+        'products': products,
+        'sub_category': sub_cat,
+
+    }
+    return render(request,'user/index.html',context)
