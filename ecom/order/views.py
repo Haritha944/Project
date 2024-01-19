@@ -505,6 +505,7 @@ def applycoupon(request):
                 cart_total = sum(cart_item.variant.discount_price * cart_item.quantity for cart_item in cart_items)
                 if cart_total >= coupon.min_purchase:
                     if UserCoupons.objects.filter(user=request.user, coupon=coupon, is_used=True).exists():
+                        coupon_code=None
                         messages.warning(request, 'Coupon has already been Used')
                     else:
                         for cart_item in cart_items:
@@ -523,7 +524,7 @@ def applycoupon(request):
                 messages.warning(request, 'Coupon is not Applicable for the current date')
         except ObjectDoesNotExist:
             messages.warning(request, 'Coupon code is Invalid')
-            return redirect('cart:cart')
+            #return redirect('cart:cart')
            
 
     return redirect('cart:cart')

@@ -51,6 +51,7 @@ def cart(request,total=0,quantity=0,cart_items=None):
     url = request.META.get('HTTP_REFERER')
     cart_id = _cart_id(request)
     tax=0
+    value=0
     discount=0
     grand_total=0
     current_date = timezone.now()
@@ -60,31 +61,20 @@ def cart(request,total=0,quantity=0,cart_items=None):
         for cart_item in cart_items:
             total += (cart_item.product.discount_price * cart_item.quantity)
             quantity += cart_item.quantity
-        if 'coupon_code' in request.session:
-            #if 'coupon_applied' not in request.session:
-                value=total
+        value=total
+        try:
+            if 'coupon_code' in request.session:
                 coupon_code = request.session['coupon_code']
-                try:
-                    coupon = Coupon.objects.get(coupon_code=coupon_code)
-                # Check if the coupon is valid and not expired
-                    if coupon.start_date <= current_date <= coupon.end_date:
-                    # Check if the coupon is applicable to the current cart total
-                        if value >= coupon.min_purchase:
-                        
-                        # Apply the coupon discount
+                coupon = Coupon.objects.get(coupon_code=coupon_code)
+                if coupon.start_date <= current_date <= coupon.end_date:
+                    if value >= coupon.min_purchase:
+                        if not UserCoupons.objects.filter(user=request.user, coupon=coupon, is_used=True).exists():
                             discount=float(coupon.coupon_discount)
                             value -= discount
-                            #request.session['coupon_applied'] = True
-                            messages.success(request, 'Coupon applied successfully!')
-                        
-                except Coupon.DoesNotExist:
-                    messages.warning(request, 'Invalid coupon code.')
-                #del request.session['coupon_code']
-        else:
-            value=total
-
-            # Remove the coupon code from the session
-            #
+        except Coupon.DoesNotExist:
+            coupon=None
+            messages.warning(request, 'Invalid coupon code.')
+       
         tax = (2*value)/100
         grand_total = value + tax
     except ObjectDoesNotExist:
