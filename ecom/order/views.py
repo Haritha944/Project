@@ -496,6 +496,8 @@ def applycoupon(request):
         cart_id = _cart_id(request)
         cart = Cart.objects.get(cart_id=cart_id)
         cart_items = CartItem.objects.filter(cart=cart, is_active=True).order_by('id')
+        if 'cancel' in request.POST:
+            return handlecancel(request)
         request.session['coupon_code'] = coupon_code
         try:
             coupon = Coupon.objects.get(coupon_code=coupon_code)
@@ -527,6 +529,11 @@ def applycoupon(request):
             #return redirect('cart:cart')
            
 
+    return redirect('cart:cart')
+
+def handlecancel(request):
+    if 'coupon_code' in request.session:
+        del request.session['coupon_code']
     return redirect('cart:cart')
 
 

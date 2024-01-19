@@ -17,6 +17,7 @@ urlpatterns = [
     path('walletpay/<int:order_id>/', views.walletpay, name='walletpay'),
     path('mycoupons/',views.mycoupons,name='mycoupons'),
     path('applycoupon/',views.applycoupon,name='applycoupon'),
+    path('handlecancel/',views.handlecancel,name='handlecancel'),
 
    #admin
     path('vieworder/', views.vieworder, name='vieworder'),
