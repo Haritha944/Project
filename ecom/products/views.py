@@ -2,6 +2,8 @@ from django.shortcuts import render,redirect
 from django.core.paginator import Paginator
 from .models import Product,ProductVariant,ProductImage
 from category.models import Sub_Category,Category
+from django.shortcuts import get_object_or_404
+from django.core.exceptions import ValidationError
 import re
 import os
 from ecom import settings
@@ -234,35 +236,42 @@ def editproduct(request, product_id):
 
 #<!--admin view variant ---------------------------------->        
 def viewvariant(request, variant_id):
-    product = Product.objects.get(id=variant_id)
-    variants = ProductVariant.objects.filter(product=product).order_by('id')
+    product = Product.objects.get(id=variant_id) 
+    variants = ProductVariant.objects.filter(product=product).order_by('id') 
+
     context = {
         'variants': variants,
+        
     }
 
     return render(request, 'admin/viewvariant.html', context)
 
 #<!--admin viewvariant  ---------------------------------->
 def addvariant(request):
+    product=Product.objects.all()
+    context={'product':product,}
     variant=ProductVariant()
     if request.method == 'POST':
        #product_id= request.POST.get('variant_product')
-       product = request.POST.get('variant_product')
-       #product = Product.objects.get(id=product_id)
-       
-       
-       variant.product = product
-       print(variant.product)
+       variant.product = get_object_or_404(Product, product_name=request.POST.get('variant_product_product_name'))
        variant.size = request.POST.get('variant_size')
        variant.color = request.POST.get('variant_color')
        variant.material = request.POST.get('variant_material')
        variant.original_price = request.POST.get('variant_original_price')
        variant.discount_price = request.POST.get('variant_discount_price')
        variant.stock = request.POST.get('variant_stock')
-       variant.save()
-       messages.success(request, "Variant added successfully!")
-       return redirect('/viewvariant/')
-    return render(request, 'admin/viewvariant.html',{'variant': variant})
+       try:
+           if variant.original_price <= 0 or variant.discount_price < 0 or variant.discount_price >= variant. original_price:
+                raise ValidationError(request,"Invalid price or stock values.")
+           variant.save()
+           messages.success(request, "Variant added successfully!")
+           return redirect('products:viewvariant',variant_id=variant.product_id)
+       except ValidationError as e:
+            messages.error(request, str(e))
+            #messages.error(request, f"An error occurred: {str(e)}")
+            
+       
+    return render(request, 'admin/viewvariant.html',context)
 
 #<!--admin editvariant  ---------------------------------->
 def editvariant(request,variant_id):
@@ -287,21 +296,21 @@ def softdeletevariant(request, variant_id):
     try:
         variant = ProductVariant.objects.get(pk=variant_id)
     except ProductVariant.DoesNotExist:
-        return redirect('/viewvariant/')
+        return redirect('products:viewvariant',variant_id)
     variant.soft_deleted = True
     variant.is_available = False
     variant.save()
-    return redirect('/viewvariant/')
+    return redirect('products:viewvariant',variant_id=variant.product_id)
 
 def undosoftdeletevariant(request, variant_id):
     try:
         variant= ProductVariant.objects.get(pk=variant_id)
     except ProductVariant.DoesNotExist:
-        return redirect('/viewvariant/')
+        return redirect('products:viewvariant',variant_id)
     variant.soft_deleted = False
     variant.is_available = True
     variant.save()
-    return redirect('/viewvariant/')
+    return redirect('products:viewvariant',variant_id=variant.product_id)
 
 #<!--admin viewimage  ---------------------------------->
 def viewimage(request,product_id):
