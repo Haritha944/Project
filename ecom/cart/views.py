@@ -61,7 +61,7 @@ def cart(request,total=0,quantity=0,cart_items=None):
             total += (cart_item.product.discount_price * cart_item.quantity)
             quantity += cart_item.quantity
         if 'coupon_code' in request.session:
-            if 'coupon_applied' not in request.session:
+            #if 'coupon_applied' not in request.session:
                 value=total
                 coupon_code = request.session['coupon_code']
                 try:
@@ -77,17 +77,14 @@ def cart(request,total=0,quantity=0,cart_items=None):
                             #request.session['coupon_applied'] = True
                             messages.success(request, 'Coupon applied successfully!')
                         
-                        else:
-                            messages.warning(request,f'This Coupon only applicable for minimum amount{coupon.min_purchase}')
-                    else:
-                        messages.warning(request, 'Coupon has expired.')
                 except Coupon.DoesNotExist:
                     messages.warning(request, 'Invalid coupon code.')
+                #del request.session['coupon_code']
         else:
             value=total
 
             # Remove the coupon code from the session
-            #del request.session['coupon_code']
+            #
         tax = (2*value)/100
         grand_total = value + tax
     except ObjectDoesNotExist:
