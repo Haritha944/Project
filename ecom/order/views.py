@@ -11,6 +11,7 @@ from django.db import transaction
 from django.views.decorators.cache import cache_control
 from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist  
+from datetime import datetime
 
 # Create your views here.
 
@@ -429,8 +430,8 @@ def addcoupon(request):
             coupon.coupon_code = request.POST.get('coupon_code')
         coupon.min_purchase=request.POST.get('min_price')
         coupon.coupon_discount = request.POST.get('discount_amount')
-        coupon.start_date=request.POST.get('start_date')
-        coupon.end_date=request.POST.get('end_date')
+        coupon.start_date=datetime.strptime(request.POST.get('start_date'), '%d/%m/%Y').strftime('%Y-%m-%d')
+        coupon.end_date=datetime.strptime(request.POST.get('end_date'), '%d/%m/%Y').strftime('%Y-%m-%d')
         coupon.save()
         return redirect('order:viewcoupon')
 
@@ -455,8 +456,8 @@ def editcoupon(request,id):
                 coupon.coupon_code = request.POST.get('coupon_code')        
         coupon.min_purchase = request.POST.get('min_price')
         coupon.coupon_discount = request.POST.get('discount_amount')
-        coupon.start_date = request.POST.get('start_date')
-        coupon.end_date = request.POST.get('end_date')
+        coupon.start_date = datetime.strptime(request.POST.get('start_date'), '%d/%m/%Y').strftime('%Y-%m-%d')
+        coupon.end_date = datetime.strptime(request.POST.get('end_date'), '%d/%m/%Y').strftime('%Y-%m-%d')
         coupon.save()
         return redirect('order:viewcoupon')
     

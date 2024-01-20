@@ -5,6 +5,7 @@ from category.models import Sub_Category,Category
 from django.shortcuts import get_object_or_404
 from django.core.exceptions import ValidationError
 import re
+from django.db.models import Q
 import os
 from ecom import settings
 from decimal import Decimal
@@ -360,5 +361,22 @@ def deleteimage(request,image_id):
         'product':product
     }
     return render(request,'admin/viewimage.html',context)
+
+def searchadmin(request):
+    if 'keyword' in request.GET:
+        keyword = request.GET['keyword']
+        if keyword:
+            products = Product.objects.filter(Q(is_available=True) &
+                                                     Q(Q(product__description__icontains=keyword) |
+                                                       Q(product__product_name__icontains=keyword)))
+   
+    sub_cat = Category.objects.all()
+
+    context = {
+        'products': products,
+        'sub_category': sub_cat,
+
+    }
+    return render(request,'admin/viewproduct.html',context)
 
 

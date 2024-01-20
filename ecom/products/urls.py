@@ -22,4 +22,5 @@ urlpatterns = [
     path('viewimage/<int:product_id>', views.viewimage, name='viewimage'),
     path('addimage/<int:product_id>', views.addimage, name='addimage'),
     path('deleteimage/<int:image_id>', views.deleteimage, name='deleteimage'),
+     path('searchadmin/', views.searchadmin, name='searchadmin'),
 ]
