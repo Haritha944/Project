@@ -227,7 +227,7 @@ Cart
                           showConfirmButton: false,
                           timer: 1500
                         });
-                    }
+                    } 
                     quantityField.val(data.quantity);
                     console.log(data.quantity);
                     console.log(data.sub_total);
@@ -249,8 +249,9 @@ Cart
                         var total = data.sub_total - parseInt(discount);
                         totalAmount.innerText = "₹" + total;
                         document.getElementById('subtotal').innerText = "₹" + data.sub_total;
-    
+                   
                 }
+              
             });
         });
     
