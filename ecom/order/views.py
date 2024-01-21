@@ -24,7 +24,7 @@ def _cart_id(request):
         cart=request.session.create()
     return cart
 
- 
+@csrf_exempt       
 def razorpaid(request,tracking_no):
     user=request.user
     try:
@@ -33,8 +33,8 @@ def razorpaid(request,tracking_no):
         return redirect('cart:cart')
     r_tot=order.total_price*100
     client = razorpay.Client(auth=("rzp_test_zLLrBmHDjYzLTa","RZzrXnbKkKZyFzvIGk57In95"))
-    payment=client.order.create({'amount':r_tot,'currency':"INR",'payment_capture':'1'})
-    order.payment.razor_pay_id=payment['id']
+    paymentt=client.order.create({'amount':r_tot,'currency':"INR",'payment_capture':'1'})
+    order.payment.razor_pay_id=paymentt['id']
     order.payment.payment_method="Razorpay"
     payment_object = Payment.objects.create(
         user=user,
@@ -80,7 +80,7 @@ def razorpaid(request,tracking_no):
         del request.session['coupon_code']
     
     
-    context={'order':order,'payment':payment}
+    context={'order':order,'payment':paymentt}
     return render(request,'order/cashdelivery.html',context)
 
     

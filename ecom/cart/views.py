@@ -328,6 +328,8 @@ def removecart(request, product_id):
         email = request.user
         user=User.objects.get(email=request.user.email)
         cart_item = CartItem.objects.get(variant=productvariant, user_id=user.id)
+        print(cart_item)
+
     except:
         cart = Cart.objects.get(cart_id=cart_id)
         cart_item = CartItem.objects.get(variant=productvariant, cart=cart)
@@ -336,6 +338,7 @@ def removecart(request, product_id):
         cart_item.save()
         sub_total = 0
         try:
+            cart_item = CartItem.objects.get(variant=productvariant, cart=cart, user=request.user)
             cart_items = CartItem.objects.filter(user=request.user, is_active=True)
         except:
             cart = Cart.objects.get(cart_id=cart_id)
@@ -666,9 +669,11 @@ def increment(request, product_id):
         email = request.user
         user = User.objects.get(email=email)
         cart_item = CartItem.objects.get(variant=productvariant, user=user)
+        print(cart_item)
     except:
         cart = Cart.objects.get(cart_id=cart_id)
         cart_item = CartItem.objects.get(variant=productvariant, cart=cart)
+        print(cart_item)
 
     if productvariant.stock <= cart_item.quantity:
 
@@ -681,6 +686,7 @@ def increment(request, product_id):
         for item in cart_items:
             sub_total += (item.variant.discount_price * item.quantity)
         total = cart_item.quantity * cart_item.variant.discount_price
+        print("hii",sub_total)
         return JsonResponse(
             {'quantity': cart_item.quantity, 'total': total, 'sub_total': sub_total, 'messages': "error"})
     # if cart_item.quantity > 1:
@@ -690,12 +696,18 @@ def increment(request, product_id):
         # calculating subtotal
         sub_total = 0
         try:
-            cart_items = CartItem.objects.filter(user=request.user, is_active=True)
+            print(request.user)
+            cart_item = CartItem.objects.get(variant=productvariant, cart=cart, user=request.user)
+            cart_items = CartItem.objects.filter(user=request.user,is_active=True)
+            print(cart_items)
         except:
+            
             cart = Cart.objects.get(cart_id=cart_id)
-            cart_items = CartItem.objects.filter(cart=cart, is_active=True)
+            cart_items = CartItem.objects.filter(cart=cart,is_active=True)
+            print(cart_items)
         for item in cart_items:
             sub_total += (item.variant.discount_price * item.quantity)
         total = cart_item.quantity * cart_item.variant.discount_price
+        print("hii",sub_total)
         return JsonResponse(
             {'quantity': cart_item.quantity, 'total': total, 'sub_total': sub_total, "messages": "success"})
