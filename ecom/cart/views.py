@@ -637,6 +637,7 @@ def placeorder(request, total=0, quantity=0):
             except:
                 pass
         order = Order.objects.get(user=user,tracking_no=trackno,total_price=grand_total)
+        r_tot=order.total_price*100
 
         context = {
             'order': order,
@@ -648,6 +649,7 @@ def placeorder(request, total=0, quantity=0):
             'discount': discount,
             'total': total ,
             'value':value,
+            'r_tot':r_tot,
             'quantity': quantity,
         }
 

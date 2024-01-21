@@ -119,36 +119,33 @@ Order
     </div>
     </div>
 </div>
+{% endblock %}
 {% block j-script %}
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+    var options = {
+        "key": "rzp_test_zLLrBmHDjYzLTa" ,
+        "amount": "{{r_tot}}" ,
+        "currency": "INR",
+        "name": "TrendyFoot",
+        "description": "Test Transaction",
+        "image": "https://example.com/your_logo",
+        "order_id": "{{payment.id}}", 
+        "callback_url": "{% url 'order:razorpaid' tracking_no=order.tracking_no %}",
+        
+            
+        "theme": {
+            "color": "#3399cc"
+        }
+    };
 
-
-
-			<script>
-				var options = {
-					"key": "rzp_test_zLLrBmHDjYzLTa" ,
-					"amount": {{ order.total_price|floatformat:2 }} * 100,
-					"currency": "INR",
-					"name": "TrendyFoot",
-					"description": "Purchase",
-					//"image": "https://example.com/your_logo",
-					"order_id": "{{ payment.id }}", 
-					"handler": function (response) {
-						alert("Payment successful!");
-						var orderNumber = "{{ order.tracking_no }}"; // Get the order number
-						window.location.href = '/placeorder/confirmrazorpayment/' + orderNumber + '/';
-					},
-						
-					"theme": {
-						"color": "#3399cc"
-					}
-				};
-
-				var rzp1 = new Razorpay(options);
-				document.getElementById('rzp-button1').addEventListener('click', function (e) {
-					rzp1.open();
-					e.preventDefault();
-				});
-			</script>
-{% endblock %}
+    var rzp1 = new Razorpay(options);
+    document.getElementById('rzp-button1').onclick = function(e){
+        rzp1.open();
+        
+        e.preventDefault();
+        
+    
+    }
+</script>
 {% endblock %}

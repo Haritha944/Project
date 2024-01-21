@@ -12,6 +12,8 @@ from django.views.decorators.cache import cache_control
 from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist  
 from datetime import datetime
+import razorpay
+from django.views.decorators.csrf import csrf_exempt
 
 
 # Create your views here.
@@ -21,52 +23,66 @@ def _cart_id(request):
     if not cart:
         cart=request.session.create()
     return cart
-@transaction.atomic      
-def confirmrazorpayment(request,tracking_no):
-    user = request.user
+
+ 
+def razorpaid(request,tracking_no):
+    user=request.user
     try:
         order = Order.objects.get(tracking_no=tracking_no, user=user)
     except Order.DoesNotExist:
         return redirect('cart:cart')
-    
-    total_amount = order.total_price 
-
-    payment = Payment(
+    r_tot=order.total_price*100
+    client = razorpay.Client(auth=("rzp_test_zLLrBmHDjYzLTa","RZzrXnbKkKZyFzvIGk57In95"))
+    payment=client.order.create({'amount':r_tot,'currency':"INR",'payment_capture':'1'})
+    order.payment.razor_pay_id=payment['id']
+    order.payment.payment_method="Razorpay"
+    payment_object = Payment.objects.create(
         user=user,
         payment_method="Razorpay",
         status="Paid",
-        amount_paid=total_amount,
+        amount_paid=order.total_price,
     )
-    payment.save()
-
+    payment_object.save()
     order.tracking_no = tracking_no
-    order.payment = payment
+    order.payment = payment_object
     order.save()
-
-
-
-    cart_items = CartItem.objects.filter(user=user)
+    cart_id = _cart_id(request)
+    cart = Cart.objects.get(cart_id=cart_id)
+    cart_items = CartItem.objects.filter(cart=cart,is_active=True).order_by('id')
+    
+    
     for cart_item in cart_items:
-        product=cart_item.product
-        stock=product.stock-cart_item.quantity
-        product.stock=stock
-        product.save()
-        order_product = OrderItem(
+        variant=cart_item.variant
+        stock=variant.stock-cart_item.quantity
+        variant.product.stock = stock
+        variant.product.save()
+        if 'coupon_code' in request.session:
+            coupon_code = request.session['coupon_code']
+            coupon = Coupon.objects.get(coupon_code=coupon_code)
+            discount = float(coupon.coupon_discount)
+            pricevalue=cart_item.variant.discount_price-discount
+        else:
+            pricevalue=cart_item.variant.discount_price
+
+        order_product = OrderItem.objects.create(
             order=order,
-            payment=payment,
             user=user,
             product=cart_item.product,
+            variant=cart_item.variant,
             quantity=cart_item.quantity,
-            product_price=cart_item.variant.discount_price,
-           
+            price=pricevalue,
+            
         )
         order_product.save()
-
+    
     cart_items.delete()
+    if 'coupon_code' in request.session:
+        del request.session['coupon_code']
+    
+    
+    context={'order':order,'payment':payment}
+    return render(request,'order/cashdelivery.html',context)
 
-    context = {'order': order}
-
-    return render(request, 'order/orderconfirm.html', context)
     
 @transaction.atomic
 def cashdelivery(request,tracking_no):
@@ -89,7 +105,7 @@ def cashdelivery(request,tracking_no):
     for cart_item in cart_items:
         variant=cart_item.variant
         stock=variant.stock-cart_item.quantity
-        variant.product.quantity = stock
+        variant.product.stock = stock
         variant.product.save()
         if 'coupon_code' in request.session:
             coupon_code = request.session['coupon_code']
