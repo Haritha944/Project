@@ -9,6 +9,11 @@ from django.contrib import messages
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.cache import cache_control, never_cache
+from order.models import Order, OrderItem
+from django.db.models import Sum
+from django.db.models.functions import ExtractMonth
+from django.utils import timezone
+from django.db.models import Q
 
 # Create your views here.
 
@@ -30,7 +35,43 @@ def adminlogin(request):
 @never_cache
 def admindashboard(request):
     if request.user.is_superuser:
-       return render(request, 'admin/dashboard.html')
+       orders=Order.objects.filter(status='Delivered')
+       order_count = orders.count()
+       total_amount=0
+       customers=User.objects.filter(is_superuser=False).count()
+       for item in orders:
+            total_amount=total_amount+item.total_price
+
+       no_deliverd = OrderItem.objects.filter(status='Delivered').count()
+       no_cancel =  OrderItem.objects.filter(status='Cancelled').count()
+       no_return =  OrderItem.objects.filter(status='Returned').count()
+
+       current_year = timezone.now().year
+
+        # Calculate monthly sales for the current year
+       monthly_sales = Order.objects.filter(
+            created_at__year=current_year
+        ).annotate(month=ExtractMonth('created_at')).values('month').annotate(total_sales=Sum('total_price')).order_by(
+            'month')
+
+        # Create a dictionary to hold the monthly sales data
+       monthly_sales_data = {month: 0 for month in range(1, 13)}
+
+       for entry in monthly_sales:
+            month = entry['month']
+            total_sales = entry['total_sales']
+            monthly_sales_data[month] = total_sales
+
+       context = {
+            'total_amount': total_amount,
+            'order_count': order_count,
+            'customers': customers,
+            'no_deliverd': no_deliverd,
+            'no_cancel': no_cancel,
+            'no_return': no_return,
+            'monthly_sales_data': monthly_sales_data
+        }
+       return render(request, 'admin/dashboard.html',context)
     else:
         return redirect('/adminlogin/')
        

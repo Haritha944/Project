@@ -24,7 +24,7 @@
                 <i class="fa fa-user fa-3x text-primary"></i>
                 <div class="ms-3">
                     <p class="mb-2">Total Customers</p>
-                    <h6 class="mb-0"></h6>
+                    <h6 class="mb-0">{{customers}}</h6>
                 </div>
             </div>
         </div>
@@ -33,7 +33,7 @@
                 <i class="fa fa-chart-bar fa-3x text-primary"></i>
                 <div class="ms-3">
                     <p class="mb-2">Total Sale</p>
-                    <h6 class="mb-0">₹</h6>
+                    <h6 class="mb-0">₹{{total_amount}}</h6>
                 </div>
             </div>
         </div>
@@ -42,7 +42,7 @@
                 <i class="fa fa-shopping-cart fa-3x text-primary"></i>
                 <div class="ms-3">
                     <p class="mb-2">Total Order</p>
-                    <h6 class="mb-0"></h6>
+                    <h6 class="mb-0">{{order_count}}</h6>
                 </div>
             </div>
         </div>
@@ -70,9 +70,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <script>
-var Delivered = 
-var Cancel = 
-var Return = 
+var Delivered = {{ no_deliverd }}
+var Cancel = {{ no_cancel }}
+var Return = {{ no_return }}
 console.log(Delivered);
 console.log(Cancel);
 console.log(Return);

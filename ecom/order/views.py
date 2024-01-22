@@ -308,37 +308,59 @@ def viewsingleadmin(request, order_id):
 def updatestatus(request, order_id, new_status):
     
     order = get_object_or_404(Order, pk=order_id)
+    order_item = OrderItem.objects.filter(order=order)
+    try:
+        if new_status == 'Order Confirmed':
+            order.status = 'Order Confirmed'
+        elif new_status == 'Shipped':
+            order.status = 'Shipped'
+        elif new_status == 'Pending':
+            order.status = 'Pending'
+        elif new_status == 'Delivered':
+            order.status = 'Delivered'
+        elif new_status == 'Cancelled':
+            order.status = 'Cancelled'
+            context = {
+                    'order': order,
+                    'order_item': order_item
+                }
+            return render(request, 'admin/viewdetailorder.html', context)
+        order = Order.objects.get(id=order_id)
+        order_item = OrderItem.objects.filter(order=order)
+        for item in order_item:
+            item.status = new_status
+            item.save()
+        order.status = new_status
+        order.save()
     
-    if new_status == 'Order Confirmed':
-        order.status = 'Order Confirmed'
-    elif new_status == 'Shipped':
-        order.status = 'Shipped'
-    elif new_status == 'Out for Delivery':
-        order.status = 'Out for Delivery'
-    elif new_status == 'Delivered':
-        order.status = 'Delivered'
-    elif new_status == 'Cancelled':
-        order.status = 'Cancelled'
     
-    order.save()
-    if order.status == 'Returned':
-        email = order.user.email
-        user = User.objects.get(email=email)
-        userwallet = UserWallet()
-        userwallet.user = user
-        userwallet.amount += order.total_price
-        userwallet.transaction = 'Credited'
-        userwallet.save()
-        user.save()
+        if order.status == 'Returned':
+            email = order.user.email
+            user = User.objects.get(email=email)
+            userwallet = UserWallet()
+            userwallet.user = user
+            userwallet.amount += order.total_price
+            userwallet.transaction = 'Credited'
+            userwallet.save()
+            user.save()
         order_item = OrderItem.objects.filter(order=order)
         context = {
                 'order': order,
                 'order_item': order_item
-            }
+        }
     
     #messages.success(request, f"Order #{order.tracking_no} has been updated to '{new_status}' status.")
     
-    return render(request, 'admin/viewdetailorder.html', context)
+        return render(request, 'admin/viewdetailorder.html',context)
+    except:
+        pass
+    order_item = OrderItem.objects.filter(order=order)
+    context = {
+        'order': order,
+        'order_item': order_item
+    }
+    return render(request, 'admin/order/viewdetailorder.html', context)
+
    
 
 def returnorder(request,order_item_id):

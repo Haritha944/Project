@@ -73,11 +73,14 @@
                                     <a class="dropdown-item" href="{% url 'order:updatestatus' order.id 'Order Confirmed' %}">
                                         <i class="bx bx-package me-1"></i> Order Confirmed
                                     </a>
+                                    <a class="dropdown-item" href="{% url 'order:updatestatus' order.id 'Delivered' %}">
+                                        <i class="bx bx-package me-1"></i> Delivered
+                                    </a>
                                     <a class="dropdown-item" href="{% url 'order:updatestatus' order.id 'Shipped' %}">
                                         <i class="bx bx-check me-1"></i> Shipped
                                     </a>
-                                    <a class="dropdown-item" href="{% url 'order:updatestatus' order.id 'Out for Delivery' %}">
-                                        <i class="bx bx-user-check me-1"></i> Out for Delivery
+                                    <a class="dropdown-item" href="{% url 'order:updatestatus' order.id 'Pending' %}">
+                                        <i class="bx bx-user-check me-1"></i> Pending
                                     </a>
                                     <a class="dropdown-item" href="{% url 'order:updatestatus' order.id 'Cancelled' %}">
                                         <i class="bx bx-trash me-1"></i> Canceled
