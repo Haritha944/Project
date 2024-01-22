@@ -119,8 +119,7 @@ Order
     </div>
     </div>
 </div>
-{% endblock %}
-{% block j-script %}
+
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script>
     var options = {
@@ -130,8 +129,13 @@ Order
         "name": "TrendyFoot",
         "description": "Test Transaction",
         "image": "https://example.com/your_logo",
-        "order_id": "{{paymentt.id}}", 
-        "callback_url": "{% url 'order:razorpaid' order.tracking_no %}",
+        "order_id": "{{ paymentt.id }}", 
+       // "callback_url": "{% url 'order:razorpaid' order.tracking_no %}",
+       "handler": function (response) {
+        alert("Payment successful!");
+        var orderNumber = "{{ order.tracking_no }}"; // Get the order number
+        window.location.href = 'razorpaid/' + orderNumber + '/';
+    },
         "theme": {
             "color": "#3399cc"
         }

@@ -27,8 +27,8 @@ Orderconfirm
     
     </div>
     <div class="cart-buttons text-center">
-        <a href="{% url 'products:viewshop' %}" class="boxed-btn black text-decoration-none fs-4">Continue Shopping</a>
-        <a href="{% url 'order:orderinvoice' order_id=order.id %}" class="boxed-btn black text-decoration-none fs-4">Order Invoice</a>
+        <a type="button" href="{% url 'products:viewshop' %}" class="boxed-btn black text-decoration-none fs-4 btn btn-warning btn-md btn-block">Continue Shopping</a>
+        <a href="{% url 'order:orderinvoice' order_id=order.id %}" class="boxed-btn black text-decoration-none fs-4 btn btn-warning btn-md btn-block">Order Invoice</a>
     </div>
 
 

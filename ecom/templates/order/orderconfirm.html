@@ -142,7 +142,7 @@ Orderconfirm
 
 <!--sample-->
 <div class="d-flex justify-content-between">
-    <div><button class="btn btn-warning" id="pdfButton">Download Invoice</button></div>
+    <div><a class="btn btn-warning" href="{% url 'order:pdf_download' id=order.id %}">Download Invoice</a></div>
     <div><a class="btn btn-success" href="{% url 'order:myorder' %}">Go to Order</a></div>
 </div>
 <div class="invoice-footer mt-5">

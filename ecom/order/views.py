@@ -13,6 +13,12 @@ from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist  
 from datetime import datetime
 import razorpay
+from django.template.loader import get_template
+from io import BytesIO
+from django.views import View
+import os
+from xhtml2pdf import pisa
+from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
 
 
@@ -554,7 +560,82 @@ def handlecancel(request):
         del request.session['coupon_code']
     return redirect('cart:cart')
 
+from typing import Dict,Any
+def pdf_download(request,id):
+    order=Order.objects.get(id=id)
+    neworderitems=OrderItem.objects.filter(order=order)
+    subtotal=0
+    for order_item in neworderitems:
+        order_item_total = order_item.variant.discount_price * order_item.quantity
+        subtotal += order_item_total
+        total=subtotal  
+    discount=order_item.variant.discount_price-order_item.price
+    if discount != 0:
+        total -= discount
+    else:
+        total=subtotal
+    tax = (2 * total) / 100  
+    grand_total = total + tax 
 
+    cont = {
+        'order': order,
+        'cart_items': neworderitems,
+        'tax':tax,
+        'discount':discount,
+        'subtotal':subtotal,
+        'total':total,
+        'grand_total':grand_total
+    }
+    pdf = render_to_pdf('order/invoicedownload.html', cont)
+    if pdf:
+        response = HttpResponse(pdf, content_type='application/pdf')
+        filename = "Invoice_%s.pdf" % (cont['order'])
+        content = "inline; filename='%s'" % (filename)
+        # download = request.GET.get("download")
+        # if download:
+        content = "attachment; filename=%s" % (filename)
+        response['Content-Disposition'] = content
+        return response
+def render_to_pdf(template_src, context_dict=None):
+    if context_dict is None:
+        context_dict = {}
+    template = get_template(template_src)
+    html  = template.render(context_dict)
+    result = BytesIO()
+    pdf = pisa.pisaDocument(BytesIO(html.encode("ISO-8859-1")), result)#, link_callback=fetch_resources)
+    if not pdf.err:
+        return HttpResponse(result.getvalue(), content_type='application/pdf')
+    return None
+
+def fetch_resources(uri, rel):
+    path = os.path.join(uri.replace(settings.STATIC_URL, ""))
+    return path
+
+class GenerateInvoice(View):
+    def get(self, request, pk, *args, **kwargs):
+        try:
+            order = Order.objects.get(payment_id=id)
+            neworderitems = OrderItem.objects.filter(order=order.id)
+        except:
+            return HttpResponse("505 Not Found")
+        data = {
+            'order': order,
+            'cart_items': neworderitems
+        }
+        pdf = render_to_pdf('order/orderconfirm.html', data)
+        # return HttpResponse(pdf, content_type='application/pdf')
+
+        # force download
+        if pdf:
+            response = HttpResponse(pdf, content_type='application/pdf')
+            filename = "Invoice_%s.pdf" % (order.id)
+            content = "inline; filename='%s'" % (filename)
+            # download = request.GET.get("download")
+            # if download:
+            content = "attachment; filename=%s" % (filename)
+            response['Content-Disposition'] = content
+            return response
+        return HttpResponse("Not found")
         
 
         
