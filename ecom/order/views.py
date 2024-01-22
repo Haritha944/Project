@@ -33,6 +33,7 @@ def _cart_id(request):
 @csrf_exempt       
 def razorpaid(request,tracking_no):
     user=request.user
+    print(user)
     try:
         order = Order.objects.get(tracking_no=tracking_no, user=user)
     except Order.DoesNotExist:
@@ -40,6 +41,7 @@ def razorpaid(request,tracking_no):
     r_tot=order.total_price*100
     client = razorpay.Client(auth=("rzp_test_zLLrBmHDjYzLTa","RZzrXnbKkKZyFzvIGk57In95"))
     paymentt=client.order.create({'amount':r_tot,'currency':"INR",'payment_capture':'1'})
+    print(paymentt)
     order.payment.razor_pay_id=paymentt['id']
     order.payment.payment_method="Razorpay"
     payment_object = Payment.objects.create(
@@ -60,7 +62,7 @@ def razorpaid(request,tracking_no):
     for cart_item in cart_items:
         variant=cart_item.variant
         stock=variant.stock-cart_item.quantity
-        variant.product.stock = stock
+        variant.product.stock = stock      
         variant.product.save()
         if 'coupon_code' in request.session:
             coupon_code = request.session['coupon_code']
@@ -111,7 +113,9 @@ def cashdelivery(request,tracking_no):
     for cart_item in cart_items:
         variant=cart_item.variant
         stock=variant.stock-cart_item.quantity
+        variant.stock=stock
         variant.product.stock = stock
+        variant.save()
         variant.product.save()
         if 'coupon_code' in request.session:
             coupon_code = request.session['coupon_code']
