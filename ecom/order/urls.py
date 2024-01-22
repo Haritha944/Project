@@ -30,5 +30,7 @@ urlpatterns = [
     path('addcoupon/',views.addcoupon,name='addcoupon'),
     path('deletecoupon/<int:id>/', views.deletecoupon, name='deletecoupon'),
     path('editcoupon/<int:id>/', views.editcoupon, name='editcoupon'),
+    path('salesreport/',views.salesreport,name='salesreport'),
+    path('sales-report-pdf/', views.sales_report_pdf_download, name='sales_report_pdf'),
    
 ]

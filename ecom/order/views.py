@@ -640,7 +640,70 @@ class GenerateInvoice(View):
             response['Content-Disposition'] = content
             return response
         return HttpResponse("Not found")
+    
+
+def salesreport(request):
+    total_sales=0
+    total_order=0
+    if request.method=="POST":
+        start_date=request.POST.get('start_date')
+        end_date=request.POST.get('end_date')
+        if start_date==end_date:
+            print(start_date)
+            orders = Order.objects.filter(created_at__date=start_date)
+        else:
+            orders = Order.objects.filter(created_at__range=(start_date, end_date))
+            Pending = Order.objects.filter(created_at__range=(start_date, end_date),status='Order confirmed').count()
+            Shipped = Order.objects.filter(created_at__range=(start_date,end_date),status='Shipped').count()
+            Delivered = Order.objects.filter(created_at__range=(start_date,end_date),status='Delivered').count()
+            Cancelled = Order.objects.filter(created_at__range=(start_date,end_date),status='Cancelled').count()
+            Returned = Order.objects.filter(created_at__range=(start_date,end_date),status='Returned').count()
+            for order in orders:
+                total_sales+=order.total_price
+    else:
+        orders=Order.objects.filter(total_price__gt=0)
+        total_order=Order.objects.all().count()
+        Pending = Order.objects.filter(status='Order confirmed').count()
+        Shipped = Order.objects.filter(status='Shipped').count()
+        Delivered = Order.objects.filter(status='Delivered').count()
+        Cancelled = Order.objects.filter(status='Cancelled').count()
+        Returned = Order.objects.filter(status='Returned').count()
+       
+        for order in orders:
+            total_sales = total_sales + order.total_price
+    context={
+        'orders':orders,
+        'total_sales':total_sales,
+        'total_order':total_order,
+        'Pending':Pending,
+        'Shipped':Shipped,
+        'Delivered':Delivered,
+        'Cancelled':Cancelled,
+        'Returned':Returned,
+    }
+
         
+    return render(request,'admin/viewsalesreport.html',context)
+
+def render_to_pdf(template_path, context_dict):
+    template = get_template(template_path)
+    html = template.render(context_dict)
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="Sales_report.pdf"'
+
+    # Create a PDF with xhtml2pdf
+    pisa_status = pisa.CreatePDF(html, dest=response)
+    if pisa_status.err:
+        return HttpResponse('We had some errors <pre>' + html + '</pre>')
+    return response
+
+def sales_report_pdf_download(request):
+    order=Order.objects.filter(total_price__gt=0)
+    cont = {
+        'orders': order,
+    }
+    pdf = render_to_pdf('admin/salesreportdownload.html', cont)
+    return pdf
 
         
 
