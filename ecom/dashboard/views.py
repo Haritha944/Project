@@ -1,5 +1,6 @@
 from django.shortcuts import render,redirect
 from django.contrib.auth import authenticate,login,logout
+from django.http import JsonResponse
 from user.models import User
 from cart.views import addcart
 from cart.models import Wishlist
@@ -183,4 +184,13 @@ def addwishcart(request,wish_id):
     }
     return render(request,'userprofile/wishlist.html',context)
 
+def get_sales_revenue(request):
+    # Replace this with your actual data retrieval logic
+    # Example mock data
+    data = {
+        'labels': ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+        'sales': [100, 200, 150, 300, 250, 400],
+        'revenue': [500, 600, 550, 700, 650, 800],
+    }
 
+    return JsonResponse(data)

@@ -367,8 +367,10 @@ def searchadmin(request):
         keyword = request.GET['keyword']
         if keyword:
             products = Product.objects.filter(Q(is_available=True) &
-                                                     Q(Q(product__description__icontains=keyword) |
-                                                       Q(product__product_name__icontains=keyword)))
+                                                     (Q(description__icontains=keyword) |
+                                                        Q(variants__size__icontains=keyword) |  
+                                                Q(variants__color__icontains=keyword) | 
+            Q(variants__material__icontains=keyword) |Q(product_name__icontains=keyword)))
    
     sub_cat = Category.objects.all()
 
