@@ -63,21 +63,7 @@ User profile
               <h2 class="mt-4 mb-4">PROFILE INFO</h2>
               <div class="card-body">
                 <div>
-                    {% if messages %}
-          <div class="container">
-                <ul class="messages mx-auto text-center">
-                  {% for message in messages %}
-                <div id="message">
-                  <div  class="error-alert {% if message.tags %}alert-{{ message.tags }}{% endif %}" role="alert">
-                <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span></button>
-                {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %} {% endif %}
-                {{ message }}
-                   </div>
-        </div>
-        {% endfor %}
-         </ul>
-</div>
-{% endif %}
+                   
 </div>
 <div class="mb-3">
          <label for="username" class="form-label">First Name</label>

@@ -238,9 +238,10 @@ def editproduct(request, product_id):
 #<!--admin view variant ---------------------------------->        
 def viewvariant(request, variant_id):
     product = Product.objects.get(id=variant_id) 
+    close_alert = request.GET.get('close_alert', False)
     variants = ProductVariant.objects.filter(product=product).order_by('id') 
     context = {
-        'variants': variants,    
+        'variants': variants, 
     }
     return render(request, 'admin/viewvariant.html', context)
 
@@ -250,44 +251,57 @@ def addvariant(request):
     context={'product':product,}
     variant=ProductVariant()
     if request.method == 'POST':
-       #product_id= request.POST.get('variant_product')
-       variant.product = get_object_or_404(Product, product_name=request.POST.get('variant_product_product_name'))
-       variant.size = request.POST.get('variant_size')
-       variant.color = request.POST.get('variant_color')
-       variant.material = request.POST.get('variant_material')
-       variant.original_price = request.POST.get('variant_original_price')
-       variant.discount_price = request.POST.get('variant_discount_price')
-       variant.stock = request.POST.get('variant_stock')
-       try:
-           if variant.original_price <= 0 or variant.discount_price < 0 or variant.discount_price >= variant. original_price:
-                raise ValidationError(request,"Invalid price or stock values.")
-           variant.save()
-           messages.success(request, "Variant added successfully!")
-           return redirect('products:viewvariant',variant_id=variant.product_id)
-       except ValidationError as e:
+        try:
+            #product_id= request.POST.get('variant_product')
+            variant.product = get_object_or_404(Product, product_name=request.POST.get('variant_product_product_name'))
+            print(f"Product Name: {variant.product}")
+            variant.size = request.POST.get('variant_size')
+            variant.color = request.POST.get('variant_color')
+            variant.material = request.POST.get('variant_material')
+            variant.original_price = float(request.POST.get('variant_original_price'))
+            variant.discount_price = float(request.POST.get('variant_discount_price'))
+            variant.stock = int(request.POST.get('variant_stock'))
+        
+            if variant.original_price <= 0 or variant.discount_price < 0 or variant.stock <=0 or variant.discount_price >= variant. original_price:
+                messages.warning(request, "Invalid input price values or stock values.")
+                return redirect('products:viewvariant', variant_id=variant.product_id)
+            else:
+                variant.save()
+                messages.success(request, "Variant added successfully!")
+                return redirect('products:viewvariant', variant_id=variant.product_id)
+        except ValidationError as e:
             messages.error(request, str(e))
             #messages.error(request, f"An error occurred: {str(e)}")
             
        
-    return render(request, 'admin/viewvariant.html',context)
+    return redirect('products:viewvariant', variant_id=variant.product_id)
 
 #<!--admin editvariant  ---------------------------------->
 def editvariant(request,variant_id):
     variant=ProductVariant.objects.get(id=variant_id)
     if request.method == "POST":
-        variant.size=request.POST.get('variant_size')
-        variant.color = request.POST.get('variant_color')
-        variant.material = request.POST.get('variant_material')
-        variant.original_price = request.POST.get('variant_original_price')
-        variant.discount_price = request.POST.get('variant_discount_price')
-        variant.stock = request.POST.get('variant_stock')
-        variant.save()
-        variants=ProductVariant.objects.filter(product=variant.product).order_by('id')
-        context={
+        try:
+            variant.size=request.POST.get('variant_size')
+            variant.color = request.POST.get('variant_color')
+            variant.material = request.POST.get('variant_material')
+            variant.original_price = float(request.POST.get('variant_original_price'))
+            variant.discount_price = float(request.POST.get('variant_discount_price'))
+            variant.stock = int(request.POST.get('variant_stock'))
+            if variant.original_price <= 0 or variant.discount_price < 0 or variant.stock <= 0 or variant.discount_price >= variant. original_price:
+                messages.warning(request, "Invalid input prices or invalid stock")
+                return redirect('products:viewvariant', variant_id=variant.product_id)
+            else:
+                variant.save()
+                messages.success(request, "Variant edited successfully!")
+                return redirect('products:viewvariant', variant_id=variant.product_id)
+        except ValidationError as e:
+            messages.error(request, str(e))  
+    variants=ProductVariant.objects.filter(product=variant.product).order_by('id')
+    context={
             'variants': variants,
-        }
-        return render(request, 'admin/viewvariant.html', context)
-    return render(request, 'admin/viewvariant.html')
+    }
+        
+    return render(request, 'admin/viewvariant.html',context)
 
 #<!--admin delvariant  ---------------------------------->
 def softdeletevariant(request, variant_id):

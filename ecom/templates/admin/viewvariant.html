@@ -21,13 +21,12 @@
     <div class="container" style="background-color:transparent;">
         <ul class="messages mx-auto text-center">
             {% for message in messages %}
-            <div id="message">
-                <div style="background-color:transparent;" class="error-alert {% if message.tags %}alert-{{ message.tags }}{% endif %}" role="alert">
-                    <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span></button>
-                    {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %} {% endif %}
-                    {{ message }}
-                </div>
-            </div>
+            <div class="alert alert-{{message.tags}} alert-dismissible fade show" role="alert">
+                 {{message}}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
             {% endfor %}
         </ul>
     </div>
@@ -46,7 +45,7 @@
                         <th scope="col"></th>
                         <!--                    <th scope="col">PRODUCTS ID</th>-->
                         <th scope="col">PRODUCTS NAME</th>
-                        <th scope="col">WEIGHT</th>
+                        <th scope="col">DETAILS</th>
                         <th scope="col">ORIGINAL PRICE</th>
                         <th scope="col">DISCOUNT PRICE</th>
                         <th scope="col">STOCK</th>
@@ -61,7 +60,9 @@
                         <td>{{forloop.counter}}</td>
                         <!--                    <td>{{item.product.id }}</td>-->
                         <td>{{item.product.product_name }}</td>
-                        <td>{{item.weight}}</td>
+                        <td>{{item.size}},{{item.color}},
+                             {{item.material}}
+                        </td>
                         <td>Rs. {{item.original_price}}</td>
                         <td>Rs. {{item.discount_price}}</td>
                         <td>{{item.stock}}</td>
