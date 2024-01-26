@@ -368,7 +368,6 @@ def searchadmin(request):
         if keyword:
             products = Product.objects.filter(Q(is_available=True) &
                                                      (Q(description__icontains=keyword) |
-                                                        Q(variants__size__icontains=keyword) |  
                                                 Q(variants__color__icontains=keyword) | 
             Q(variants__material__icontains=keyword) |Q(product_name__icontains=keyword)))
    

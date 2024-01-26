@@ -90,7 +90,7 @@
                 <td>{{order.order.status}}</td>
                 <td>{{order.order.payment.payment_method}}</td>
                 <td>{{order.order.created_at}}</td>
-                <td>{{subtotal}} </td>
+                <td>{{order.price}} </td>
                 {% if order.status == 'Return requested' %}
                 <td> <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#exampleModal">
                     Return requested.!

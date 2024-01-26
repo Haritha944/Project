@@ -40,7 +40,7 @@ def razorpaid(request,tracking_no):
         return redirect('cart:cart')
     r_tot=order.total_price*100
     client = razorpay.Client(auth=("rzp_test_zLLrBmHDjYzLTa","RZzrXnbKkKZyFzvIGk57In95"))
-    paymentt=client.order.create({'amount':r_tot,'currency':"INR",'payment_capture':'1'})
+    paymentt=client.order.create({'amount':r_tot,'payment_capture':'1'})
     print(paymentt)
     order.payment.razor_pay_id=paymentt['id']
     order.payment.payment_method="Razorpay"

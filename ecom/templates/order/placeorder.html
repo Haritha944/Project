@@ -125,17 +125,13 @@ Order
     var options = {
         "key": "rzp_test_zLLrBmHDjYzLTa" ,
         "amount": "{{r_tot}}" ,
-        "currency": "INR",
+        "currency": "USD",
         "name": "TrendyFoot",
         "description": "Test Transaction",
         "image": "https://example.com/your_logo",
         "order_id": "{{ paymentt.id }}", 
-       // "callback_url": "{% url 'order:razorpaid' order.tracking_no %}",
-       "handler": function (response) {
-        alert("Payment successful!");
-        var orderNumber = "{{ order.tracking_no }}"; // Get the order number
-        window.location.href = 'razorpaid/' + orderNumber + '/';
-    },
+       "callback_url": "{% url 'order:razorpaid' order.tracking_no %}",
+      
         "theme": {
             "color": "#3399cc"
         }
