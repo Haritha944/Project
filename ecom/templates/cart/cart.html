@@ -157,9 +157,9 @@ Cart
     <div class="shoping__checkout bg-light mt-5">
         <h4 class="d-flex align-items-center justify-content-center pt-3">CART TOTAL</h4>
         <ul class="list-unstyled">
-            <li class="d-flex justify-content-between px-4 fs-5">Subtotal <span id="subtotal" class="text-danger"> ₹ {{total}}</span></li>
+            <li class="d-flex justify-content-between px-4 fs-5">Subtotal <span id="subtotal" class="text-danger"> ₹ {{subtotal}}</span></li>
             <li class="d-flex justify-content-between px-4 fs-5">Discount <span id="discount" class="text-danger"> ₹ {% if discount %}{{discount}}{% else %}0{% endif %}</span></li>
-            <li class="d-flex justify-content-between px-4 fs-5">Total <span id="total_amount"class="text-danger" > ₹ {% if total_value %} {{total_value}} {% else %}  {{value}} {% endif %}</span></li>
+            <li class="d-flex justify-content-between px-4 fs-5">Total <span id="total_amount"class="text-danger" > ₹ {% if value %} {{value}} {% else %} {{total}} {% endif %}</span></li>
         </ul>
         <a href="{% url 'cart:checkout' %}" class="text-decoration-none"><button type="button" class="mx-2 mx-auto d-block btn btn-warning">PROCEED TO CHECKOUT</button></a>
     </div>
@@ -239,18 +239,21 @@ Cart
                     var totalAmount = document.getElementById('total_amount')
     
                     var discountSpan = document.getElementById('discount')
-                    var discount = discountSpan.textContent;
+                    var discount = discountSpan.textContent.replace(/[^\d.-]/g, '');
                     console.log(discount);
+                    console.log('Raw discount value:', discount);
                     if (isNaN(discount))
                     {
                     discount=0;
                     }
     
                         // Update the content of the span with the received total value
-                        var total = data.sub_total - parseInt(discount);
+                        var total = data.sub_total - parseFloat(discount);
                         totalAmount.innerText = "₹" + total;
                         document.getElementById('subtotal').innerText = "₹" + data.sub_total;
-                   
+                        console.log('Total after applying discount:', total);
+                        console.log('Raw discount value:', discount);
+                        console.log('Discount (parsed):', parseFloat(discount));
                 }
               
             });
@@ -284,7 +287,7 @@ Cart
                     var totalAmount = document.getElementById('total_amount')
     
                     var discountSpan = document.getElementById('discount')
-                    var discount = discountSpan.textContent;
+                    var discount = discountSpan.textContent.replace(/[^\d.-]/g, '');
                     console.log(discount);
                     if (isNaN(discount))
                     {
@@ -292,7 +295,7 @@ Cart
                     }
     
                         // Update the content of the span with the received total value
-                        var total = data.sub_total - parseInt(discount);
+                        var total = data.sub_total - parseFloat(discount);
                         totalAmount.innerText = "₹" + total;
                         document.getElementById('subtotal').innerText = "₹" + data.sub_total;
     

@@ -9,6 +9,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from order.models import Order,OrderItem,Payment
 import random
+import datetime
 # Create your views here.
 
 #<!- Cart section --->
@@ -80,7 +81,7 @@ def cart(request,total=0,quantity=0,cart_items=None):
     except ObjectDoesNotExist:
         pass  #just ignore
     context = {
-        'total':total,
+        'subtotal':total,
         'value':value,
         'quantity':quantity,
         'cart_items':cart_items,
@@ -344,7 +345,7 @@ def removecart(request, product_id):
             cart = Cart.objects.get(cart_id=cart_id)
             cart_items = CartItem.objects.filter(cart=cart, is_active=True)
         for item in cart_items:
-            sub_total += (item.variant.discount_price * item.quantity)
+            sub_total += (item.variant.discount_price * item.quantity)         
         total = cart_item.quantity * cart_item.variant.discount_price
         return JsonResponse({'quantity': cart_item.quantity, 'total': total,'sub_total': sub_total})
         
