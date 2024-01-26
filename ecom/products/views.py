@@ -262,7 +262,7 @@ def addvariant(request):
             variant.discount_price = float(request.POST.get('variant_discount_price'))
             variant.stock = int(request.POST.get('variant_stock'))
         
-            if variant.original_price <= 0 or variant.discount_price < 0 or variant.stock <=0 or variant.discount_price >= variant. original_price:
+            if variant.original_price <= 0 or variant.discount_price <= 0 or variant.stock <=0 or variant.discount_price >= variant. original_price:
                 messages.warning(request, "Invalid input price values or stock values.")
                 return redirect('products:viewvariant', variant_id=variant.product_id)
             else:
@@ -287,7 +287,7 @@ def editvariant(request,variant_id):
             variant.original_price = float(request.POST.get('variant_original_price'))
             variant.discount_price = float(request.POST.get('variant_discount_price'))
             variant.stock = int(request.POST.get('variant_stock'))
-            if variant.original_price <= 0 or variant.discount_price < 0 or variant.stock <= 0 or variant.discount_price >= variant. original_price:
+            if variant.original_price <= 0 or variant.discount_price <= 0 or variant.stock <= 0 or variant.discount_price >= variant. original_price:
                 messages.warning(request, "Invalid input prices or invalid stock")
                 return redirect('products:viewvariant', variant_id=variant.product_id)
             else:

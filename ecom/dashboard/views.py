@@ -148,6 +148,7 @@ def addwishlist(request,variant_id):
         is_exist = Wishlist.objects.filter(user=request.user,variant=variant).exists()
         if is_exist:
             messages.warning(request,'This product is already in your wishlist.')
+            return redirect('dashboard:wishlist')
         else:
             wishlist = Wishlist.objects.create(user=request.user,variant=variant)
             wishlist.save()
