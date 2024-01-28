@@ -13,6 +13,7 @@ from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist  
 from datetime import datetime
 import razorpay
+import json
 from django.template.loader import get_template
 from io import BytesIO
 from django.views import View
@@ -30,10 +31,10 @@ def _cart_id(request):
         cart=request.session.create()
     return cart
 
-@csrf_exempt       
+       
 def razorpaid(request,tracking_no):
     user=request.user
-    print(user)
+    print("hii",user)
     try:
         order = Order.objects.get(tracking_no=tracking_no, user=user)
     except Order.DoesNotExist:
@@ -87,9 +88,18 @@ def razorpaid(request,tracking_no):
     if 'coupon_code' in request.session:
         del request.session['coupon_code']
     
-    
-    context={'order':order,'payment':paymentt}
-    return render(request,'order/cashdelivery.html',context)
+    return render(
+            request,
+            "order/placeorder.html",
+            {
+                "callback_url": "http://" + "127.0.0.1:8000" + "/callback/",
+                "razorpay_key":"rzp_test_zLLrBmHDjYzLTa",
+                'payment':paymentt,
+                "order": order,
+            },
+        )
+   
+    return render(request,'order/placeorder.html')
 
     
 @transaction.atomic
@@ -727,7 +737,47 @@ def sales_report_pdf_download(request):
     pdf = render_to_pdf('admin/salesreportdownload.html', cont)
     return pdf
 
-        
+@csrf_exempt
+def callback(request):
+    order_id = request.GET.get('order_id')
+    try:
+        order = Order.objects.get(id=order_id)
+        payment = Payment.objects.get(order=order)
+    except Order.DoesNotExist:
+        return redirect('cart:cart')
+    def verify_signature(response_data):
+        client = razorpay.Client(auth=("rzp_test_zLLrBmHDjYzLTa","RZzrXnbKkKZyFzvIGk57In95"))
+        return client.utility.verify_payment_signature(response_data)
+    if "razorpay_signature" in request.POST:
+        payment_id = request.POST.get("razorpay_payment_id", "")
+        print('hiii')
+        order_id = request.POST.get("razorpay_order_id", "")
+        signature_id = request.POST.get("razorpay_signature", "")
+        order = Order.objects.get(id=order_id)
+        payment = Payment.objects.get(order=order)
+        payment_id = order.payment.payment_id
+        order.payment.razor_pay_id = payment_id
+        order.payment.signature_id = signature_id
+        order.save()
+        if verify_signature(request.POST):
+            order.payment.status = "SUCCESS"
+            order.save()
+            return render(request, 'order/cashdelivery.html',{'order':order})
+        else:
+            order.payment.status = "FAILURE"
+            order.save()
+
+            return render(request, "order/paymentfailure.html", context={"status": order.payment.status})
+    else:
+        payment_id = json.loads(request.POST.get("error[metadata]")).get("payment_id")
+        order_id = json.loads(request.POST.get("error[metadata]")).get("order_id")
+        order = Order.objects.get(id=order_id)
+        order.payment.razor_pay_id = payment_id
+        order.payment.status = "FAILURE"
+        order.save()
+        return render(request, "order/paymentfailure.html", context={"status": order.payment.status})
+
+       
 
     
     

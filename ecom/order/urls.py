@@ -20,6 +20,7 @@ urlpatterns = [
     path('applycoupon/',views.applycoupon,name='applycoupon'),
     path('handlecancel/',views.handlecancel,name='handlecancel'),
     path('pdf-download/<int:id>', views.pdf_download, name='pdf_download'),
+    path('callback/', views.callback, name='callback'),
 
    #admin
     path('vieworder/', views.vieworder, name='vieworder'),

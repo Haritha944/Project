@@ -119,31 +119,37 @@ Order
     </div>
     </div>
 </div>
-
+<form method="POST">
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script>
     var options = {
-        "key": "rzp_test_zLLrBmHDjYzLTa" ,
-        "amount": "{{r_tot}}" ,
-        "currency": "USD",
-        "name": "TrendyFoot",
-        "description": "Test Transaction",
-        "image": "https://example.com/your_logo",
-        "order_id": "{{ paymentt.id }}", 
-       "callback_url": "{% url 'order:razorpaid' order.tracking_no %}",
+        key: "rzp_test_zLLrBmHDjYzLTa" ,
+        amount: "{{r_tot}}" ,
+        currency: "INR",
+        name: "TrendyFoot",
+        description: "Test Transaction",
+        image: "https://example.com/your_logo",
+        order_id: "{{ paymentt.id }}", 
+        callback_url: "{{callback_url}}",
+        redirect: true,
+        
+         notes: {
+        "address": "Razorpay Corporate Office"
+        },
       
-        "theme": {
+        theme: {
             "color": "#3399cc"
         }
     };
 
     var rzp1 = new Razorpay(options);
     document.getElementById('rzp-button1').onclick = function(e){
-        rzp1.open();
-        var url = $("#Url").attr("data-url");
-        e.preventDefault();
-        
-    
+    rzp1.open();
     }
-</script>
+    
+   
+    
+ </script>
+<input type="hidden" custom="Hidden Element" name="hidden">
+</form>
 {% endblock %}

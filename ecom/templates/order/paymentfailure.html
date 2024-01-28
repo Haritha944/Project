@@ -1,0 +1,46 @@
+{% extends 'user/base.html' %}
+{% load static %}
+{% block title %}
+Paymnetfailure
+{% endblock %}
+{% block style %}
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        text-align: center;
+        padding: 50px;
+    }
+    .container {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 5px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    h1 {
+        color: #e74c3c;
+    }
+    p {
+        color: #333;
+    }
+    .button {
+        display: inline-block;
+        padding: 10px 20px;
+        background-color: #e74c3c;
+        color: #fff;
+        text-decoration: none;
+        border-radius: 5px;
+    }
+    .button:hover {
+        background-color: #c0392b;
+    }
+</style>
+{% endblock %}
+{% block content %}
+<div class="container"> 
+    <h1>Payment Failed</h1>
+    <p>Oops! It seems there was an issue with your payment.</p>
+    <p>Please try again or <a href="#">contact support</a> if the problem persists.</p>
+    <a class="button" href="{% url 'products:viewshop' %}">Continue SHopping</a>
+</div>
+{% endblock %}

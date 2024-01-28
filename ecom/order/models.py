@@ -12,6 +12,7 @@ class Payment(models.Model):
     discount = models.FloatField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     razor_pay_id = models.CharField(blank=True, null=True, max_length=100)
+    signature_id = models.CharField(blank=True, null=True, max_length=100)
 
     def __str__(self):
         return self.payment_method

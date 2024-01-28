@@ -10,6 +10,7 @@ from django.contrib.auth.decorators import login_required
 from order.models import Order,OrderItem,Payment
 import random
 import datetime
+import razorpay
 # Create your views here.
 
 #<!- Cart section --->
@@ -641,8 +642,9 @@ def placeorder(request, total=0, quantity=0):
             except:
                 pass
         order = Order.objects.get(user=user,tracking_no=trackno,total_price=grand_total)
+        bulk_order_id=order.id
         r_tot=order.total_price*100
-
+        
         context = {
             'order': order,
             'address':address,
@@ -655,6 +657,9 @@ def placeorder(request, total=0, quantity=0):
             'value':value,
             'r_tot':r_tot,
             'quantity': quantity,
+            "callback_url": "http://" + "127.0.0.1:8000" + "/callback/?order_id={}".format(bulk_order_id),
+            "razorpay_key":"rzp_test_zLLrBmHDjYzLTa",
+            
         }
 
         return render(request, 'order/placeorder.html', context)
