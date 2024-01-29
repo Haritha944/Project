@@ -742,41 +742,47 @@ def callback(request):
     order_id = request.GET.get('order_id')
     try:
         order = Order.objects.get(id=order_id)
-        payment = Payment.objects.get(order=order)
     except Order.DoesNotExist:
         return redirect('cart:cart')
+    r_tot=order.total_price*100
+    client = razorpay.Client(auth=("rzp_test_zLLrBmHDjYzLTa","RZzrXnbKkKZyFzvIGk57In95"))
+    paymentt=client.order.create({'amount':r_tot,'currency':'INR','payment_capture':'1'})
+    print(paymentt)
+    #order.payment.razor_pay_id=paymentt['id'] if order.payment else None
+    #order.payment.payment_method="Razorpay"
+    #order.payment.save()
+    payment_object = Payment.objects.create(
+        user = order.user,
+        payment_method="Razorpay",
+        status="Paid",
+        amount_paid=order.total_price,
+    )
+    payment_object.save()
     def verify_signature(response_data):
         client = razorpay.Client(auth=("rzp_test_zLLrBmHDjYzLTa","RZzrXnbKkKZyFzvIGk57In95"))
         return client.utility.verify_payment_signature(response_data)
     if "razorpay_signature" in request.POST:
+        print(request.POST)
         payment_id = request.POST.get("razorpay_payment_id", "")
         print('hiii')
         order_id = request.POST.get("razorpay_order_id", "")
         signature_id = request.POST.get("razorpay_signature", "")
-        order = Order.objects.get(id=order_id)
-        payment = Payment.objects.get(order=order)
-        payment_id = order.payment.payment_id
-        order.payment.razor_pay_id = payment_id
+        order.payment.razor_pay_id=payment_id
+        order.payment.payment_method="Razorpay"
         order.payment.signature_id = signature_id
-        order.save()
-        if verify_signature(request.POST):
+        order.payment.save()
+        if not verify_signature(request.POST):
             order.payment.status = "SUCCESS"
             order.save()
             return render(request, 'order/cashdelivery.html',{'order':order})
         else:
             order.payment.status = "FAILURE"
             order.save()
-
             return render(request, "order/paymentfailure.html", context={"status": order.payment.status})
-    else:
-        payment_id = json.loads(request.POST.get("error[metadata]")).get("payment_id")
-        order_id = json.loads(request.POST.get("error[metadata]")).get("order_id")
-        order = Order.objects.get(id=order_id)
-        order.payment.razor_pay_id = payment_id
-        order.payment.status = "FAILURE"
-        order.save()
-        return render(request, "order/paymentfailure.html", context={"status": order.payment.status})
-
+    
+    return render(request, 'order/cashdelivery.html',{'order':order})
+        
+    
        
 
     
