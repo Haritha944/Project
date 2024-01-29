@@ -37,23 +37,12 @@ def razorpaid(request,tracking_no):
     print("hii",user)
     try:
         order = Order.objects.get(tracking_no=tracking_no, user=user)
+        order_id = order.id
     except Order.DoesNotExist:
         return redirect('cart:cart')
-    r_tot=order.total_price*100
-    client = razorpay.Client(auth=("rzp_test_zLLrBmHDjYzLTa","RZzrXnbKkKZyFzvIGk57In95"))
-    paymentt=client.order.create({'amount':r_tot,'currency':'INR','payment_capture':'1'})
-    print(paymentt)
-    order.payment.razor_pay_id=paymentt['id']
-    order.payment.payment_method="Razorpay"
-    payment_object = Payment.objects.create(
-        user=user,
-        payment_method="Razorpay",
-        status="Paid",
-        amount_paid=order.total_price,
-    )
-    payment_object.save()
-    order.tracking_no = tracking_no
-    order.payment = payment_object
+    payment= Payment.objects.filter(user=user).order_by('-created_at').first()
+    payment.save()
+    order.payment=payment
     order.save()
     cart_id = _cart_id(request)
     cart = Cart.objects.get(cart_id=cart_id)
@@ -87,19 +76,8 @@ def razorpaid(request,tracking_no):
     cart_items.delete()
     if 'coupon_code' in request.session:
         del request.session['coupon_code']
-    
-    return render(
-            request,
-            "order/placeorder.html",
-            {
-                "callback_url": "http://" + "127.0.0.1:8000" + "/callback/",
-                "razorpay_key":"rzp_test_zLLrBmHDjYzLTa",
-                'payment':paymentt,
-                "order": order,
-            },
-        )
    
-    return render(request,'order/placeorder.html')
+    return redirect('order:orderinvoice', order_id=order_id)
 
     
 @transaction.atomic
@@ -158,8 +136,8 @@ def cashdelivery(request,tracking_no):
 def orderinvoice(request,order_id):
     user = request.user
     order = Order.objects.get(id=order_id)
-    order_items = OrderItem.objects.filter(order=order)
-    payment = Payment.objects.get(order=order)
+    order_items = OrderItem.objects.filter(order=order,user=user)
+    payment = Payment.objects.filter(order=order,user=user)
     #cart_id = _cart_id(request)
     #cart = Cart.objects.get(cart_id=cart_id)
    #cart_items = CartItem.objects.filter(cart=cart,is_active=True).order_by('id')
@@ -745,42 +723,55 @@ def callback(request):
     except Order.DoesNotExist:
         return redirect('cart:cart')
     r_tot=order.total_price*100
+    request.user=order.user
     client = razorpay.Client(auth=("rzp_test_zLLrBmHDjYzLTa","RZzrXnbKkKZyFzvIGk57In95"))
     paymentt=client.order.create({'amount':r_tot,'currency':'INR','payment_capture':'1'})
-    print(paymentt)
-    #order.payment.razor_pay_id=paymentt['id'] if order.payment else None
+    print(paymentt,request.user)
+    razorpay_payment_id = request.POST.get("razorpay_payment_id")
+    signature_id = request.POST.get("razorpay_signature")
+
+    print(razorpay_payment_id,signature_id)
+    #payment.razor_pay_id=razorpay_payment_id
     #order.payment.payment_method="Razorpay"
     #order.payment.save()
     payment_object = Payment.objects.create(
         user = order.user,
+        razor_pay_id = razorpay_payment_id,
+        signature_id = signature_id,
         payment_method="Razorpay",
         status="Paid",
         amount_paid=order.total_price,
     )
     payment_object.save()
+    
+
     def verify_signature(response_data):
         client = razorpay.Client(auth=("rzp_test_zLLrBmHDjYzLTa","RZzrXnbKkKZyFzvIGk57In95"))
         return client.utility.verify_payment_signature(response_data)
     if "razorpay_signature" in request.POST:
-        print(request.POST)
-        payment_id = request.POST.get("razorpay_payment_id", "")
+        order_id = request.GET.get('order_id')
+        order = Order.objects.get(id=order_id)
+        payment = Payment.objects.get(order=order) 
+        payment_id = request.POST.get("razorpay_payment_id")
         print('hiii')
-        order_id = request.POST.get("razorpay_order_id", "")
-        signature_id = request.POST.get("razorpay_signature", "")
-        order.payment.razor_pay_id=payment_id
-        order.payment.payment_method="Razorpay"
-        order.payment.signature_id = signature_id
-        order.payment.save()
-        if not verify_signature(request.POST):
+        order_id = request.POST.get("razorpay_order_id")
+        signature_id = request.POST.get("razorpay_signature")
+        payment.razor_pay_id=payment_id
+        payment.payment_method="Razorpay"
+        payment.signature_id = signature_id
+        print(payment.razor_pay_id)
+        print(payment.signature_id)
+        payment.save()
+        if verify_signature(request.POST):
             order.payment.status = "SUCCESS"
             order.save()
-            return render(request, 'order/cashdelivery.html',{'order':order})
+            return render(request, 'order/sucessorder.html',{'order':order})
         else:
             order.payment.status = "FAILURE"
             order.save()
             return render(request, "order/paymentfailure.html", context={"status": order.payment.status})
     
-    return render(request, 'order/cashdelivery.html',{'order':order})
+    return render(request, 'order/sucessorder.html',{'order':order})
         
     
        

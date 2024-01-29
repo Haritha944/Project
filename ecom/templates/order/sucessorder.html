@@ -1,0 +1,40 @@
+{% extends 'user/base.html' %}
+{% load static %}
+{% block title %}
+Razorconfirm
+{% endblock %}
+{% block content %}
+<div class="container-fluid p-0">
+    <div vlass="row">
+        <div class="col-lg-12 p-0">
+            <nav aria-label="breadcrumb" style="background-image: url('{% static '/images/newyear.jpg' %}'); background-size: cover; width:100%; height:250px;">
+                <ol class="breadcrumb justify-content-center mb-0">
+                  <li class="breadcrumb-item active text-dark fw-bold">Checkout</a></li>
+                  <li class="breadcrumb-item active text-dark fw-bold"><a class="text-decoration-none text-dark" href="#">Placeorder</a></li>
+                  <li class="breadcrumb-item active text-dark fw-bold" aria-current="page">PaymentSuccess</li>
+            </nav>
+        </div>
+    </div>
+    <section>
+    <div class="container mt-3">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title mb-4 text-success">Order Placed Successfully (Razorpay)</h4>
+                        <p>Your order has been successfully placed using Razorpay. Thank you for shopping with us!</p>
+                        
+                        <p>Payment Method: Razorpay</p>
+                        <p>Your payment has been processed successfully.</p>
+                    </div> 
+                </div> 
+                <div class="cart-buttons text-center mt-3">
+                    <a type="button" href="{% url 'products:viewshop' %}" class="boxed-btn black text-decoration-none fs-5 btn btn-warning btn-md btn-block">Continue Shopping</a>
+                    <a href="{% url 'order:razorpaid' tracking_no=order.tracking_no %}" class="boxed-btn black text-decoration-none fs-5 btn btn-warning btn-md btn-block mx-2">Order Invoice</a>
+                </div>
+              
+            </div>   
+        </div>
+    </div> 
+</section>
+{% endblock %}
