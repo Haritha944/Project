@@ -188,10 +188,30 @@ def addwishcart(request,wish_id):
 def get_sales_revenue(request):
     # Replace this with your actual data retrieval logic
     # Example mock data
+    orders=Order.objects.filter(status='Delivered')
+    order_count = orders.count()
+    total_amount=0
+    current_year = timezone.now().year
+    for item in orders:
+        total_amount=total_amount+item.total_price
+    revenue=total_amount*12
+   
+    monthly_sales = Order.objects.filter(
+            created_at__year=current_year
+        ).annotate(month=ExtractMonth('created_at')).values('month').annotate(total_sales=Sum('total_price')).order_by(
+            'month')
+    
+        # Create a dictionary to hold the monthly sales data
+    monthly_sales_data = {month: 0 for month in range(1, 13)}
+
+    for entry in monthly_sales:
+        month = entry['month']
+        total_sales = entry['total_sales']
+        monthly_sales_data[month] = total_sales
     data = {
-        'labels': ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-        'sales': [100, 200, 150, 300, 250, 400],
-        'revenue': [500, 600, 550, 700, 650, 800],
+        
+        'sales': monthly_sales_data,
+        'revenue':revenue,
     }
 
     return JsonResponse(data)

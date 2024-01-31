@@ -15,10 +15,12 @@
             <div class="mr-5"><label>Start Date</label><input type="date" name="start_date"></div>
             <div class="ml-5"><label>End Date</label><input type="date" name="end_date"></div>
         <div>
-        <button class="btn btn-primary" type="submit">Generate Report</button>
+        <button class="btn btn-primary" type="submit">Generate Report in PDF</button>
+        <button class="btn btn-success mx-2" id="excelfilterButton">Print as Excel</button>
         </div>
     </div>
-    </form>
+</form>
+    
     <div class="d-flex justify-content-around mt-2">
       <div class="d-flex"><label>Total Sales :</label><h5>{{total_sales}}</h5></div>
       <div class="d-flex"><label>Total Order :</label><h5>{{total_order}}</h5></div>
@@ -50,11 +52,12 @@
         </div>
     </div>
 <div class="bg-light text-center rounded p-4">
-    <div class="d-flex align-items-center justify-content-between mb-4">
+    <div class="d-flex align-items-center justify-content-between mb-2">
         <h6 class="mb-0">Sales report</h6>
-        <a class="btn btn-warning" href="{% url 'order:sales_report_pdf' %}">Download Sales Report</a>
+        <a class="btn btn-warning" href="{% url 'order:sales_report_pdf' %}"> Sales Report as PDF</a>
+        <button class="btn btn-success mx-2" id="excelButton">Print as Excel</button>
     </div>
-    <div class="table-responsive">
+    <div class="table-responsive" id="salesTable">
         <table class="table text-start align-middle table-bordered table-hover mb-0">
             <thead>
             <tr class="text-dark">
@@ -80,4 +83,76 @@
         </table>
 </div>
 </div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/TableExport/5.2.0/js/tableexport.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.4/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
+<script>
+    document.getElementById('excelButton').addEventListener('click', function() {
+        var salesTable = document.getElementById('salesTable');
+        var workbook = XLSX.utils.table_to_book(salesTable);
+        var excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+
+        // Convert the array buffer to a Blob
+        var blob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        
+        // Create a download link
+        var a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'sales_report.xlsx';
+        a.click();
+    });
+
+    document.getElementById('excelfilterButton').addEventListener('click', function() {
+        var start_date = document.getElementsByName('start_date')[0].value;
+        var end_date = document.getElementsByName('end_date')[0].value;
+    
+        // Ensure both start_date and end_date are not empty
+        if (start_date && end_date) {
+            // Get the salesTable element
+            var salesTable = document.getElementById('salesTable');
+    
+            // Clone the table to avoid modifying the original table
+            var filteredTable = salesTable.cloneNode(true);
+    
+            // Iterate through each row in the cloned table
+            var rows = filteredTable.getElementsByTagName('tr');
+            for (var i = 1; i < rows.length; i++) {  // Skip the header row
+                var created_at = rows[i].cells[5].innerText;  // Assuming the date is in the 6th cell
+    
+                // Parse the date string to a Date object
+                var rowDate = new Date(created_at);
+    
+                // Check if the rowDate is within the selected date range
+                if (rowDate >= new Date(start_date) && rowDate <= new Date(end_date)) {
+                    // If within the date range, keep the row; otherwise, remove it
+                    rows[i].style.display = 'table-row';
+                } else {
+                    rows[i].style.display = 'none';
+                }
+            }
+    
+            // Create an Excel file from the filtered table
+            var workbook = XLSX.utils.table_to_book(filteredTable);
+            var excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+    
+            // Convert the array buffer to a Blob
+            var blob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    
+            // Create a download link
+            var a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+    
+            // Append start_date and end_date as query parameters to the download link
+            a.download = `sales_report_${start_date}_${end_date}.xlsx`;
+    
+            // Trigger a click on the link to initiate the download
+            a.click();
+        } else {
+            // Handle the case where start_date or end_date is empty
+            alert("Please select both start date and end date.");
+        }
+    });
+    
+</script>
 {% endblock %}
