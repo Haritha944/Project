@@ -9,7 +9,7 @@
    <h2 class="">Sales Report</h2>
     </div>
     </div>
-    <form method="POST">
+    <form method="POST" action="{% url 'order:sales_report_pdf' %}">
         {% csrf_token %}
         <div class="d-flex justify-content-around m-4">
             <div class="mr-5"><label>Start Date</label><input type="date" name="start_date"></div>
