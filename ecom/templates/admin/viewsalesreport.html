@@ -15,8 +15,8 @@
             <div class="mr-5"><label>Start Date</label><input type="date" name="start_date"></div>
             <div class="ml-5"><label>End Date</label><input type="date" name="end_date"></div>
         <div>
-        <button class="btn btn-primary" type="submit">Generate Report in PDF</button>
-        <button class="btn btn-success mx-2" id="excelfilterButton">Print as Excel</button>
+        <button class="btn btn-primary" type="submit">Generate Report</button>
+       
         </div>
     </div>
 </form>
@@ -83,7 +83,9 @@
         </table>
 </div>
 </div>
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.10.2/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.3.2/jspdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/TableExport/5.2.0/js/tableexport.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.4/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
@@ -103,56 +105,21 @@
         a.click();
     });
 
-    document.getElementById('excelfilterButton').addEventListener('click', function() {
-        var start_date = document.getElementsByName('start_date')[0].value;
-        var end_date = document.getElementsByName('end_date')[0].value;
-    
-        // Ensure both start_date and end_date are not empty
-        if (start_date && end_date) {
-            // Get the salesTable element
-            var salesTable = document.getElementById('salesTable');
-    
-            // Clone the table to avoid modifying the original table
-            var filteredTable = salesTable.cloneNode(true);
-    
-            // Iterate through each row in the cloned table
-            var rows = filteredTable.getElementsByTagName('tr');
-            for (var i = 1; i < rows.length; i++) {  // Skip the header row
-                var created_at = rows[i].cells[5].innerText;  // Assuming the date is in the 6th cell
-    
-                // Parse the date string to a Date object
-                var rowDate = new Date(created_at);
-    
-                // Check if the rowDate is within the selected date range
-                if (rowDate >= new Date(start_date) && rowDate <= new Date(end_date)) {
-                    // If within the date range, keep the row; otherwise, remove it
-                    rows[i].style.display = 'table-row';
-                } else {
-                    rows[i].style.display = 'none';
-                }
-            }
-    
-            // Create an Excel file from the filtered table
-            var workbook = XLSX.utils.table_to_book(filteredTable);
-            var excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-    
-            // Convert the array buffer to a Blob
-            var blob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-    
-            // Create a download link
-            var a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-    
-            // Append start_date and end_date as query parameters to the download link
-            a.download = `sales_report_${start_date}_${end_date}.xlsx`;
-    
-            // Trigger a click on the link to initiate the download
-            a.click();
-        } else {
-            // Handle the case where start_date or end_date is empty
-            alert("Please select both start date and end date.");
-        }
+    document.getElementById('pdfButton').addEventListener('click', function() {
+        var salesTable = document.getElementById('salesTable');
+        var opt = {
+            margin: 10,
+            filename: 'sales_report.pdf',
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2 },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+
+        // Create a new instance of html2pdf and provide the element to be converted
+        html2pdf().from(salesTable).set(opt).save();
     });
+
+    
     
 </script>
 {% endblock %}

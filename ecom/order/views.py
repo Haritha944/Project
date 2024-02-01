@@ -721,7 +721,16 @@ def sales_report_pdf_download(request):
         }
         pdf = render_to_pdf('admin/salesreportdownload.html', cont)
         return pdf
-    return HttpResponse("Invalid request. Use POST method to submit the form.")
+    
+    else:
+        order=Order.objects.filter(total_price__gt=0)
+    cont = {
+            'orders': order,
+        }
+    pdf = render_to_pdf('admin/salesreportdownload.html', cont)
+    return pdf
+    
+    
 
 @csrf_exempt
 def callback(request):
