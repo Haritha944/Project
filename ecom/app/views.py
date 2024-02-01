@@ -157,7 +157,9 @@ def handlesignup(request):
            messages.error(request, 'Passwords do not match')
            return render(request, 'user/signup.html', context)
 
-       my_user = User(email=email, password=password1,name=name,mobile=mobile)
+       my_user = User(email=email,name=name,mobile=mobile)
+       my_user.set_password(password1)
+       my_user.is_active = True
        my_user.save()
        send_otp(request, email)
        return redirect('/signup_otp/')
