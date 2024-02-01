@@ -17,6 +17,7 @@ import json
 from django.template.loader import get_template
 from io import BytesIO
 from django.views import View
+from django.db.models import Sum
 import os
 from xhtml2pdf import pisa
 from django.conf import settings
@@ -52,6 +53,7 @@ def razorpaid(request,tracking_no):
     for cart_item in cart_items:
         variant=cart_item.variant
         stock=variant.stock-cart_item.quantity
+        variant.stock=stock
         variant.product.stock = stock      
         variant.product.save()
         if 'coupon_code' in request.session:
@@ -224,9 +226,11 @@ def cancelorder(request,order_item_id):
             user = User.objects.get(email=email)
             userwallet = UserWallet()
             userwallet.user = request.user
-            userwallet.amount += order.total_price
-            userwallet.transaction = 'Credited'
-            userwallet.save()
+            if userwallet is not None:
+                userwallet.amount=UserWallet.objects.filter(user=user, transaction='Credited').aggregate(Sum('amount'))['amount__sum'] or 0
+                userwallet.amount = (userwallet.amount or 0) + order.total_price
+                userwallet.transaction = 'Credited'
+                userwallet.save()
             user.save()
         for item in order_items:
             reason = request.POST.get('cancel')
@@ -390,9 +394,11 @@ def mywallet(request):
     wallet_transaction = UserWallet.objects.filter(user=request.user)
     try:
         wallet = UserWallet.objects.filter(user=user).order_by('-created_at').first()
+        wallet_amount=wallet.amount
     except UserWallet.DoesNotExist:
-        wallet = UserWallet.objects.create(user=user,amount=0)
-    wallet_amount=wallet.amount
+        wallet_amount=0
+        
+   
      
     context = {
         'wallet_amount': wallet_amount,
@@ -406,24 +412,31 @@ def mywallet(request):
 def walletpay(request,order_id):
     user=request.user
     order = Order.objects.get(id=order_id)
+    wallet = None
     try:
-        wallet = UserWallet.objects.get(user=request.user)
+        wallet = UserWallet.objects.filter(user=user).order_by('-created_at').first()
     except:
-        wallet = UserWallet.objects.create(user=request.user,amount=0)
-        wallet.save()
-    if wallet.amount > order.total_price:
+        #wallet = UserWallet.objects.create(user=request.user,amount=0)
+        #wallet.save()
+        pass
+    if wallet.amount >= order.total_price:
         payment = Payment.objects.create(user=request.user,payment_method='Wallet',amount_paid=order.total_price,status='Paid')
         payment.save()
         order.payment=payment
         order.save()
         wallet.amount -= order.total_price
         wallet.save()
-        cart_items = CartItem.objects.filter(user=user)
+        cart_id = _cart_id(request)
+        cart = Cart.objects.get(cart_id=cart_id)
+        cart_items = CartItem.objects.filter(cart=cart,is_active=True).order_by('id')
+        print(cart_items)
         for cart_item in cart_items:
-            product=cart_item.product
-            stock=product.stock-cart_item.quantity
-            product.stock=stock
-            product.save()
+            variant=cart_item.variant
+            stock=variant.stock-cart_item.quantity
+            variant.stock=stock
+            variant.product.stock = stock
+            variant.save()
+            variant.product.save()
             order_product = OrderItem(
                 order=order,
                 user=user,
