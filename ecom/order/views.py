@@ -219,12 +219,12 @@ def cancelorder(request,order_item_id):
         order.save()
         order_items = OrderItem.objects.filter(order=order)
         print(order.payment.payment_method)
-        if order.payment.payment_method == 'Paid by Razorpay' or order.payment.payment_method == 'Wallet':
+        if order.payment.payment_method == 'Razorpay' or order.payment.payment_method == 'Wallet':
             email = request.user
             user = User.objects.get(email=email)
             userwallet = UserWallet()
             userwallet.user = request.user
-            userwallet.amount = order.total_price
+            userwallet.amount += order.total_price
             userwallet.transaction = 'Credited'
             userwallet.save()
             user.save()
@@ -387,13 +387,17 @@ def returnapprove(request,order_id):
 @login_required
 def mywallet(request):
     user = request.user 
+    wallet_transaction = UserWallet.objects.filter(user=request.user)
     try:
-        wallet = UserWallet.objects.get(user=user)
+        wallet = UserWallet.objects.filter(user=user).order_by('-created_at').first()
     except UserWallet.DoesNotExist:
         wallet = UserWallet.objects.create(user=user,amount=0)
     wallet_amount=wallet.amount
      
-    context = {'wallet_amount': wallet_amount}
+    context = {
+        'wallet_amount': wallet_amount,
+        'wallet_transaction': wallet_transaction,
+    }
 
     return render(request, 'userprofile/wallet.html', context)
 
