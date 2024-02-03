@@ -276,6 +276,7 @@ def checkout(request,total=0,quantity=0,cart_items=None):
     default_address = address_list.filter(user_id=request.user).first()
     if not default_address:
         return redirect('cart:address')
+    
 
     context = {
         'total':total,
@@ -717,3 +718,4 @@ def increment(request, product_id):
         print("hii",sub_total)
         return JsonResponse(
             {'quantity': cart_item.quantity, 'total': total, 'sub_total': sub_total, "messages": "success"})
+    

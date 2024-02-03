@@ -76,8 +76,8 @@ def admindashboard(request):
     else:
         return redirect('/adminlogin/')
        
+@cache_control(no_cache=True, must_revalidate=True,no_store=True) 
 @never_cache
-@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def adminlogout(request):
     if request.user.is_authenticated:
         print("User is authenticated. Logging out...")

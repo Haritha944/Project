@@ -21,6 +21,7 @@ urlpatterns = [
     path('checkoutorder/', views.checkoutorder, name='checkoutorder'),
     #path('my-order/<str:id>/', views.order, name='my_order'),
     #path('my-order/', views.order, name='my_order'),
+    #path('selected_address/', views.selectedAddress, name='selected_address'),
     path('placeorder/', views.placeorder, name='placeorder'),
     path('increment/<int:product_id>/', views.increment,name='increment'),
     

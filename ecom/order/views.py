@@ -668,7 +668,7 @@ class GenerateInvoice(View):
             return response
         return HttpResponse("Not found")
     
-
+@never_cache
 def salesreport(request):
     total_sales=0
     total_order=0

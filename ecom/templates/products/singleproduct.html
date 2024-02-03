@@ -4,7 +4,8 @@
 {% block title %}
 Singleproduct
 {% endblock %}
-{% block styles %}
+<link rel="stylesheet" href="{% static 'css/imagecrop/image.css' %}" type="text/css">
+<style>
 <style>
  .zoom-container {
     position: relative;
@@ -20,7 +21,7 @@ Singleproduct
     cursor: zoom-in;
 }
 </style>
-{%endblock%}
+
 {% block content %}
    <!-- Single Page Header start -->
    <div class="container-fluid page-header py-5 m-0"  >
@@ -48,7 +49,8 @@ Singleproduct
                         {% for image in images %}
                         <div class="zoom-container" onmouseover="zoomIn(this)" onmouseout="zoomOut(this)">
                             <img src="/media/{{image.image}}" alt="" width="150px" height="150px" id="aaa"
-                                 onclick="swapImages(this)">
+                                 onclick="swapImages(this)" style="position: relative;
+                                 overflow: hidden;">
                         </div>
                         {% endfor %}
                     </div>
@@ -224,9 +226,9 @@ Singleproduct
         </div>
     </div>
 </section>
-{% endblock %}
 
-{% block jscript %}
+
+
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="{% static 'js/image_cropping/jquery.js'%}"></script>
 <script src="{% static 'js/image_cropping/script.js'%}"></script>
