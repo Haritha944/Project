@@ -15,6 +15,8 @@ from django.db.models import Sum
 from django.db.models.functions import ExtractMonth
 from django.utils import timezone
 from django.db.models import Q
+import string
+import random
 
 # Create your views here.
 
@@ -215,3 +217,9 @@ def get_sales_revenue(request):
     }
 
     return JsonResponse(data)
+
+
+def generate_referral_code():
+    code_length=6
+    characters = string.ascii_letters + string.digits
+    return ''.join(random.choices(characters) for _ in range(code_length) )
