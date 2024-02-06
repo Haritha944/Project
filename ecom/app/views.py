@@ -92,6 +92,13 @@ def validate_name(value):
         
     else:
         return None
+    
+
+def generate_referral_code():
+    code_length=6
+    characters = string.ascii_letters + string.digits
+    return ''.join(random.choices(characters,k=code_length))
+
 
 def handlesignup(request):
     if request.method =='POST':
@@ -102,7 +109,7 @@ def handlesignup(request):
         password2=request.POST["password2"]
         referral_code=request.POST.get('referral_code')
 
-        check=[name,email,password1,password2,mobile,referral_code]
+        check=[name,email,password1,password2,mobile]
         for value in check:
             if not value:
                 context = {
@@ -164,27 +171,33 @@ def handlesignup(request):
         referrer = None
         if referral_code:
             try:
-                referrer = UserReferral.objects.get(referral__referral_code=referral_code)
+                referral_instance = Referral.objects.get(referral_code=referral_code)
+                referrer = UserReferral.objects.get(referral__referral_code=referral_instance)
                 if referrer.is_used:
                     messages.error(request, 'Referral code has already been used.')
-                    return render(request, 'user/signup.html', context)
+                    return render(request, 'user/signup.html')
             except UserReferral.DoesNotExist:
                 messages.error(request, 'Referral code is incorrect.')
-                return render(request, 'user/signup.html', context)
+                return render(request, 'user/signup.html')
 
         my_user = User(email=email,name=name,mobile=mobile)
         my_user.set_password(password1)
         my_user.is_active = True
-        my_user.generate_referral_code()
+        refer_code = generate_referral_code()
         my_user.save()
-        user_refer = UserReferral.objects.create(user=my_user,referral__referral_code=generate_referral_code(),is_used=False)
+        
+        referral_instance = Referral.objects.create(user=my_user,referral_code=refer_code)
+        user_refer = UserReferral.objects.create(user=my_user,referral=referral_instance,is_used=False)
         user_refer.save()
         referred_amount = ReferralAmount.objects.first()
         if  UserReferral.objects.filter(referral__referral_code=referral_code).exists():
-            referred_user = UserReferral.objects.get(referral_code=referral_code)
-            referobj=Referral.objects.create(user=my_user,referred_by =referred_user,
-                                             referral_code=referral_code,new_user_amount= referred_amount.new_user_amount,
-                                             referred_user_amount=referred_amount.referred_user_amount)
+            user_referral = UserReferral.objects.get(referral__referral_code=referral_code)
+            referred_user = user_referral.user
+            referobj = Referral.objects.get(referral_code=referral_code)
+            referobj.user=my_user
+            referobj.referred_by=referred_user
+            referobj.new_user_amount = referred_amount.new_user_amount
+            referobj.referred_user_amount = referred_amount.referred_user_amount
             referobj.save()
             referred_user_wallet = UserWallet.objects.get(user=referred_user)
             referred_user_wallet.amount += referred_amount.referred_user_amount
@@ -192,6 +205,8 @@ def handlesignup(request):
             user_wallet = UserWallet.objects.create(user=request.user)
             user_wallet.amount += referred_amount.new_user_amount
             user_wallet.save()
+            referred_user.is_used = True
+            referred_user.save()
         send_otp(request, email)
         return redirect('/signup_otp/')
 
@@ -381,7 +396,3 @@ def search(request):
     }
     return render(request,'user/index.html',context)
 
-def generate_referral_code():
-    code_length=6
-    characters = string.ascii_letters + string.digits
-    return ''.join(random.choices(characters) for _ in range(code_length) )

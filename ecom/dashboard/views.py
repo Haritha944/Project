@@ -15,7 +15,7 @@ from django.db.models import Sum
 from django.db.models.functions import ExtractMonth
 from django.utils import timezone
 from django.db.models import Q
-from dashboard.models import ReferralAmount
+from dashboard.models import ReferralAmount,UserReferral
 
 
 # Create your views here.
@@ -259,3 +259,28 @@ def deletereferral(request,program_id):
     refers = ReferralAmount.objects.get(id=program_id)
     refers.delete()
     return redirect('dashboard:add_referral_program')
+
+def myrefer(request):
+    if request.user.is_authenticated:
+        user=request.user
+        try:
+            refer=UserReferral.objects.filter(user=user).first()
+            if refer:
+                refer_code=refer.referral.referral_code
+                context={
+                'refer_code':refer_code,
+                'user':user,
+                }
+
+                return render(request, 'userprofile/referral.html',context)
+            else:
+                messages.error(request,'No referral code for you now')
+                return render(request, 'userprofile/referral.html')
+        except UserReferral.DoesNotExist:
+           
+            context = {
+                'error_message': 'No referral code found for the current user.'
+            }
+            return render(request, 'userprofile/referral.html', context)
+    else:
+        return render(request, 'userprofile/referral.html')

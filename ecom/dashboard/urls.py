@@ -18,5 +18,6 @@ urlpatterns = [
     path('add_referral_program/', views.add_referral_program, name='add_referral_program'),
     path('edit_referral_program/<int:program_id>/', views.edit_referral_program, name='edit_referral_program'),
     path('deletereferral/<int:program_id>/', views.deletereferral, name='deletereferral'),
+    path('myrefer/', views.myrefer, name='myrefer'),
 ]
 
