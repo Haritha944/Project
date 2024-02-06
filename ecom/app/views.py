@@ -170,15 +170,14 @@ def handlesignup(request):
            return render(request, 'user/signup.html', context)
         referrer = None
         if referral_code:
-            try:
-                referral_instance = Referral.objects.get(referral_code=referral_code)
-                referrer = UserReferral.objects.get(referral__referral_code=referral_instance)
-                if referrer.is_used:
-                    messages.error(request, 'Referral code has already been used.')
-                    return render(request, 'user/signup.html')
-            except UserReferral.DoesNotExist:
-                messages.error(request, 'Referral code is incorrect.')
+            referral_instance = Referral.objects.get(referral_code=referral_code)
+            referrer = UserReferral.objects.get(referral=referral_instance)
+            if referrer.is_used:
+                messages.error(request, 'Referral code has already been used.')
                 return render(request, 'user/signup.html')
+            #except UserReferral.DoesNotExist:
+                #messages.error(request, 'Referral code is incorrect.')
+                #return render(request, 'user/signup.html')
 
         my_user = User(email=email,name=name,mobile=mobile)
         my_user.set_password(password1)
@@ -193,20 +192,24 @@ def handlesignup(request):
         if  UserReferral.objects.filter(referral__referral_code=referral_code).exists():
             user_referral = UserReferral.objects.get(referral__referral_code=referral_code)
             referred_user = user_referral.user
-            referobj = Referral.objects.get(referral_code=referral_code)
-            referobj.user=my_user
+            referobj = Referral.objects.get(user=my_user)
             referobj.referred_by=referred_user
             referobj.new_user_amount = referred_amount.new_user_amount
             referobj.referred_user_amount = referred_amount.referred_user_amount
             referobj.save()
-            referred_user_wallet = UserWallet.objects.get(user=referred_user)
+            try:
+                referred_user_wallet = UserWallet.objects.get(user=referred_user)
+            except UserWallet.DoesNotExist:
+                referred_user_wallet = UserWallet.objects.create(user=referred_user, amount=0)
             referred_user_wallet.amount += referred_amount.referred_user_amount
+            referred_user_wallet.transaction="Credited"
             referred_user_wallet.save()
-            user_wallet = UserWallet.objects.create(user=request.user)
+            user_wallet = UserWallet.objects.create(user=my_user,amount=0)
             user_wallet.amount += referred_amount.new_user_amount
+            user_wallet.transaction="Credited"
             user_wallet.save()
-            referred_user.is_used = True
-            referred_user.save()
+            user_referral.is_used = True
+            user_referral.save()
         send_otp(request, email)
         return redirect('/signup_otp/')
 
