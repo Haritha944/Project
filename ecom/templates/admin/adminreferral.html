@@ -1,0 +1,84 @@
+{% extends 'admin/adminmain.html' %}
+{% load static %}
+{% block styles %}
+<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+{% endblock %}
+{% block content %}
+<div>
+    {% if messages %}
+    <div class="container" style="background-color:transparent;">
+        <ul class="messages mx-auto text-center">
+            {% for message in messages %}
+            <div class="alert alert-{{message.tags}} alert-dismissible fade show" role="alert">
+                 {{message}}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+</div>
+<div class="container-fluid">
+<div class="row">
+    {% if no_referral_programs %}
+        <div class="alert alert-info">
+            No referral program available.
+            <h3>Create Referral Program</h3>
+            <form method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <textarea class="form-control" id="description" name="description" rows="4"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="new_user_amount">User Amount</label>
+                    <input type="number" class="form-control" id="new_user_amount" name="new_user_amount">
+                </div>
+                <div class="form-group">
+                    <label for="referred_user_amount">Referrer's Amount</label>
+
+                   <input type="number" class="form-control" id="referred_user_amount" name="referred_user_amount">
+                </div>
+                <button type="submit" class="btn btn-primary">Create Referral Program</button>
+            </form>
+        </div>
+        {% else %}
+        <div class="card shadow">
+            <div class="card-body">
+                <h3>Existing Referral Programs</h3>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Description</th>
+                            <th>User Amount</th>
+                            <th>Referrer's  Amount</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for program in referral_programs %}
+                        <tr>
+                            <td>{{ program.description }}</td>
+                            <td>{{ program.new_user_amount}}</td>
+                            <td>{{ program.referred_user_amount }}</td>
+                            <td>
+                                <a href="{% url 'dashboard:edit_referral_program' program.id %}" class="btn btn-sm btn-primary">Edit</a>
+                            </td>
+                            <td>
+                            <a href="{%url "dashboard:deletereferral" program.id %}">
+                                <button class="btn btn-danger toggle-btn">Delete</button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% endif %}
+
+
+</div>
+</div>
+{% endblock %}

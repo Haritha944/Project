@@ -15,8 +15,8 @@ from django.db.models import Sum
 from django.db.models.functions import ExtractMonth
 from django.utils import timezone
 from django.db.models import Q
-import string
-import random
+from dashboard.models import ReferralAmount
+
 
 # Create your views here.
 
@@ -219,7 +219,43 @@ def get_sales_revenue(request):
     return JsonResponse(data)
 
 
-def generate_referral_code():
-    code_length=6
-    characters = string.ascii_letters + string.digits
-    return ''.join(random.choices(characters) for _ in range(code_length) )
+def add_referral_program(request):
+    referral_programs = ReferralAmount.objects.all()
+    no_referral_programs = False
+    if not referral_programs:
+        no_referral_programs = True
+    if request.method == 'POST':
+        description = request.POST.get('description', '')
+        new_user_amount = float(request.POST.get('new_user_amount'))
+        referred_user_amount = float(request.POST.get('referred_user_amount'))
+        # Create the referral program with the provided data
+        ReferralAmount.objects.create(
+            description=description,
+            new_user_amount=new_user_amount,
+             referred_user_amount = referred_user_amount 
+        )
+        # Redirect to a success page or perform other actions
+        return redirect('dashboard:add_referral_program')
+    context = {
+        'referral_programs': referral_programs,
+        'no_referral_programs': no_referral_programs,
+    }
+    return render(request, 'admin/adminreferral.html', context)
+
+def edit_referral_program(request, program_id):
+    program = ReferralAmount.objects.get(id=program_id)
+    if request.method == 'POST':
+        description = request.POST.get('description')
+        new_user_amount = float(request.POST.get('new_user_amount'))
+        referred_user_amount  = float(request.POST.get('referred_user_amount'))
+        program.description = description
+        program.new_user_amount = new_user_amount
+        program.referred_user_amount  = referred_user_amount 
+        program.save()
+        return redirect('dashboard:add_referral_program')
+    context = {'program': program}
+    return render(request, 'admin/editreferral.html', context)
+def deletereferral(request,program_id):
+    refers = ReferralAmount.objects.get(id=program_id)
+    refers.delete()
+    return redirect('dashboard:add_referral_program')

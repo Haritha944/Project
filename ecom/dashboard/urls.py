@@ -15,5 +15,8 @@ urlpatterns = [
     path('addwishcart/<int:wish_id>', views.addwishcart, name='addwishcart'),
     path('get-sales-revenue/', views.get_sales_revenue,
          name='get_sales_revenue'),
+    path('add_referral_program/', views.add_referral_program, name='add_referral_program'),
+    path('edit_referral_program/<int:program_id>/', views.edit_referral_program, name='edit_referral_program'),
+    path('deletereferral/<int:program_id>/', views.deletereferral, name='deletereferral'),
 ]
 

@@ -25,6 +25,10 @@ from category.models import Category,Sub_Category
 from django.contrib.sites.shortcuts import get_current_site
 from django.template.loader import render_to_string
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from dashboard.models import Referral,UserReferral,ReferralAmount
+from order.models import UserWallet
+import string
+import random
 
 
 
@@ -91,14 +95,15 @@ def validate_name(value):
 
 def handlesignup(request):
     if request.method =='POST':
-       name=request.POST["name"]
-       email=request.POST["email"]
-       mobile = request.POST.get("mobile")
-       password1=request.POST["password1"]
-       password2=request.POST["password2"]
+        name=request.POST["name"]
+        email=request.POST["email"]
+        mobile = request.POST.get("mobile")
+        password1=request.POST["password1"]
+        password2=request.POST["password2"]
+        referral_code=request.POST.get('referral_code')
 
-       check=[name,email,password1,password2,mobile]
-       for value in check:
+        check=[name,email,password1,password2,mobile,referral_code]
+        for value in check:
             if not value:
                 context = {
                     'pre_name': name,
@@ -108,8 +113,8 @@ def handlesignup(request):
                 messages.info(request, 'Some fields are empty')
                 return render(request, 'user/signup.html', context)
        # validate username   
-       result = validate_name(name)
-       if result is not None:
+        result = validate_name(name)
+        if result is not None:
            context = {
                 'pre_name': name,
                 'pre_mobile': mobile,
@@ -119,7 +124,7 @@ def handlesignup(request):
            return render(request, 'user/signup.html', context)
          # validate email   
      
-       if not validateEmail(email) :
+        if not validateEmail(email) :
            context = {
                 'pre_name': name,
                 'pre_mobile': mobile,
@@ -129,7 +134,7 @@ def handlesignup(request):
            return render(request, 'user/signup.html', context)
          # validate password
      
-       if not ValidatePassword(password1) :
+        if not ValidatePassword(password1) :
             context = {
                 'pre_name': name,
                 'pre_email': email,
@@ -140,7 +145,7 @@ def handlesignup(request):
            
            
         # Check if the email already exists in the User model
-       if User.objects.filter(email=email).exists():
+        if User.objects.filter(email=email).exists():
             context = {
                 'pre_name': name,
                 'pre_email': email,
@@ -148,7 +153,7 @@ def handlesignup(request):
             }
             messages.error(request, 'Email already exists')
             return render(request, 'user/signup.html', context)
-       if password1!=password2 :
+        if password1!=password2 :
            context = {
                 'pre_name': name,
                 'pre_email': email,
@@ -156,13 +161,39 @@ def handlesignup(request):
                  }
            messages.error(request, 'Passwords do not match')
            return render(request, 'user/signup.html', context)
+        referrer = None
+        if referral_code:
+            try:
+                referrer = UserReferral.objects.get(referral__referral_code=referral_code)
+                if referrer.is_used:
+                    messages.error(request, 'Referral code has already been used.')
+                    return render(request, 'user/signup.html', context)
+            except UserReferral.DoesNotExist:
+                messages.error(request, 'Referral code is incorrect.')
+                return render(request, 'user/signup.html', context)
 
-       my_user = User(email=email,name=name,mobile=mobile)
-       my_user.set_password(password1)
-       my_user.is_active = True
-       my_user.save()
-       send_otp(request, email)
-       return redirect('/signup_otp/')
+        my_user = User(email=email,name=name,mobile=mobile)
+        my_user.set_password(password1)
+        my_user.is_active = True
+        my_user.generate_referral_code()
+        my_user.save()
+        user_refer = UserReferral.objects.create(user=my_user,referral__referral_code=generate_referral_code(),is_used=False)
+        user_refer.save()
+        referred_amount = ReferralAmount.objects.first()
+        if  UserReferral.objects.filter(referral__referral_code=referral_code).exists():
+            referred_user = UserReferral.objects.get(referral_code=referral_code)
+            referobj=Referral.objects.create(user=my_user,referred_by =referred_user,
+                                             referral_code=referral_code,new_user_amount= referred_amount.new_user_amount,
+                                             referred_user_amount=referred_amount.referred_user_amount)
+            referobj.save()
+            referred_user_wallet = UserWallet.objects.get(user=referred_user)
+            referred_user_wallet.amount += referred_amount.referred_user_amount
+            referred_user_wallet.save()
+            user_wallet = UserWallet.objects.create(user=request.user)
+            user_wallet.amount += referred_amount.new_user_amount
+            user_wallet.save()
+        send_otp(request, email)
+        return redirect('/signup_otp/')
 
     return render(request, 'user/signup.html')
 
@@ -349,3 +380,8 @@ def search(request):
 
     }
     return render(request,'user/index.html',context)
+
+def generate_referral_code():
+    code_length=6
+    characters = string.ascii_letters + string.digits
+    return ''.join(random.choices(characters) for _ in range(code_length) )

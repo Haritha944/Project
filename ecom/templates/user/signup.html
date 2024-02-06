@@ -44,7 +44,9 @@ signup
             <input type="password" class="form-control" name="password2" id="password"
                                    placeholder="Confirm Password" required>
         </div>
-        
+        <div class='mt-3'>
+        <input type="text" id="referral_code" name="referral_code" class="form-control" placeholder="Referral code" />
+        </div>
         {% if form.errors or form.non_field_errors %}
             <div class='mb-3 p-6 bg-danger-100 rounded-xl'>
                 {% for field in form %}
