@@ -66,10 +66,15 @@ Singleproduct
                             <del class="price-old text-dark fs-4 mx-3 ">₹ {{product.product.original_price}}</del>
                           </div>
                         <p class="my-3">{{product.product.description}}.</p>
+                        
                     </div>
                     <div class="featured-icons mt-2">
+                        {% if variant.stock == 0 or product.stock == 0 %}
+                        <p class="text-danger">Out of Stock</p>
+                        {% else %}
                         <a href="{% url 'cart:addcart' product.id %}" class="text-decoration-none btn btn-block px-5 py-2" style="background-color:#E9967A;">Add Cart</a>
                         <a href="{% url 'dashboard:addwishlist' variant_id=product.id%}" class="text-decoration-none mx-4"><i class="fa fa-heart fs-3 "style="color:#E9967A;" title="Add to Wishlist"></i></a>
+                        {% endif %}
                       </div>
                    </button>
                 <div class="row">

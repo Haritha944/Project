@@ -48,7 +48,7 @@ def addcart(request,product_id):
         
 
 
-       
+      
 def cart(request,total=0,quantity=0,cart_items=None):
     url = request.META.get('HTTP_REFERER')
     cart_id = _cart_id(request)

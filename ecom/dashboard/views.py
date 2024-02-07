@@ -144,7 +144,7 @@ def wishlist(request):
         'wishlist':wishlist,
     }
     return render(request,'userprofile/wishlist.html',context)
-
+@login_required
 def addwishlist(request,variant_id):
     variant=ProductVariant.objects.get(id=variant_id)
     product = Product.objects.get(id=variant.product.id)
@@ -221,7 +221,7 @@ def get_sales_revenue(request):
 
     return JsonResponse(data)
 
-
+@login_required(login_url='/adminlogin/')
 def add_referral_program(request):
     referral_programs = ReferralAmount.objects.all()
     no_referral_programs = False
@@ -245,6 +245,7 @@ def add_referral_program(request):
     }
     return render(request, 'admin/adminreferral.html', context)
 
+@login_required(login_url='/adminlogin/')
 def edit_referral_program(request, program_id):
     program = ReferralAmount.objects.get(id=program_id)
     if request.method == 'POST':

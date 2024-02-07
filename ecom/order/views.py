@@ -32,7 +32,8 @@ def _cart_id(request):
         cart=request.session.create()
     return cart
 
-       
+@never_cache    
+@login_required   
 def razorpaid(request,tracking_no):
     user=request.user
     print("hii",user)
@@ -54,7 +55,8 @@ def razorpaid(request,tracking_no):
         variant=cart_item.variant
         stock=variant.stock-cart_item.quantity
         variant.stock=stock
-        variant.product.stock = stock      
+        variant.product.stock = stock   
+        variant.save()   
         variant.product.save()
         if 'coupon_code' in request.session:
             coupon_code = request.session['coupon_code']

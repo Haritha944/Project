@@ -190,12 +190,16 @@ Shop
               <p>Product ID: {{variant.product.id}}</p>
               <div class="text-center">
                 <span class="price fw-bold">₹ {{variant.product.discount_price}}</span>
-                
               </div>
               <div class="featured-icons mt-2">
+                {% if variant.stock == 0 or product.stock == 0 %}
+                <p class="text-danger">Out of Stock</p>
+                {% else %}
                 <a href="{% url 'cart:addcart' product_id=variant.id %}" class="text-decoration-none btn btn-block px-3"style="background-color:#E9967A;">Add Cart</a>
                 <a href="{% url 'dashboard:addwishlist' variant_id=variant.id%}" class="text-decoration-none mx-2"><i class="fa fa-heart fs-5"style="color:#E9967A;" title="Add to Wishlist"></i></a>
+                {% endif %}
               </div>
+              
             </div>
           </div>
           </div>
