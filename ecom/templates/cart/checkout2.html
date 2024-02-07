@@ -1,0 +1,299 @@
+{% extends 'userprofile/profileinfo.html' %}
+{% load static %}
+{% block title %}
+Checkout
+{% endblock %}
+{% block content %}
+<div class="container-fluid p-0">
+    <div vlass="row">
+        <div class="col-lg-12 p-0">
+            <nav aria-label="breadcrumb" style="background-image: url('{% static '/images/cartbread.jpg' %}'); background-size: cover; width:100%; height:150px;">
+                <ol class="breadcrumb justify-content-center mb-0">
+                  <li class="breadcrumb-item"><a class="text-decoration-none text-dark fw-bold" href="{% url 'products:viewshop' %}">Shop</a></li>
+                  <li class="breadcrumb-item active text-dark fw-bold">Shop Detail</a></li>
+                  <li class="breadcrumb-item active text-dark fw-bold"><a class="text-decoration-none text-dark" href="{% url 'cart:cart' %}">Cart</a></li>
+                  <li class="breadcrumb-item active text-dark fw-bold" aria-current="page">Checkout</li>
+            </nav>
+        </div>
+    </div>
+</div>
+<div>
+ {% if messages %}
+  <div class="container" style="background-color:transparent;">
+    <ul class="messages mx-auto text-center">
+         {% for message in messages %}
+        <div id="message">
+           <div style="background-color:transparent;" class="error-alert  {% if message.tags %}alert-{{ message.tags }}{% endif %}" role="alert">
+             <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %} {% endif %}
+          {{ message }}
+            </div>
+        </div>
+         {% endfor %}
+     </ul>
+  </div>
+{% endif %}
+</div>
+<div class="container-fluid mt-3 d-flex col-12 col-sm-12 details-block">  
+<div class="col-lg-8 col-md-8 col-sm-12 mt-5">
+    <div class="checkout-accordion-wrap">
+        <div class="accordion" id="accordionExample">
+            <div class="card single-accordion">
+                <div class="card-header" id="headingTwo">
+                    <h5 class="mb-0">
+                        <button class="btn btn-link collapsed text-decoration-none" type="button" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                            Select Shipping Address
+                        </button>
+                    </h5>
+                </div>
+                <div id="collapseTwo" class="collapse show" aria-labelledby="headingTwo" data-parent="#accordionExample">
+                    <div class="card-body">
+                        <div class="shipping-address-form">
+                            {% if address_list %}
+                                {% for address in address_list %}
+                                    <main class="main-content">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="card-body">
+                                                    <h5 class="card-title">{{ address.recipient_name }} ,{{ address.house_no }}</h5>
+                                                    <p class="card-text">{{ address.street_name }}</p> 
+                                                    <p class="card-text">{{ address.village_name }}, {{ address.postal_code }}</p>
+                                                    <p class="card-text">Phone: {{ address.mobile }}</p>
+                                                </div>
+                                                <div class="form-check mt-2">
+                                                    {% if address.is_default %}
+                                                        <a href="#" class="text-decoration-none fs-5 fw-bold text-primary">Selected</a>
+                                                    {% else %}
+                                                        <a class="text-decoration-none fs-5 fw-bold text-primary" href="{% url 'cart:set_default_address' address_id=address.id %}">
+                                                            Select
+                                                        </a>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </main>
+                                {% endfor %}
+                            {% else %}
+                                <h4>No Addresses Found</h4>
+                            {% endif %}
+                            <br>
+                            <button type="button" class="btn text-white mb-3 mx-3" style="background-color:rgba(127, 173, 57, 1)" data-bs-toggle="modal"
+                        data-bs-target="#exampleModal1">
+                        Add Shipping Address
+        </button>    
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="col-lg-4 mx-2">
+    <div class="card-body">
+        <h4 class="text-center" style="color:#FF0000"> Order Summary </h4>
+                        <form action="{% url 'cart:placeorder' %}" method="POST">
+                            {% csrf_token %}
+                        <table class="table  align-middle border-collapse: collapse;
+                        width: 80 %; margin:auto; mx-3">
+                            <thead>
+                                <tr>
+                                    <th>Products</th>
+                                    <th>Details</th>
+                                    <th>Price </th>
+                                    <th>Total</th>
+                                </tr>
+                
+                            </thead>
+                            <tbody class="order-details-body">
+                                {% for cart_item in cart_items %}
+                                <tr>
+                                    <td class="shoping__cart__item">
+                                        <a href="{% url 'products:singleproductview' product_id=cart_item.variant.id %}">
+                                            <img src="{{ cart_item.product.images.url }}" alt="" width="50px">
+                                        </a>
+                
+                                    </td>
+                                    <td class="shoping__cart__price"><h5>{{cart_item.variant.product.product_name}}</h5>
+                                        Size : {{cart_item.variant.size}}
+                                       <p>Colour : {{cart_item.variant.color}}</p>
+                                       <p>Quantity : {{cart_item.quantity}}</p></td>
+                                    <td class="shoping__cart__price">
+                                        ₹{{cart_item.variant.discount_price}}
+                                        
+                                    </td>
+                                    
+                                    
+                                    <td class="shoping__cart__total" id="total{{ cart_item.variant.id }}">
+                                        ₹{{ total }}
+                                    </td>
+                                    {% endfor %}
+                                </tr>
+                                
+                            </tbody>
+                
+                        </table>
+                        <h6 class="px-3" style="color:#A80000;"> Order Total :  ₹ {{total}} </h6>
+                        <h6 class="px-3 checkout__order__total" style="color:#A80000;">Tax <span>₹ {{tax}}</span></h6>
+                        <h6 class="px-3 checkout__order__total" style="color:#A80000;">Discount <span>₹ {% if discount %}{{discount|floatformat:2}}{% else %}0{% endif %}</span></h6>
+                        <h6 class="px-3 checkout__order__total" style="color:#A80000;">Total <span>₹ {{grand_total}}</span></h6>
+                        
+                        <p class="px-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="30" height="30"
+                                 viewBox="0 0 48 48">
+                                <polygon fill="#42a5f5"
+                                         points="29.62,3 33.053,8.308 39.367,8.624 39.686,14.937 44.997,18.367 42.116,23.995 45,29.62 39.692,33.053 39.376,39.367 33.063,39.686 29.633,44.997 24.005,42.116 18.38,45 14.947,39.692 8.633,39.376 8.314,33.063 3.003,29.633 5.884,24.005 3,18.38 8.308,14.947 8.624,8.633 14.937,8.314 18.367,3.003 23.995,5.884">
+                                </polygon>
+                                <polygon fill="#fff"
+                                         points="21.396,31.255 14.899,24.76 17.021,22.639 21.428,27.046 30.996,17.772 33.084,19.926">
+                                </polygon>
+                            </svg>
+                            Safe and Secure Payments.Easy returns.100% Authentic products.
+                        </p>
+                        <button type="submit" name="submit" class="boxered-btn" style="background-color:rgba(127, 173, 57, 1)">Check Out</button>
+
+
+                    </form>
+    </div>
+</div>
+</div>
+</div>
+</div>
+ <!--Add Address modal-->
+ <div class="container-fluid">
+    <div class="row">
+    <div class="col-lg-12 col-md-12 ">
+        <div class="modal fade" id="exampleModal1" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true"
+            data-bs-backdrop="static">
+            <div class="modal-dialog modal-dialog-scrollable">
+                <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModal">ADD ADDRESS</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="max-height: 400px; max-width:600px; overflow-y: auto;">
+                <form method="post" action="{% url 'cart:addaddresscheck' %}" id="form1">
+                    {% csrf_token %}
+                    <div>
+                        {% if messages %}
+              <div class="container">
+                    <ul class="messages mx-auto text-center">
+                      {% for message in messages %}
+                    <div id="message">
+                      <div  class="error-alert {% if message.tags %}alert-{{ message.tags }}{% endif %}" role="alert">
+                    <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span></button>
+                    {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %} {% endif %}
+                    {{ message }}
+                       </div>
+            </div>
+            {% endfor %}
+             </ul>
+    </div>
+    {% endif %}
+    </div>
+        <div class="row">
+            <div class="col-md-6">
+              <div class="mb-3 mx-1">
+                <label for="RecipientName" class="form-label">Recipient Name:</label>
+                <input type="text" class="form-control" id="RecipientName" name="RecipientName"
+                       value="" required>
+               </div>
+            </div>
+            <div class="col-md-6">
+                <div class="mb-3 ml-2 mr-1">
+                  <label for="house_no" class="form-label">House No:</label>
+                  <input type="text" class="form-control" id="house_no" name="house_no"
+                         value="" required>
+                 </div>
+              </div>
+    
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+              <div class="mb-3 ml-2 mr-1">
+                <label for="street_name" class="form-label">Street Name:</label>
+                <input type="text" class="form-control" id="street_name" name="street_name"
+                       value="" required>
+               </div>
+            </div>
+            <div class="col-md-6">
+                <div class="mb-3 ml-2 mr-1">
+                  <label for="village_name" class="form-label">Village/City: </label>
+                  <input type="text" class="form-control" id="village_name" name="village_name"
+                         value="" required>
+                 </div>
+              </div>
+    
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+              <div class="mb-3 ml-2 mr-1">
+                <label for="postal_code" class="form-label">Postal code:</label>
+                <input type="text" class="form-control" id="postal_code" name="postal_code"
+                       value="" required>
+               </div>
+            </div>
+            <div class="col-md-6">
+                <div class="mb-3 ml-2 mr-1">
+                  <label for="district" class="form-label">District: </label>
+                  <input type="text" class="form-control" id="district" name="district"
+                         value="" required>
+                 </div>
+              </div>
+    
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+              <div class="mb-3 ml-2 mr-1">
+                <label for="email" class="form-label">Email:</label>
+                <input type="text" class="form-control" id="email" name="email"
+                       value="" required>
+               </div>
+            </div>
+            <div class="col-md-6">
+                <div class="mb-3 ml-2 mr-1">
+                  <label for="mobile" class="form-label">Phone Number: </label>
+                  <input type="tel" class="form-control" id="mobile" name="mobile"
+                         value="" required>
+                 </div>
+              </div>
+    
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+              <div class="mb-3 ml-2 mr-1">
+                <label for="state" class="form-label">State:</label>
+                <input type="text" class="form-control" id="state" name="state"
+                       value="" required>
+               </div>
+            </div>
+            <div class="col-md-6">
+                <div class="mb-3 ml-2 mr-1">
+                  <label for="country" class="form-label">Country: </label>
+                  <input type="text" class="form-control" id="country" name="country"
+                         value="" required>
+                 </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3 ml-2 mr-1 form-check form-switch">
+                  <label for="flexSwitchCheckDefault" class="form-check-label">Make this my default address: </label>
+                  <input type="checkbox" class="form-check-input" id="flexSwitchCheckDefault" name="default_address"
+                         value="" required>
+                 </div>
+              </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary">Add</button>
+        </div>
+             </form>
+            </div>
+            </div>   
+        </div>
+       </div>
+        </div> 
+    </div>
+    </div>  
+ 
+<!-- end check out section -->
+{% endblock %}

@@ -291,7 +291,19 @@ def checkout(request,total=0,quantity=0,cart_items=None):
         'default_address': default_address,
     }
 
-    return render(request,'cart/checkout.html',context)
+    return render(request,'cart/checkout2.html',context)
+
+@login_required
+def set_default_address(request, address_id):
+    addr_list = Address.objects.filter(email=request.user.email)
+    for a in addr_list:
+        a.is_default = False
+        a.save()
+    address = Address.objects.get(id=address_id)
+    address.is_default=True
+    address.save()
+    return redirect('cart:checkout')
+
 
 def addaddresscheck(request):
     email = request.POST.get('email')
@@ -592,9 +604,12 @@ def placeorder(request, total=0, quantity=0):
         
         if user is not None:
             try:
-                address=Address.objects.filter(user_id=user.id).last()
+                #address=Address.objects.filter(user_id=user.id).last()
+                address=Address.objects.get(email=request.user.email,is_default=True)
             except:
                 messages.error(request,"Create a address...!")
+                return redirect('cart:address')
+                
         else:
             address=Address.objects.filter(email=user.email).last()
         

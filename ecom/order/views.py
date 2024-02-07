@@ -392,9 +392,10 @@ def returnapprove(request,order_id):
 def mywallet(request):
     user = request.user 
     wallet_transaction = UserWallet.objects.filter(user=request.user)
+    
     try:
-        wallet = UserWallet.objects.filter(user=user).order_by('-created_at').first()
-        wallet_amount=wallet.amount
+        wallets = UserWallet.objects.filter(user=user).order_by('-created_at')
+        wallet_amount = sum(wallet.amount for wallet in wallets)
     except UserWallet.DoesNotExist:
         wallet_amount=0
         
@@ -403,6 +404,7 @@ def mywallet(request):
     context = {
         'wallet_amount': wallet_amount,
         'wallet_transaction': wallet_transaction,
+        
     }
 
     return render(request, 'userprofile/wallet.html', context)
