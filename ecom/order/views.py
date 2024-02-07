@@ -241,6 +241,7 @@ def cancelorder(request,order_item_id):
         pass    
 
 #<!---------admin---------->  
+@login_required(login_url='/adminlogin/')
 def vieworder(request):
     if request.method=="POST":
         status=request.POST.get('status')
@@ -260,6 +261,7 @@ def vieworder(request):
             
         }
         return render(request, 'admin/vieworder.html', context)
+    
 def viewsingleadmin(request, order_id):
     order = Order.objects.get(id=order_id)
     order_item = OrderItem.objects.filter(order=order)
@@ -297,6 +299,7 @@ def viewsingleadmin(request, order_id):
     }
     return render(request, 'admin/viewdetailorder.html', context)
 
+@login_required(login_url='/adminlogin/')
 def updatestatus(request, order_id, new_status):
     
     order = get_object_or_404(Order, pk=order_id)
@@ -374,7 +377,7 @@ def returnorder(request,order_item_id):
             order.save()
     return redirect('order:myorder')   
 
-
+@login_required(login_url='/adminlogin/')
 def returnapprove(request,order_id):
     order = Order.objects.get(id=order_id)
     order.status = "Returned"
@@ -671,6 +674,7 @@ class GenerateInvoice(View):
         return HttpResponse("Not found")
     
 @never_cache
+@login_required(login_url='/adminlogin/')
 def salesreport(request):
     total_sales=0
     total_order=0

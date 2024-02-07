@@ -18,6 +18,7 @@ from django.db.models import Q
 from dashboard.models import ReferralAmount,UserReferral
 
 
+
 # Create your views here.
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
@@ -36,6 +37,7 @@ def adminlogin(request):
     return render(request,'admin/adminlogin.html')
 
 @never_cache
+@login_required(login_url='/adminlogin/')
 def admindashboard(request):
     if request.user.is_superuser:
        orders=Order.objects.filter(status='Delivered')
@@ -87,7 +89,7 @@ def adminlogout(request):
         print("User logged out.")
     return redirect('/adminlogin/')
 
-
+@login_required(login_url='/adminlogin/')
 def usersdetails(request):
     if request.method == 'POST':
         search = request.POST.get('search')
@@ -187,6 +189,7 @@ def addwishcart(request,wish_id):
     }
     return render(request,'userprofile/wishlist.html',context)
 
+@login_required(login_url='/adminlogin/')
 def get_sales_revenue(request):
     # Replace this with your actual data retrieval logic
     # Example mock data
