@@ -19,7 +19,7 @@
     <div class="row">
         <div class="bg-light text-center rounded p-4">
             <div class="d-flex align-items-center justify-content-between">
-            <h6 class="mb-0"> Product Name:{{ product.product_name }}</h6>
+            <h6 class="mb-0"> Product Name:{{product}}</h6>
               
             </div>
         </div>
@@ -58,8 +58,9 @@
         <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-scrollable">
                 <div class="modal-content">
-                    <form method="post" action="{% if product and product.id %}{% url 'products:addimage' product_id=product.id %}{% endif %}" enctype="multipart/form-data">
-                        {% csrf_token %}
+                    
+                        <form method="post" action="{% url 'products:addimage' product.id %}" enctype="multipart/form-data">
+                        {% csrf_token %} 
                         <div class="modal-header">
                             <h5 class="modal-title">Add Image</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -77,17 +78,18 @@
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                             <button type="submit" class="btn btn-primary">Add</button>
                         </div>
-                    </form>
+                     </form> 
                 </div>
             </div>
         </div>
         
     </div>
     </div>
-    
+
 {% endblock %}
 {% block scripts %}
 <script src="{% static 'js/admin/uploadstyle.js'%}"></script>
 <script src="{% static 'js/admin/prod/varstyle.js'%}"></script>
 
 {% endblock %}
+

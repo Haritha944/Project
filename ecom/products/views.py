@@ -326,12 +326,10 @@ def undosoftdeletevariant(request, variant_id):
 
 #<!--admin viewimage  ---------------------------------->
 def viewimage(request,product_id):
-    #retrieve all images related to specified product id
     images=ProductImage.objects.filter(product=product_id)
-    #retrieve product related to specified product id
-    product=Product.objects.filter(id=product_id)
+    product=Product.objects.get(pk=product_id)
     context={
-        'images':images,  #pass the retrieved images,product to the template
+        'images':images,  
         'product':product
     }
     return render(request,'admin/viewimage.html',context)
@@ -340,17 +338,16 @@ def viewimage(request,product_id):
 
 #<!--admin addimage  ---------------------------------->
 def addimage(request,product_id):
-    product=Product.objects.get(id=product_id)
     if request.method == 'POST':
+        product=Product.objects.get(pk=product_id)
         images = request.FILES.getlist('img')
-        print(product.product_name,images)
         if images:
             for image in images:
-                #Create a ProductImage instance for each image
                 new_image=ProductImage(product=product,image=image)
-                #save the instance
                 new_image.save()
-    images = ProductImage.objects.filter(product=product_id)
+                
+
+    images = ProductImage.objects.filter(product_id=product_id)
     context={
         'images':images,
         'product':product,
@@ -361,7 +358,7 @@ def addimage(request,product_id):
 #<!--admin deleteimage  ---------------------------------->   
 def deleteimage(request,image_id):
     image=ProductImage.objects.get(id=image_id)
-    product=Product.objects.get(id=image.product_id)
+    product=Product.objects.get(pk=image.product_id)
     try:
         file_path=os.path.join(settings.MEDIA_ROOT,str(image.image))
         image.delete()
