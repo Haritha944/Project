@@ -6,7 +6,7 @@ Singleproduct
 {% endblock %}
 <link rel="stylesheet" href="{% static 'css/imagecrop/image.css' %}" type="text/css">
 <style>
-<style>
+
  .zoom-container {
     position: relative;
     overflow: hidden;
@@ -42,14 +42,14 @@ Singleproduct
                 <div class="product__details__pic">
                     <div class="image-container">
                         <img class="product__details__pic__item--large" src="/media/{{product.product.images}}" alt=""
-                             style="width:400px;!important" id="bbb" onclick="swapImages(this)">
+                             style="width:400px;!important" id="bbb" onclick="enlargeImage('/media/{{product.product.images}}')">
                         <div id="zoom-lens" class="zoom-lens"></div>
                     </div>
                     <div class="d-flex">
                         {% for image in images %}
                         <div class="zoom-container" onmouseover="zoomIn(this)" onmouseout="zoomOut(this)">
                             <img src="/media/{{image.image}}" alt="" width="150px" height="150px" id="aaa"
-                                 onclick="swapImages(this)" style="position: relative;
+                                 onclick="swapImages(this); enlargeImage('/media/{{image.image}}', 'bbb')" style="position: relative;
                                  overflow: hidden;">
                         </div>
                         {% endfor %}
@@ -235,9 +235,7 @@ Singleproduct
 
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="{% static 'js/image_cropping/jquery.js'%}"></script>
-<script src="{% static 'js/image_cropping/script.js'%}"></script>
-<script src="{% static 'js/image_cropping/zoom.js'%}"></script>
+
 <script>
    var previousImageUrl = null;
 
@@ -258,14 +256,36 @@ Singleproduct
     bbbImage.setAttribute('src', imageUrl);
     }
     
-  function zoomIn(container) {
-    var largeImage = container.querySelector('.product__details__pic__item--large');
-    largeImage.style.transform = 'scale(1.2)';
+    function enlargeImage(imageUrl) {
+        var enlargedImage = document.getElementById('enlarged-image');
+
+        if (enlargedImage) {
+            // If the enlarged image already exists, remove it
+            document.body.removeChild(enlargedImage);
+        } else {
+            // If the enlarged image doesn't exist, create and display it
+            enlargedImage = document.createElement('div');
+            enlargedImage.innerHTML = '<img src="' + imageUrl + '" class="img-fluid rounded" alt="Enlarged Image"  style="padding: 10px; max-width: 100vw; max-height: 100vh; background:white; border:2px solid black;"> ';
+            enlargedImage.id = 'enlarged-image';
+            enlargedImage.style.position = 'fixed';
+            enlargedImage.style.top = '0';
+            enlargedImage.style.left = '0';
+            enlargedImage.style.width = '100%';
+            enlargedImage.style.height = '100%';
+            enlargedImage.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+            enlargedImage.style.display = 'flex';
+            enlargedImage.style.alignItems = 'center';
+            enlargedImage.style.justifyContent = 'center';
+            enlargedImage.style.zIndex = '1000';
+            enlargedImage.onclick = function () {
+                // Clicking anywhere on the overlay will close it
+                document.body.removeChild(enlargedImage);
+            };
+            document.body.appendChild(enlargedImage);
+        }
     }
     
-  function zoomOut(container) {
-    var largeImage = container.querySelector('.product__details__pic__item--large');
-    largeImage.style.transform = 'scale(1)';
-    }
+  
 </script>
+
 {% endblock %}
