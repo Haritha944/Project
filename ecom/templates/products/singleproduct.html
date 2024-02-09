@@ -47,7 +47,7 @@ Singleproduct
                     </div>
                     <div class="d-flex">
                         {% for image in images %}
-                        <div class="zoom-container" onmouseover="zoomIn(this)" onmouseout="zoomOut(this)">
+                        <div class="zoom-container" >
                             <img src="/media/{{image.image}}" alt="" width="150px" height="150px" id="aaa"
                                  onclick="swapImages(this); enlargeImage('/media/{{image.image}}', 'bbb')" style="position: relative;
                                  overflow: hidden;">
