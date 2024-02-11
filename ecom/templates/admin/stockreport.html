@@ -1,0 +1,34 @@
+{% extends 'admin/adminmain.html' %}
+{% load static %}
+{% block styles %}
+{% endblock %}
+{% block content %}
+<!-- Stock Report Table -->
+<h2 class="mt-4">Stock Report</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Product Title</th>
+            <th>Category</th>
+            <th>Subcategory</th>
+            <th>Image</th>
+            <th>Available Stock </th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for product in stock  %}
+            <tr>
+                <td>{{ product.product.product_name }}</td>
+                <td>{{ product.product.category }}</td>
+                <td>{{ product.product.subcategory }}</td>
+                <td><img src="/media/{{product.product.images}}" alt="{{ product.product_name }}" width="100"></td>
+                <td>{{ product.stock }}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+
+
+
+{% endblock %}
