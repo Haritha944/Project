@@ -222,7 +222,6 @@ def cancelorder(request,order_item_id):
         order.status = 'Cancelled'
         order.save()
         order_items = OrderItem.objects.filter(order=order)
-        print(order.payment.payment_method)
         if order.payment.payment_method == 'Razorpay' or order.payment.payment_method == 'Wallet':
             email = request.user
             user = User.objects.get(email=email)
@@ -330,16 +329,7 @@ def updatestatus(request, order_id, new_status):
         order.status = new_status
         order.save()
     
-    
-        if order.status == 'Returned':
-            email = order.user.email
-            user = User.objects.get(email=email)
-            userwallet = UserWallet()
-            userwallet.user = user
-            userwallet.amount += order.total_price
-            userwallet.transaction = 'Credited'
-            userwallet.save()
-            user.save()
+           
         order_item = OrderItem.objects.filter(order=order)
         context = {
                 'order': order,
@@ -387,7 +377,23 @@ def returnapprove(request,order_id):
     order_item = OrderItem.objects.filter(order=order)
     for item in order_item:
         item.status = "Returned"
-        item.save()
+        item.save()  
+    if order.status == "Returned":
+        if order.payment.payment_method == 'Razorpay' or order.payment.payment_method == 'Wallet':
+            user = order.user
+            userwallet = UserWallet()
+            userwallet.user = user
+            if userwallet is not None:
+                latest_userwallet  = UserWallet.objects.filter(user=user, transaction='Credited').order_by('-created_at').values('amount').first()
+                latest_amount = latest_userwallet['amount'] if latest_userwallet else 0
+                userwallet.amount = latest_amount + order.total_price
+                userwallet.transaction = 'Credited'
+                userwallet.save()
+            else:
+    
+                userwallet = UserWallet.objects.create(user=user, amount=order.total_price, transaction='Credited')
+                userwallet.save()
+    user.save() 
     context = {
         'order' : order,
         'order_item' : order_item,
@@ -397,6 +403,7 @@ def returnapprove(request,order_id):
 def mywallet(request):
     user = request.user 
     wallet_transaction = UserWallet.objects.filter(user=request.user)
+    
     
     try:
         wallets = UserWallet.objects.filter(user=user).order_by('-created_at')
